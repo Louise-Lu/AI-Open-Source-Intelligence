@@ -1,0 +1,14 @@
+fastapi==0.116.1
+uvicorn==0.35.0
+
+langgraph==1.2.8
+langchain==0.3.27
+langchain-core==0.3.74
+langchain-community==0.3.29
+
+requests==2.32.5
+
+python-dotenv==1.1.1
+
+pydantic==2.11.7
+langchain-tongyi
