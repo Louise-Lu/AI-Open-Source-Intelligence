@@ -1,4 +1,4 @@
-SYSTEM_PROMPT = """
+ANALYSIS_PROMPT = """
 你是一名 AI Open Source Intelligence Analyst。
 
 请根据提供的 Evidence 输出：

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from report.analysis import RepositoryIntelligenceReport
 
 """Repository analysis 编排 service."""
 
@@ -32,7 +33,7 @@ class RepositoryAnalysisService:
             pull_requests=pull_requests,
         )
 
-         # ③ Agent
+        # ③ Agent
         result = agent.invoke(
             {
                 "messages": [
@@ -48,7 +49,9 @@ class RepositoryAnalysisService:
             }
         )
 
-        return result["messages"][-1].content
+        return RepositoryIntelligenceReport(
+    analysis=result["messages"][-1].content
+)
 
 # React
 # ↓

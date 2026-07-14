@@ -1,12 +1,12 @@
 from fastapi import APIRouter
 
 from services.analysis_service import RepositoryAnalysisService
+from services.profile_service import RepositoryProfileService
+
 from tools.github import GitHubAPI
 
 router = APIRouter()
-
 github = GitHubAPI()
-analysis_service = RepositoryAnalysisService()
 
 
 @router.get("/")
@@ -82,7 +82,14 @@ def contributors(owner: str, repo: str, anon: bool = False, page: int = 1, per_p
     }
 
 
-@router.get("/analysis/{owner}/{repo}")
+@router.get("/repositories/{owner}/{repo}/analysis")
 def analyze_repository(owner: str, repo: str):
     """Run a one-shot repository analysis through the existing Agent."""
-    return {"analysis": analysis_service.analyze(owner, repo)}
+    analysis_service = RepositoryAnalysisService()
+    return analysis_service.analyze(owner, repo)
+
+@router.get("/repositories/{owner}/{repo}/profile")
+def get_profile(owner: str, repo: str):
+
+    profile_service = RepositoryProfileService()
+    return profile_service.generate(owner, repo)
