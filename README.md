@@ -10,7 +10,7 @@ Agent开发：
 LangGraph
 
 模型：
-DeepSeek R1 / OpenRouter（你自己选）
+DeepSeek R1 / OpenRouter
 
 GitHub：
 GitHub API

@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from services.analysis_service import RepositoryAnalysisService
 from services.profile_service import RepositoryProfileService
+from services.comparison_service import RepositoryComparisonService
 
 from tools.github import GitHubAPI
 
@@ -93,3 +94,27 @@ def get_profile(owner: str, repo: str):
 
     profile_service = RepositoryProfileService()
     return profile_service.generate(owner, repo)
+
+
+
+@router.get("/compare")
+def compare_repositories(
+    repo1: str,
+    repo2: str,
+):
+    """
+    repo1=langchain-ai/langgraph
+    repo2=microsoft/autogen
+    """
+
+    owner1, name1 = repo1.split("/")
+
+    owner2, name2 = repo2.split("/")
+    
+    comparison_service = RepositoryComparisonService()
+    return comparison_service.analyze(
+        owner1,
+        name1,
+        owner2,
+        name2,
+    )
