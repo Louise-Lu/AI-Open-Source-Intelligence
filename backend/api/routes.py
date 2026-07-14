@@ -1,9 +1,5 @@
 from fastapi import APIRouter
 
-from services.analysis_service import RepositoryAnalysisService
-from services.profile_service import RepositoryProfileService
-from services.comparison_service import RepositoryComparisonService
-
 from tools.github import GitHubAPI
 
 router = APIRouter()
@@ -81,40 +77,3 @@ def contributors(owner: str, repo: str, anon: bool = False, page: int = 1, per_p
             per_page=per_page,
         )
     }
-
-
-@router.get("/repositories/{owner}/{repo}/analysis")
-def analyze_repository(owner: str, repo: str):
-    """Run a one-shot repository analysis through the existing Agent."""
-    analysis_service = RepositoryAnalysisService()
-    return analysis_service.analyze(owner, repo)
-
-@router.get("/repositories/{owner}/{repo}/profile")
-def get_profile(owner: str, repo: str):
-
-    profile_service = RepositoryProfileService()
-    return profile_service.generate(owner, repo)
-
-
-
-@router.get("/compare")
-def compare_repositories(
-    repo1: str,
-    repo2: str,
-):
-    """
-    repo1=langchain-ai/langgraph
-    repo2=microsoft/autogen
-    """
-
-    owner1, name1 = repo1.split("/")
-
-    owner2, name2 = repo2.split("/")
-    
-    comparison_service = RepositoryComparisonService()
-    return comparison_service.analyze(
-        owner1,
-        name1,
-        owner2,
-        name2,
-    )

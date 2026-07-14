@@ -19,6 +19,14 @@
 
 Repository Intelligence Report
 
+架构：workflow
+GitHub API
+↓
+EvidenceBuilder
+↓
+LLM Analysis - markdown 
+
+
 ---
 
 ## Phase 2
@@ -38,6 +46,24 @@ Weekly Report
 Follow
 
 Notification
+
+todo:
+Repository Analysis        ✅ 已完成
+↓
+
+Project Profile           ✅ 已完成
+↓
+
+Release Diff
+
+↓
+
+Repository Comparison  ✅ 已完成
+
+↓
+
+Roadmap Prediction
+
 
 ---
 

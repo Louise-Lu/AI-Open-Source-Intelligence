@@ -1,5 +1,9 @@
 from fastapi import FastAPI
-from api.routes import router
+from api.analysis import router as analysis_router
+from api.compare import router as compare_router
+from api.profile import router as profile_router
+from api.release_diff import router as release_diff_router
+from api.routes import router as base_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,6 +19,8 @@ app.add_middleware(
     allow_headers=["*"],  # 允许所有请求头
 )
 
-# 所有 API 都放在 api/routes.py
-app.include_router(router)
-
+app.include_router(base_router)
+app.include_router(profile_router)
+app.include_router(analysis_router)
+app.include_router(compare_router)
+app.include_router(release_diff_router)
