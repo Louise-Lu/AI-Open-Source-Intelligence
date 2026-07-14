@@ -1,154 +1,414 @@
-# AI Open Source Intelligence Platform 系统架构
-- Architecture Decision（架构决策）
-> Version: MVP v1.0
+# GitHub AI Intelligence Platform - 系统架构
+
+## 1. 项目目标
+
+GitHub AI Intelligence Platform 是一个基于 LLM 的开源项目情报分析平台。
+
+目标不是做 GitHub ChatBot，而是帮助开发者、技术负责人和 AI 创业团队快速理解一个开源项目：
+
+- 项目定位
+- 社区活跃度
+- 企业成熟度
+- 技术路线
+- Release 演进
+- 多项目比较
+
+目前 V1 采用 Workflow Architecture。
+
+未来 V2 V3...逐步演进到真正的 AI Agent。
 
 ---
 
-# 1. 项目定位
+# 2. 当前架构（V1）
 
-AI Open Source Intelligence Platform（AI 开源情报平台）不是一个 GitHub 搜索工具，也不是一个 GitHub Summary 工具。
+```
+                用户
 
-它是一个帮助 AI 产品经理、AI 创业者、技术负责人持续跟踪 AI 开源生态的智能分析平台。
+                  │
 
-产品目标：
+             FastAPI API
 
-> 持续追踪 AI 开源项目，自动收集证据，分析趋势，并生成结构化情报报告，帮助用户快速完成技术调研和技术选型。
+                  │
 
----
-
-# 2. 总体架构
-
-
-```text
-                React Dashboard
-                        │
-                        ▼
-                  FastAPI Backend
-                        │
-        ┌───────────────┴───────────────┐
-        ▼                               ▼
- GitHub Intelligence Agent         Report Service
-        │                               │
-        ▼                               ▼
- Evidence Builder              Structured Report
-        │
-        ▼
- GitHub Tools
+            Service Layer
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+ GitHub API Client      Evidence Builder 
+        │                   │
+        └─────────┬─────────┘
+                  │
+         Structured Evidence
+                  │
+             Qwen-Max LLM 
+                  │
+        Markdown / JSON Report
+                  │
+              Frontend
 ```
 
-
 ---
 
-# 3. 分层设计
+# 3. 分层职责
 
-## Presentation Layer（展示层）
+## API Layer
 
 负责：
 
-- Dashboard
-- Repository 页面
-- Compare 页面
-- 趋势分析页面
+- HTTP 请求
+- 参数校验
+- 返回 JSON
 
-技术：
+例如：
 
-- React
-- TailwindCSS
+```
+POST /analysis
 
----
+POST /profile
 
-## API Layer（接口层）
+POST /comparison
 
-负责：
+POST /release-diff
+```
 
-- REST API
-- Streaming
-- Agent 调用
-FastAPI（main.py + api/）：负责 HTTP、参数校验、调用业务。
-技术：
-
-- FastAPI
+API 不包含业务逻辑。
 
 ---
 
-## Agent Layer（智能体）
+## Service Layer
 
 负责：
 
-- 理解用户问题
-- 决定调用哪些 Tool
-- 根据 Evidence 完成推理 
-- 输出 Report
-Agent：负责推理，决定调用哪些 Tool。
-技术：
+整个业务流程。
 
-- LangGraph create_react_agent
+例如：
 
-workflow:
+Repository Analysis：
 
-User
+```
+获取 GitHub 数据
+
 ↓
-Planner（LLM）
-↓
-Tool Calling
-↓
+
 Evidence Builder
+
 ↓
-LLM Analysis
+
+调用 LLM
+
 ↓
-Structured Report
+
+返回报告
+```
+
+Service 不负责：
+
+- GitHub API
+- Prompt
+- 数据结构
+
+它只负责组织流程。
+
 ---
 
-## Evidence Layer（证据层）
+## GitHub API Layer
+
+统一封装 GitHub REST API。
+
+例如：
+
+```
+RepositoryTool
+
+ReleaseTool
+
+IssueTool
+
+PullRequestTool
+
+ReadmeTool
+```
+
+所有 HTTP 请求统一管理。
+
+方便以后：
+
+- Token
+- Retry
+- Cache
+
+统一扩展。
+
+---
+
+## Evidence Builder
+
+作用：
+
+把 GitHub 原始 JSON
+
+转换成
+
+统一结构化 Evidence。
+
+例如：
+
+```
+GitHub JSON
+
+↓
+
+RepositoryInfo
+
+↓
+
+GitHubEvidence
+```
+
+Builder 不负责分析。
+
+Builder 只负责：
+
+- 清洗
+- 聚合
+- 标准化
+
+---
+
+## LLM Layer
 
 负责：
-聚合和清洗 Tool 返回的数据。
-统一整理多个 Tool 的数据。
+
+根据 Evidence
+
+输出：
+
+Markdown
+
+或者
+
+Structured JSON。
 
 例如：
 
-Repository
-
-README
-
-Release
-
-Issue
-
-Pull Request
-
-Contributor
+Analysis
 
 ↓
 
-Evidence
+Markdown
 
-Agent 永远基于 Evidence 推理。
+Profile
+
+↓
+
+RepositoryProfile
+
+Comparison
+
+↓
+
+Markdown
+
+Release Diff
+
+↓
+
+Markdown
+
+LLM 不直接调用 GitHub API。
 
 ---
 
-## Tool Layer（工具层）
+# 4. 当前为什么不是 Agent
 
-每个 Tool 负责一个 GitHub API。
-Tools：负责访问 GitHub API。
+目前：
+
+所有流程都是固定的。
+
 例如：
+
+Analysis
+
+```
+GitHub API
+
+↓
+
+Evidence Builder
+
+↓
+
+LLM
+```
+
+LLM 不需要决定：
+
+- 调哪个 Tool
+- 调几次 Tool
+
+因此：
+
+当前属于：
+
+LLM Workflow。
+
+不是：
+
+AI Agent。
+
+---
+
+# 5. V2 演进
+
+新增：
+
+```
+POST /chat
+```
+
+用户：
+
+```
+Which framework is better for enterprise AI?
+```
+
+Agent：
+
+```
+Thought
+
+↓
 
 Repository Tool
 
+↓
+
+README Tool
+
+↓
+
 Release Tool
+
+↓
 
 Issue Tool
 
-Readme Tool
+↓
 
-Contributor Tool
+Answer
+```
 
-Pull Request Tool
+此时：
+
+LLM 自主决定：
+
+调用哪些 Tool。
+
+真正进入：
+
+ReAct Agent。
 
 ---
 
-## Data Source
+# 6. V3 演进
 
-GitHub REST API
+采用 Multi-Agent。
 
-Report：负责生成结构化输出。
+```
+                Supervisor
+
+        ┌────────┼────────┐
+
+ Repository   Release   Issue
+
+     │           │         │
+
+      └───────Report Agent───────┘
+```
+
+各 Agent：
+
+负责：
+
+自己的专业领域。
+
+最后：
+
+Supervisor 汇总。
+
+---
+
+# 7. 当前目录
+
+```
+backend/
+
+api/
+
+services/
+
+github/
+
+report/
+
+prompts/
+
+models/
+
+tools/
+```
+
+职责清晰。
+
+方便继续扩展。
+
+---
+
+# 8. 当前能力（V1）
+
+✅ Repository Analysis
+
+输出：
+
+Markdown
+
+---
+
+✅ Repository Profile
+
+输出：
+
+Structured JSON
+
+---
+
+✅ Repository Comparison
+
+输出：
+
+Markdown
+
+---
+
+✅ Release Diff
+
+输出：
+
+Markdown
+
+---
+
+# 9. 后续 Roadmap
+
+V2
+
+- Chat Agent
+- Tool Calling
+- Memory
+
+V3
+
+- Multi-Agent
+- Planning
+- RAG
+- Knowledge Base
