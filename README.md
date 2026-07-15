@@ -257,7 +257,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-# 当前版本
+# MVP
 
 V1
 
@@ -268,7 +268,7 @@ V1
 
 ---
 
-# Roadmap
+# 当前版本
 
 ## V2
 
@@ -287,6 +287,23 @@ V1
 
 ---
 
+V1
+
+GitHub Intelligence Platform
+
+↓
+
+V2
+
+AI Repository Assistant
+
+↓
+
+V3
+
+Multi-Agent Intelligence Platform
+
+---
 # License
 
 MIT

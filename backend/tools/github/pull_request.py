@@ -2,29 +2,77 @@ from __future__ import annotations
 
 from typing import Any
 
-from .utils import normalize_list
 
 
 class PullRequestTool:
-    """Pull request helper methods."""
+
+    """
+    获取 GitHub Pull Request 信息
+
+    用于：
+    - 开发活跃度
+    - 最近代码变化
+    """
+
 
     client: Any
 
-    def list_pull_requests(
+
+    def get_pull_requests(
         self,
-        owner: str,
-        repo: str,
-        state: str = "open",
-        per_page: int = 30,
-        page: int = 1,
-    ) -> list[dict[str, Any]]:
-        response = self.client.get(
-            f"/repos/{owner}/{repo}/pulls",
-            params={"state": state, "per_page": per_page, "page": page},
+        owner:str,
+        repo:str
+    )->dict[str,Any]:
+
+
+        response=self.client.get(
+            f"/repos/{owner}/{repo}/pulls"
         )
-        return normalize_list(response.json())
 
-    def get_pull_request(self, owner: str, repo: str, number: int) -> dict[str, Any]:
-        response = self.client.get(f"/repos/{owner}/{repo}/pulls/{number}")
-        return response.json()
 
+        prs=response.json()
+
+
+        formatted=[]
+
+
+        for pr in prs[:5]:
+
+            formatted.append(
+                {
+
+                    "title":
+                        pr.get("title"),
+
+                    "state":
+                        pr.get("state"),
+
+                    "created_at":
+                        pr.get("created_at"),
+
+                    "merged":
+                        pr.get("merged_at") is not None
+
+                }
+            )
+
+
+        open_count=len(
+            [
+                pr
+                for pr in prs
+                if pr.get("state")=="open"
+            ]
+        )
+
+
+        return {
+
+            "open_pr_count":
+                open_count,
+
+
+            "recent_pull_requests":
+                formatted
+
+        }

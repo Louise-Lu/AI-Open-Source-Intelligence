@@ -4,7 +4,6 @@ from tools.github.client import GitHubAPI
 from evidence.builder import EvidenceBuilder
 
 from llms.qwen import qwen_model
-
 from prompts.profile import PROFILE_PROMPT
 
 from report.profile import RepositoryProfile
@@ -19,8 +18,8 @@ class RepositoryProfileService:
     def generate(self, owner: str, repo: str):
         repository = self.github.get_repository(owner, repo)
         readme = self.github.get_readme(owner, repo)
-        releases = self.github.get_release(owner, repo)
-        issues = self.github.list_issues(owner=owner, repo=repo)
+        releases = self.github.get_releases(owner, repo)
+        issues = self.github.get_issues(owner=owner, repo=repo)
 
         evidence = self.builder.build(
             repository=repository,

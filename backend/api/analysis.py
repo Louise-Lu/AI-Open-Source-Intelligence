@@ -2,7 +2,6 @@ from fastapi import APIRouter
 
 from services.analysis_service import RepositoryAnalysisService
 
-
 router = APIRouter(tags=["Analysis"])
 
 service = RepositoryAnalysisService()
@@ -11,4 +10,18 @@ service = RepositoryAnalysisService()
 @router.get("/repositories/{owner}/{repo}/analysis")
 def analyze_repository(owner: str, repo: str):
     """Run a one-shot repository analysis through the existing Agent."""
-    return service.analyze(owner, repo)
+    analysis = service.analyze(owner, repo)
+
+    return {
+        "analysis": analysis
+    }
+
+# @router.get(
+#     "/repositories/{owner}/{repo}/analysis",
+#     response_model=AnalysisResponse
+# )
+# def analyze_repository(owner: str, repo: str):
+
+#     return AnalysisResponse(
+#         analysis=service.analyze(owner, repo)
+#     )

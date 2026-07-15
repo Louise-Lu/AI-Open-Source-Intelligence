@@ -22,7 +22,7 @@ class ReleaseDiffService:
         new_tag: str,
     ) -> str:
 
-        releases = self.github.get_release(owner, repo)
+        releases = self.github.get_releases(owner, repo)
 
         old_release = next(
             release

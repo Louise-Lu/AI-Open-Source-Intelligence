@@ -4,13 +4,50 @@ from typing import Any
 
 
 class RepositoryTool:
-    """Repository metadata helper 元数据 
-    名称 所有者 描述 星级 分支 语言 主题 许可证 主页 创建时间 更新时间."""
+    """
+    获取 GitHub Repository 基础信息
+
+    返回：
+    - full_name
+    - description
+    - language
+    - stars
+    - forks
+    - topics
+    - license
+    - created_at
+    - updated_at
+    """
 
     client: Any
 
-    def get_repository(self, owner: str, repo: str) -> dict[str, Any]:
-        # 仓库元数据是用户界面（UI）所使用的主要摘要视图
-        response = self.client.get(f"/repos/{owner}/{repo}")
-        return response.json()
 
+    def get_repository(
+        self,
+        owner: str,
+        repo: str
+    ) -> dict[str, Any]:
+
+        response = self.client.get(
+            f"/repos/{owner}/{repo}"
+        )
+
+        data = response.json()
+
+        license_info = data.get("license")
+
+        return {
+            "full_name": data.get("full_name"),
+            "description": data.get("description"),
+            "language": data.get("language"),
+            "stars": data.get("stargazers_count", 0),
+            "forks": data.get("forks_count", 0),
+            "topics": data.get("topics", []),
+            "license": (
+                license_info.get("name")
+                if license_info
+                else None
+            ),
+            "created_at": data.get("created_at"),
+            "updated_at": data.get("updated_at"),
+        }

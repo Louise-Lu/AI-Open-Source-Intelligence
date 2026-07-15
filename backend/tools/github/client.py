@@ -4,8 +4,9 @@ import os
 from typing import Any
 
 import requests
+import time
 
-from .contributor import ContributorTool
+# from .contributor import ContributorTool
 from .issue import IssueTool
 from .pull_request import PullRequestTool
 from .readme import ReadmeTool
@@ -31,10 +32,40 @@ class GitHubClient:
         if self.token:
             self.session.headers["Authorization"] = f"Bearer {self.token}"  # ② 添加到请求头
 
-    def get(self, path: str, params: dict[str, Any] | None = None) -> requests.Response:
+    # def get(self, path: str, params: dict[str, Any] | None = None) -> requests.Response:
+    #     url = f"{self.BASE_URL}{path}"
+    #     response = self.session.get(url, params=build_query(params), timeout=30)
+    #     raise_for_github_response(response)
+    #     return response
+
+
+    def get(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None
+    ) -> requests.Response:
+
         url = f"{self.BASE_URL}{path}"
-        response = self.session.get(url, params=build_query(params), timeout=30)
+
+        print("GitHub API calling:", url)
+
+        start = time.time()
+
+        response = self.session.get(
+            url,
+            params=build_query(params),
+            timeout=30
+        )
+
+        print(
+            "GitHub API finished:",
+            response.status_code,
+            round(time.time()-start, 2),
+            "seconds"
+        )
+
         raise_for_github_response(response)
+
         return response
 
 
@@ -44,9 +75,8 @@ class GitHubAPI(
     ReleaseTool,
     IssueTool,
     PullRequestTool,
-    ContributorTool,
+    # ContributorTool,
 ):
-    """Facade that keeps the old `GitHubAPI` entry point working."""
 
     def __init__(self, token: str | None = None):
         self.client = GitHubClient(token=token)

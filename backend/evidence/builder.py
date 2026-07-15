@@ -79,3 +79,15 @@ class EvidenceBuilder:
         if isinstance(topics, list):
             return [topic for topic in topics if isinstance(topic, str)]
         return []
+
+
+#   GitHub API JSON
+#         |
+#         v
+#   EvidenceBuilder
+#         |
+#         v
+# Pydantic Evidence Model
+#         |
+#         v
+#        LLM

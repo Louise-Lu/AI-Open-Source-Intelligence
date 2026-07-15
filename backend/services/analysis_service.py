@@ -1,15 +1,12 @@
 from __future__ import annotations
-from report.analysis import RepositoryIntelligenceReport
 
-"""Repository analysis 编排 service."""
-
-from agent.graph import agent
-from evidence import EvidenceBuilder
 from tools.github.client import GitHubAPI
+from evidence import EvidenceBuilder
 
+from llms.qwen import qwen_model
+from prompts.analysis import ANALYSIS_PROMPT
 
 class RepositoryAnalysisService:
-    """Fetch GitHub data, build evidence, and run the LangGraph agent."""
 
     def __init__(self) -> None:
         self.github = GitHubAPI()
@@ -20,9 +17,9 @@ class RepositoryAnalysisService:
         # ① 调 GitHub
         repository = self.github.get_repository(owner, repo)
         readme = self.github.get_readme(owner, repo)
-        releases = self.github.get_release(owner, repo)
-        issues = self.github.list_issues(owner=owner, repo=repo)
-        pull_requests = self.github.list_pull_requests(owner=owner, repo=repo)
+        releases = self.github.get_releases(owner, repo)
+        issues = self.github.get_issues(owner=owner, repo=repo)
+        pull_requests = self.github.get_pull_requests(owner=owner, repo=repo)
 
         # ② Builder 清洗，聚合，整理数据 
         evidence = self.builder.build(
@@ -33,29 +30,20 @@ class RepositoryAnalysisService:
             pull_requests=pull_requests,
         )
 
-        # ③ Agent
-        result = agent.invoke(
-            {
-                "messages": [
-                    (
-                        "user",
-                        f"""
-请分析下面 GitHub Repository。
-
+        prompt = f"""
+{ANALYSIS_PROMPT}
+Evidence:
 {evidence.model_dump_json(indent=2)}
-""",
-                    )
-                ]
-            }
-        )
+"""
+        response = qwen_model.invoke(prompt)
 
-        return RepositoryIntelligenceReport(
-    analysis=result["messages"][-1].content
-)
+        return response.content
+    ## 直接返回 字符串 markdown 
+
 
 # React
 # ↓
-# POST /repositories/analyze
+# GET /repositories/analyze
 # ↓
 # api/repository.py
 # ↓
@@ -72,10 +60,8 @@ class RepositoryAnalysisService:
 
 # EvidenceBuilder.build() = GitHubEvidence
 # ↓
-# LangGraph Agent
+# LLM
 # ↓
-# RepositoryIntelligenceReport
-# ↓
-# JSON
+# Markdown - string
 # ↓
 # React

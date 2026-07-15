@@ -275,27 +275,36 @@ Which framework is better for enterprise AI?
 Agent：
 
 ```
-Thought
+React Dashboard
 
 ↓
 
-Repository Tool
+FastAPI
 
 ↓
 
-README Tool
+Chat Service
 
 ↓
 
-Release Tool
+LangGraph ReAct Agent
 
 ↓
 
-Issue Tool
+GitHub Tools
 
 ↓
 
-Answer
+Evidence Builder（可选）
+
+↓
+
+LLM
+
+↓
+
+Streaming
+
 ```
 
 此时：
