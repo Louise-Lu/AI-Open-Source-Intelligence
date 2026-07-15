@@ -35,50 +35,89 @@ class EvidenceBuilder:
         )
 
     def _build_repository(
-        self, repository: dict[str, Any] | None
+        self,
+        repository: dict[str, Any] | None
     ) -> RepositoryInfo | None:
+
         if not repository:
             return None
 
-        license_info = repository.get("license")
-        topics = self._normalize_topics(repository.get("topics"))
-
         return RepositoryInfo(
+
             full_name=repository.get("full_name"),
+
             description=repository.get("description"),
+
             language=repository.get("language"),
-            stars=int(repository.get("stargazers_count") or 0),
-            forks=int(repository.get("forks_count") or 0),
-            topics=topics,
-            license=license_info.get("name") if isinstance(license_info, dict) else None,
+
+            stars=int(repository.get("stars") or 0),
+
+            forks=int(repository.get("forks") or 0),
+
+            topics=repository.get("topics", []),
+
+            license=repository.get("license"),
+
+            created_at=repository.get("created_at"),
+
+            updated_at=repository.get("updated_at"),
         )
 
-    def _build_release(self, release: dict[str, Any]) -> ReleaseInfo:
+
+    def _build_release(
+        self,
+        release: dict[str, Any]
+    ) -> ReleaseInfo:
+
         return ReleaseInfo(
-            tag_name=release.get("tag_name"),
-            published_at=release.get("published_at"),
-            body=release.get("body"),
-        )
 
-    def _build_issue(self, issue: dict[str, Any]) -> IssueInfo:
+            tag_name=release.get("tag_name"),
+
+            name=release.get("name"),
+
+            published_at=release.get("published_at"),
+
+            body=release.get("body"),
+    )
+
+    def _build_issue(
+        self,
+        issue: dict[str, Any]
+    ) -> IssueInfo:
+
+        labels=[]
+
+        for label in issue.get("labels", []):
+            if isinstance(label, dict):
+                labels.append(
+                    label.get("name")
+                )
+
+
         return IssueInfo(
             title=issue.get("title"),
             state=issue.get("state"),
             created_at=issue.get("created_at"),
             comments=int(issue.get("comments") or 0),
-        )
+            labels=labels
+    )
 
-    def _build_pull_request(self, pull_request: dict[str, Any]) -> PullRequestInfo:
+    def _build_pull_request(
+    self,
+    pull_request: dict[str, Any]
+    ) -> PullRequestInfo:
+
         return PullRequestInfo(
-            title=pull_request.get("title"),
-            state=pull_request.get("state"),
-            created_at=pull_request.get("created_at"),
-        )
 
-    def _normalize_topics(self, topics: Any) -> list[str]:
-        if isinstance(topics, list):
-            return [topic for topic in topics if isinstance(topic, str)]
-        return []
+            title=pull_request.get("title"),
+
+            state=pull_request.get("state"),
+
+            created_at=pull_request.get("created_at"),
+
+            merged=pull_request.get("merged", False)
+
+        )
 
 
 #   GitHub API JSON

@@ -20,59 +20,35 @@ class PullRequestTool:
 
     def get_pull_requests(
         self,
-        owner:str,
-        repo:str
-    )->dict[str,Any]:
+        owner: str,
+        repo: str
+    ) -> list[dict[str, Any]]:
 
 
-        response=self.client.get(
+        response = self.client.get(
             f"/repos/{owner}/{repo}/pulls"
         )
 
 
-        prs=response.json()
+        prs = response.json()
 
 
-        formatted=[]
+        formatted = []
 
 
         for pr in prs[:5]:
 
             formatted.append(
                 {
+                    "title": pr.get("title"),
 
-                    "title":
-                        pr.get("title"),
+                    "state": pr.get("state"),
 
-                    "state":
-                        pr.get("state"),
+                    "created_at": pr.get("created_at"),
 
-                    "created_at":
-                        pr.get("created_at"),
-
-                    "merged":
-                        pr.get("merged_at") is not None
-
+                    "merged": pr.get("merged_at") is not None
                 }
             )
 
 
-        open_count=len(
-            [
-                pr
-                for pr in prs
-                if pr.get("state")=="open"
-            ]
-        )
-
-
-        return {
-
-            "open_pr_count":
-                open_count,
-
-
-            "recent_pull_requests":
-                formatted
-
-        }
+        return formatted

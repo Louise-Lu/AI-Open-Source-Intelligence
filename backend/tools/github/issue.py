@@ -18,9 +18,9 @@ class IssueTool:
 
     def get_issues(
         self,
-        owner:str,
-        repo:str
-    ) -> dict[str,Any]:
+        owner: str,
+        repo: str
+    ) -> list[dict[str, Any]]:
 
 
         response = self.client.get(
@@ -28,16 +28,16 @@ class IssueTool:
         )
 
 
-        issues=response.json()
+        issues = response.json()
 
 
-        formatted=[]
+        formatted = []
 
 
-        for issue in issues[:5]:
+        for issue in issues:
 
-            # GitHub API 会把 PR 也返回
-            # 排除 pull request
+            # GitHub issues API 会返回 PR
+            # 排除 PR
 
             if "pull_request" in issue:
                 continue
@@ -45,37 +45,21 @@ class IssueTool:
 
             formatted.append(
                 {
-                    "title":
-                        issue.get("title"),
+                    "title": issue.get("title"),
 
-                    "state":
-                        issue.get("state"),
+                    "state": issue.get("state"),
 
-                    "created_at":
-                        issue.get("created_at"),
+                    "created_at": issue.get("created_at"),
 
-                    "comments":
-                        issue.get("comments")
+                    "comments": int(
+                        issue.get("comments") or 0
+                    )
                 }
             )
 
 
-        open_count=len(
-            [
-                i for i in issues
-                if i.get("state")=="open"
-                and "pull_request" not in i
-            ]
-        )
+            if len(formatted) >= 5:
+                break
 
 
-        return {
-
-            "open_issue_count":
-                open_count,
-
-
-            "recent_issues":
-                formatted
-
-        }
+        return formatted

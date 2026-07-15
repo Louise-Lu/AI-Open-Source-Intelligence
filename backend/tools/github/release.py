@@ -18,11 +18,13 @@ class ReleaseTool:
         self,
         owner: str,
         repo: str
-    ) -> dict[str, Any]:
+    ) -> list[dict[str, Any]]:
+
 
         response = self.client.get(
             f"/repos/{owner}/{repo}/releases"
         )
+
 
         releases = response.json()
 
@@ -34,27 +36,11 @@ class ReleaseTool:
             formatted.append(
                 {
                     "tag_name": release.get("tag_name"),
-
                     "name": release.get("name"),
-
-                    "published_at": release.get(
-                        "published_at"
-                    ),
-
+                    "published_at": release.get("published_at"),
                     "body": release.get("body"),
                 }
             )
 
 
-        return {
-
-            "latest_release":
-                formatted[0]
-                if formatted
-                else None,
-
-
-            "recent_releases":
-                formatted
-
-        }
+        return formatted

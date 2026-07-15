@@ -15,6 +15,8 @@ def get_repository_info(owner:str, repo:str):
     - language
     - license
     - topics
+    - created_at
+    - updated_at
 
     不包含：
     - README
@@ -38,11 +40,19 @@ def readme(owner: str, repo: str):
 
 @tool
 def releases(owner: str, repo: str):
-    """获取 Releases 列表
-    
-    Args:
-        owner: GitHub 仓库的所有者用户名，例如 "langchain-ai"
-        repo: GitHub 仓库名称，例如 "langgraph"
+    """
+    获取 GitHub Repository 的 Release 信息。
+
+    用于：
+    - 查看版本号
+    - 查看发布时间
+    - 查看 release notes
+
+    不用于：
+    - star
+    - fork
+    - README
+    - 仓库基本信息
     """
     return github.get_releases(owner, repo)
 
