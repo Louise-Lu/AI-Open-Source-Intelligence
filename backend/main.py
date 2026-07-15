@@ -13,7 +13,7 @@ app = FastAPI(title="GitHub Intelligence Agent")
 # 配置 CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # 允许前端域名
+    allow_origins=["http://localhost:5173"],  # 允许前端域名
     allow_credentials=True,
     allow_methods=["*"],  # 允许所有 HTTP 方法
     allow_headers=["*"],  # 允许所有请求头

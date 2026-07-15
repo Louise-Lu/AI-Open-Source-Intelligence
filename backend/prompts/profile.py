@@ -39,8 +39,25 @@ Do NOT use the repository owner (e.g. Microsoft, Google, LangChain) as a scoring
 
 Writing Rules:
 
-- summary must be exactly one sentence describing the project.
-- recommendation must be exactly one sentence describing who should use this project.
+- summary 使用一句中文，总结"这个项目是什么、核心价值是什么"。
+- Recommendation should explain:
+
+- who should use this repository
+- in which scenarios it is most suitable
+
+Do not simply restate the repository description.
+
+Base the recommendation only on the provided evidence.
+
+
+recommendation 应说明：
+
+- 推荐给哪些开发者或团队
+- 适合哪些典型应用场景
+
+不要简单重复项目描述。
+recommendation 使用中文，不要重复 summary。
+
 - Do not copy the repository description directly.
 - Do not invent facts.
 - Use only the provided evidence.
