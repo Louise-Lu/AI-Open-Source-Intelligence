@@ -186,15 +186,6 @@ export default function Dashboard() {
             }
             bodyClassName="space-y-6 pt-6"
           >
-            <div className="space-y-3">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                GitHub AI Intelligence Platform
-              </h1>
-              <p className="max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
-                Analyze repositories, compare projects, and inspect release changes from a single
-                professional dashboard.
-              </p>
-            </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -280,140 +271,140 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-6 p-4 sm:p-6">
-            {activeTab === 'profile' ? <ProfileCard profile={profile} /> : null}
+              {activeTab === 'profile' ? <ProfileCard profile={profile} /> : null}
 
-            {activeTab === 'analysis' ? (
-              <MarkdownViewer
-                title="Analysis"
-                content={analysis}
-                emptyText="Run Analyze Repository to load the markdown analysis."
-              />
-            ) : null}
+              {activeTab === 'analysis' ? (
+                <MarkdownViewer
+                  title="Analysis"
+                  content={analysis}
+                  emptyText="Run Analyze Repository to load the markdown analysis."
+                />
+              ) : null}
 
-            {activeTab === 'comparison' ? (
-              <div className="space-y-6">
-                <div className="grid gap-4 xl:grid-cols-2">
-                  <RepositoryForm
-                    title="Repository A"
-                    helperText="Enter the first repository to compare."
-                    owner={compareRepoAOwner}
-                    repo={compareRepoAName}
-                    onOwnerChange={setCompareRepoAOwner}
-                    onRepoChange={setCompareRepoAName}
-                    showButton={false}
-                  />
-                  <RepositoryForm
-                    title="Repository B"
-                    helperText="Enter the second repository to compare."
-                    owner={compareRepoBOwner}
-                    repo={compareRepoBName}
-                    onOwnerChange={setCompareRepoBOwner}
-                    onRepoChange={setCompareRepoBName}
-                    showButton={false}
+              {activeTab === 'comparison' ? (
+                <div className="space-y-6">
+                  <div className="grid gap-4 xl:grid-cols-2">
+                    <RepositoryForm
+                      title="Repository A"
+                      helperText="Enter the first repository to compare."
+                      owner={compareRepoAOwner}
+                      repo={compareRepoAName}
+                      onOwnerChange={setCompareRepoAOwner}
+                      onRepoChange={setCompareRepoAName}
+                      showButton={false}
+                    />
+                    <RepositoryForm
+                      title="Repository B"
+                      helperText="Enter the second repository to compare."
+                      owner={compareRepoBOwner}
+                      repo={compareRepoBName}
+                      onOwnerChange={setCompareRepoBOwner}
+                      onRepoChange={setCompareRepoBName}
+                      showButton={false}
+                    />
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleComparison}
+                      disabled={comparisonLoading}
+                      className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                    >
+                      <ArrowRightLeft className="h-4 w-4" />
+                      {comparisonLoading ? 'Comparing...' : 'Compare'}
+                    </button>
+                  </div>
+
+                  <Alert message={comparisonError} />
+
+                  <MarkdownViewer
+                    title="Comparison"
+                    content={comparison}
+                    emptyText="Run Compare to render the markdown comparison."
                   />
                 </div>
+              ) : null}
 
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleComparison}
-                    disabled={comparisonLoading}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+              {activeTab === 'releaseDiff' ? (
+                <div className="space-y-6">
+                  <UiCard
+                    badge={
+                      <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <GitPullRequest className="h-3.5 w-3.5" />
+                        Release Diff
+                      </div>
+                    }
                   >
-                    <ArrowRightLeft className="h-4 w-4" />
-                    {comparisonLoading ? 'Comparing...' : 'Compare'}
-                  </button>
+                    <form onSubmit={handleReleaseDiff} className="space-y-6">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-medium text-slate-700">Owner</span>
+                          <input
+                            type="text"
+                            value={releaseOwner}
+                            onChange={(event) => setReleaseOwner(event.target.value)}
+                            placeholder="langchain-ai"
+                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                          />
+                        </label>
+
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-medium text-slate-700">Repo</span>
+                          <input
+                            type="text"
+                            value={releaseRepo}
+                            onChange={(event) => setReleaseRepo(event.target.value)}
+                            placeholder="langgraph"
+                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                          />
+                        </label>
+
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-medium text-slate-700">Old Tag</span>
+                          <input
+                            type="text"
+                            value={oldTag}
+                            onChange={(event) => setOldTag(event.target.value)}
+                            placeholder="v0.1.0"
+                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                          />
+                        </label>
+
+                        <label className="block">
+                          <span className="mb-2 block text-sm font-medium text-slate-700">New Tag</span>
+                          <input
+                            type="text"
+                            value={newTag}
+                            onChange={(event) => setNewTag(event.target.value)}
+                            placeholder="v0.2.0"
+                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                          />
+                        </label>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          disabled={releaseDiffLoading}
+                          className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+                        >
+                          <GitPullRequest className="h-4 w-4" />
+                          {releaseDiffLoading ? 'Comparing Release...' : 'Compare Release'}
+                        </button>
+                      </div>
+                    </form>
+                  </UiCard>
+
+                  <Alert message={releaseDiffError} />
+
+                  <MarkdownViewer
+                    title="Release Diff"
+                    content={releaseDiff}
+                    emptyText="Run Compare Release to render the markdown release diff."
+                  />
                 </div>
-
-                <Alert message={comparisonError} />
-
-                <MarkdownViewer
-                  title="Comparison"
-                  content={comparison}
-                  emptyText="Run Compare to render the markdown comparison."
-                />
-              </div>
-            ) : null}
-
-            {activeTab === 'releaseDiff' ? (
-              <div className="space-y-6">
-                <UiCard
-                  badge={
-                    <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                      <GitPullRequest className="h-3.5 w-3.5" />
-                      Release Diff
-                    </div>
-                  }
-                >
-                  <form onSubmit={handleReleaseDiff} className="space-y-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <label className="block">
-                        <span className="mb-2 block text-sm font-medium text-slate-700">Owner</span>
-                        <input
-                          type="text"
-                          value={releaseOwner}
-                          onChange={(event) => setReleaseOwner(event.target.value)}
-                          placeholder="langchain-ai"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
-                        />
-                      </label>
-
-                      <label className="block">
-                        <span className="mb-2 block text-sm font-medium text-slate-700">Repo</span>
-                        <input
-                          type="text"
-                          value={releaseRepo}
-                          onChange={(event) => setReleaseRepo(event.target.value)}
-                          placeholder="langgraph"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
-                        />
-                      </label>
-
-                      <label className="block">
-                        <span className="mb-2 block text-sm font-medium text-slate-700">Old Tag</span>
-                        <input
-                          type="text"
-                          value={oldTag}
-                          onChange={(event) => setOldTag(event.target.value)}
-                          placeholder="v0.1.0"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
-                        />
-                      </label>
-
-                      <label className="block">
-                        <span className="mb-2 block text-sm font-medium text-slate-700">New Tag</span>
-                        <input
-                          type="text"
-                          value={newTag}
-                          onChange={(event) => setNewTag(event.target.value)}
-                          placeholder="v0.2.0"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
-                        />
-                      </label>
-                    </div>
-
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={releaseDiffLoading}
-                        className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-                      >
-                        <GitPullRequest className="h-4 w-4" />
-                        {releaseDiffLoading ? 'Comparing Release...' : 'Compare Release'}
-                      </button>
-                    </div>
-                  </form>
-                </UiCard>
-
-                <Alert message={releaseDiffError} />
-
-                <MarkdownViewer
-                  title="Release Diff"
-                  content={releaseDiff}
-                  emptyText="Run Compare Release to render the markdown release diff."
-                />
-              </div>
-            ) : null}
+              ) : null}
             </div>
           </UiCard>
         </section>

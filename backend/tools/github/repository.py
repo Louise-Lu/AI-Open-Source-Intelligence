@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
-
+from agent.trace import add_trace
 
 class RepositoryTool:
     """
@@ -36,7 +36,7 @@ class RepositoryTool:
 
         license_info = data.get("license")
 
-        return {
+        result = {
             "full_name": data.get("full_name"),
             "description": data.get("description"),
             "language": data.get("language"),
@@ -51,3 +51,14 @@ class RepositoryTool:
             "created_at": data.get("created_at"),
             "updated_at": data.get("updated_at"),
         }
+
+        add_trace(
+        tool_name="get_repository",
+        tool_input={
+            "owner": owner,
+            "repo": repo
+        },
+        tool_output=result
+    )
+
+        return result

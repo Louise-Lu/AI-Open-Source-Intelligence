@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from agent.trace import add_trace
 
 class ReleaseTool:
     """
@@ -42,5 +43,13 @@ class ReleaseTool:
                 }
             )
 
-
+        add_trace(
+                "get_releases",
+                {
+                "owner":owner,
+                "repo":repo
+                },
+                formatted
+            )
+        
         return formatted

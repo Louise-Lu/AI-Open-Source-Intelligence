@@ -6,7 +6,7 @@ from llms.qwen import qwen_model
 
 from prompts.release_diff import RELEASE_DIFF_PROMPT
 
-from report.release_diff import ReleaseDiffEvidence
+from schemas.release_diff import ReleaseDiffEvidence
 
 
 class ReleaseDiffService:

@@ -13,7 +13,7 @@ class RepositoryAnalysisService:
         self.builder = EvidenceBuilder()
 
     def analyze(self, owner: str, repo: str) -> str:
-        """Run one repository analysis and return the final agent message."""
+        """Run one repository analysis and return the final message."""
         # ① 调 GitHub
         repository = self.github.get_repository(owner, repo)
         readme = self.github.get_readme(owner, repo)

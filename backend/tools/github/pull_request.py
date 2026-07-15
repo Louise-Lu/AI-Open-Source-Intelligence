@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
-
-
+from agent.trace import add_trace
 
 class PullRequestTool:
 
@@ -29,12 +28,9 @@ class PullRequestTool:
             f"/repos/{owner}/{repo}/pulls"
         )
 
-
         prs = response.json()
 
-
         formatted = []
-
 
         for pr in prs[:5]:
 
@@ -50,5 +46,14 @@ class PullRequestTool:
                 }
             )
 
-
+        
+        add_trace(
+        "get_pull_requests",
+                {
+                "owner":owner,
+                "repo":repo
+                },
+                formatted
+            )
+        
         return formatted

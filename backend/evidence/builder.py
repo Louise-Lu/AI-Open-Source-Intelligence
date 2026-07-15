@@ -9,7 +9,7 @@ from .models import (
     ReleaseInfo,
     RepositoryInfo,
 )
-# Builder 只负责：① 调 Tool ② 清洗 ③ 聚合 ④ 给 Agent 
+# Builder 只负责：① 调 Tool ② 清洗 ③ 聚合 ④ 给 llm
 # 数据整理 
 class EvidenceBuilder:
     """Aggregate and normalize GitHub tool outputs into structured evidence."""

@@ -2,7 +2,7 @@ from llms.qwen import qwen_model
 
 from prompts.comparison import COMPARISON_PROMPT
 
-from report.comparison import RepositoryComparisonReport
+from schemas.comparison import RepositoryComparisonReport
 
 from services.profile_service import RepositoryProfileService
 

@@ -1,5 +1,5 @@
-from agent.graph import agent
-result = agent.invoke(
+from backend.agent.github_agent import github_agent
+result = github_agent.invoke(
     {
         "messages": [
             (

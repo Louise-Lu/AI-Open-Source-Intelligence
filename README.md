@@ -184,7 +184,7 @@ github/
 
 prompts/
 
-report/
+schemas/
 
 models/
 

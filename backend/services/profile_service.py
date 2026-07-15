@@ -6,7 +6,7 @@ from evidence.builder import EvidenceBuilder
 from llms.qwen import qwen_model
 from prompts.profile import PROFILE_PROMPT
 
-from report.profile import RepositoryProfile
+from schemas.profile import RepositoryProfile
 
 
 class RepositoryProfileService:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from agent.trace import add_trace
 
 class IssueTool:
 
@@ -30,9 +31,7 @@ class IssueTool:
 
         issues = response.json()
 
-
         formatted = []
-
 
         for issue in issues:
 
@@ -61,5 +60,13 @@ class IssueTool:
             if len(formatted) >= 5:
                 break
 
-
+        add_trace(
+                "get_issues",
+                {
+                "owner":owner,
+                "repo":repo
+                },
+                formatted
+            )
+        
         return formatted

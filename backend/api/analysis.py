@@ -15,13 +15,3 @@ def analyze_repository(owner: str, repo: str):
     return {
         "analysis": analysis
     }
-
-# @router.get(
-#     "/repositories/{owner}/{repo}/analysis",
-#     response_model=AnalysisResponse
-# )
-# def analyze_repository(owner: str, repo: str):
-
-#     return AnalysisResponse(
-#         analysis=service.analyze(owner, repo)
-#     )

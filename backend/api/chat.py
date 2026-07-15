@@ -1,14 +1,38 @@
-# from fastapi import APIRouter
+from fastapi import APIRouter
 
-# # from services.profile_service import RepositoryProfileService
+from schemas.chat import (
+    ChatRequest,
+    ChatResponse
+)
+
+from services.chat_service import ChatService
 
 
-# router = APIRouter(tags=["Chat"])
 
-# # service = RepositoryProfileService()
+router = APIRouter(
+    prefix="/chat",
+    tags=["chat"]
+)
 
 
-# @router.post("/chat")
-# def chat(owner: str, repo: str):
+service = ChatService()
 
-#     return 
+
+
+@router.post(
+    "",
+    response_model=ChatResponse
+)
+def chat(
+    request: ChatRequest
+):
+
+    result = service.chat(
+        request.message
+    )
+
+
+    return ChatResponse(
+        answer=result["answer"],
+        trace=result["trace"]
+    )

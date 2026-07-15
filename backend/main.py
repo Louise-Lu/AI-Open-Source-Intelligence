@@ -4,6 +4,7 @@ from api.compare import router as compare_router
 from api.profile import router as profile_router
 from api.release_diff import router as release_diff_router
 from api.routes import router as base_router
+from api.chat import router as chat_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -24,3 +25,4 @@ app.include_router(profile_router)
 app.include_router(analysis_router)
 app.include_router(compare_router)
 app.include_router(release_diff_router)
+app.include_router(chat_router)
