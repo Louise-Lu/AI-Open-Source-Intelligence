@@ -8,7 +8,7 @@ export default function ChatBox() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: 'Hello. Send me a message and I will reply through the backend `/chat` API.',
+      content: 'Hello. Send me a message and I will reply.',
     },
   ]);
   const [input, setInput] = useState('');

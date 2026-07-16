@@ -1,20 +1,44 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
+
+class EnterpriseReadiness(BaseModel):
+
+    level: str = "信息不足"
+
+    explanation: str = "信息不足"
+
 
 
 class RepositoryProfile(BaseModel):
-    model_config = ConfigDict(extra="ignore")
 
-    full_name: str = ""
-    description: str | None = None
-    language: str | None = None
-    license: str | None = None
-    stars: int = 0
-    forks: int = 0
-    topics: list[str] = Field(default_factory=list)
+    project_type: str = "信息不足"
 
-    maintenance_score: int = Field(default=0, ge=0, le=10)
-    enterprise_score: int = Field(default=0, ge=0, le=10)
-    community_score: int = Field(default=0, ge=0, le=10)
+
+    target_users: list[str] = Field(
+        default_factory=list
+    )
+
+
+    core_features: list[str] = Field(
+        default_factory=list
+    )
+
+
+    technical_stack: list[str] = Field(
+        default_factory=list
+    )
+
+
+    strengths: list[str] = Field(
+        default_factory=list
+    )
+
+
+    weaknesses: list[str] = Field(
+        default_factory=list
+    )
+
+
+    enterprise_readiness: EnterpriseReadiness
+
 
     summary: str = ""
-    recommendation: str = ""

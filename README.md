@@ -313,25 +313,25 @@ Tool Trace 可以帮助：
 
         v
 
-Agent 理解任务
+  Agent 理解任务
 
         |
 
         v
 
-选择 Tool
+    选择 Tool
 
         |
 
         v
 
-调用 GitHub API
+  调用 GitHub API
 
         |
 
         v
 
-获取真实数据
+   获取真实数据
 
         |
 
@@ -343,13 +343,13 @@ Evidence Builder 数据整理
 
         v
 
-LLM 分析推理
+   LLM 分析推理
 
         |
 
         v
 
-返回最终回答
+    返回最终回答
 ```
 
 
@@ -672,7 +672,7 @@ Agent:
 ---
 
 # 🎯 Project Goal
-
+# AI Open Source Intelligence Platform
 
 本项目探索如何使用现代 AI Agent 架构解决真实工程问题：
 
@@ -699,448 +699,5 @@ Agent:
 # License
 
 MIT License
----
-
-
-# 分层职责
-
-## API Layer
-
-负责：
-
-- HTTP 请求
-- 参数校验
-- 返回 JSON
-
-例如：
-
-```
-POST /analysis
-
-POST /profile
-
-POST /comparison
-
-POST /release-diff
-```
-
-API 不包含业务逻辑。
 
 ---
-
-## Service Layer
-
-负责：
-
-整个业务流程。
-
-例如：
-
-Repository Analysis：
-
-```
-获取 GitHub 数据
-
-↓
-
-Evidence Builder
-
-↓
-
-调用 LLM
-
-↓
-
-返回报告
-```
-
-Service 不负责：
-
-- GitHub API
-- Prompt
-- 数据结构
-
-它只负责组织流程。
-
----
-
-## GitHub API Layer
-
-统一封装 GitHub REST API。
-
-例如：
-
-```
-RepositoryTool
-
-ReleaseTool
-
-IssueTool
-
-PullRequestTool
-
-ReadmeTool
-```
-
-所有 HTTP 请求统一管理。
-
-方便以后：
-
-- Token
-- Retry
-- Cache
-
-统一扩展。
-
----
-
-## Evidence Builder
-
-作用：
-
-把 GitHub 原始 JSON
-
-转换成
-
-统一结构化 Evidence。
-
-例如：
-
-```
-GitHub JSON
-
-↓
-
-RepositoryInfo
-
-↓
-
-GitHubEvidence
-```
-
-Builder 不负责分析。
-
-Builder 只负责：
-
-- 清洗
-- 聚合
-- 标准化
-
----
-
-## LLM Layer
-
-负责：
-
-根据 Evidence
-
-输出：
-
-Markdown
-
-或者
-
-Structured JSON。
-
-例如：
-
-Analysis
-
-↓
-
-Markdown
-
-Profile
-
-↓
-
-RepositoryProfile
-
-Comparison
-
-↓
-
-Markdown
-
-Release Diff
-
-↓
-
-Markdown
-
-LLM 不直接调用 GitHub API。
-
-----
-
-# V2 演进
-
-新增：
-
-```
-POST /chat
-```
-
-用户：
-
-```
-Which framework is better for enterprise AI?
-```
-
-Agent：
-
-此时：
-
-LLM 自主决定：
-
-调用哪些 Tool。
-
-真正进入：ReAct Agent。
-
----
-
-# V3 演进
-
-采用 Multi-Agent。
-
-```
-                Supervisor
-
-        ┌────────┼────────┐
-
- Repository   Release   Issue
-
-     │           │         │
-
-      └───────Report Agent───────┘
-```
-
-各 Agent：
-
-负责：
-
-自己的专业领域。
-
-最后：
-
-Supervisor 汇总。
-
----
-
-# 当前目录
-
-```
-backend/
-
-api/
-
-services/
-
-github/
-
-report/
-
-prompts/
-
-models/
-
-tools/
-```
-
-职责清晰。
-
-方便继续扩展。
-
----
-
-# 后续 Roadmap
-V2.1
-- 完善 Trace
-
-V2.2
-- Memory
-
-V2.3
-- Report Agent
-
-V2.4
-- 部署 Docker
-
-V3
-
-- Multi-Agent
-- Planning
-- RAG
-- Knowledge Base
-
-
-更多内容：
-
-请查看：
-
-docs/ARCHITECTURE.md
-
----
-
-# 技术栈
-
-Backend
-
-- Python
-- FastAPI
-- LangChain
-- Qwen-Max
-- Pydantic
-
-LLM
-
-- DashScope
-- Qwen-Max
-
-API
-
-- GitHub REST API
-
-Deployment
-
-- Docker
-- Render（Backend）
-- Vercel（Frontend）
-
----
-
-# 项目结构
-
-```
-backend/
-
-api/
-
-services/
-
-github/
-
-prompts/
-
-schemas/
-
-models/
-
-tools/
-```
-
----
-
-# API
-
-## Repository Analysis
-
-```
-POST /analysis
-```
-
----
-
-## Repository Profile
-
-```
-POST /profile
-```
-
----
-
-## Repository Comparison
-
-```
-POST /comparison
-```
-
----
-
-## Release Diff
-
-```
-POST /release-diff
-```
-
----
-
-# 本地运行
-
-安装依赖：
-
-```bash
-pip install -r requirements.txt
-```
-
-配置：
-
-```
-DASHSCOPE_API_KEY=
-
-GITHUB_TOKEN=
-```
-
-启动：
-
-```bash
-uvicorn main:app --reload
-```
-
-Swagger：
-
-```
-http://127.0.0.1:8000/docs
-```
-
----
-
-# MVP
-
-V1
-
-- Repository Analysis
-- Repository Profile
-- Repository Comparison
-- Release Diff
-
----
-
-# 当前版本
-
-## V2
-
-- Chat Agent
-- Tool Calling
-- Memory
-- Streaming
-
-## V3
-
-- Multi-Agent
-- Knowledge Graph
-- RAG
-- Long-term Memory
-- AI Project Ranking
-
----
-
-V1
-
-GitHub Intelligence Platform
-
-↓
-
-V2
-
-AI Intelligence Agent
-
-↓
-
-V3
-
-Multi-Agent Intelligence Platform
-
----
-# License
-
-MIT

@@ -5,6 +5,7 @@ from api.profile import router as profile_router
 from api.release_diff import router as release_diff_router
 from api.routes import router as base_router
 from api.chat import router as chat_router
+from api.roadmap import router as roadmap_router
 
 from fastapi.responses import JSONResponse
 from tools.github.utils import GitHubAPIError
@@ -29,8 +30,9 @@ app.include_router(analysis_router)
 app.include_router(compare_router)
 app.include_router(release_diff_router)
 app.include_router(chat_router)
+app.include_router(roadmap_router)
 
-from fastapi import FastAPI, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from tools.github.utils import GitHubAPIError
 

@@ -12,7 +12,7 @@
 - Release
 - Issue
 - PR
-- Contributor
+<!-- - Contributor -->
 
 输出：
 
@@ -74,5 +74,73 @@ Reddit
 X
 
 统一情报分析。
+
+---
+
+# 后续 Roadmap
+V2.1
+- 完善 Trace
+
+V2.2
+- Memory
+
+V2.3
+- Report Agent
+
+V2.4
+- 部署 Docker
+
+V3
+
+- Multi-Agent
+- Planning
+- RAG
+- Knowledge Base
+
+
+---
+
+## V1
+
+- Repository Analysis
+- Repository Profile
+- Repository Comparison
+- Release Diff
+- RoadMap 预测
+
+---
+
+## V2
+
+- Chat Agent
+- Tool Calling
+- Memory
+- Streaming
+
+## V3
+
+- Multi-Agent
+- Knowledge Graph
+- RAG
+- Long-term Memory
+- AI Project Ranking
+
+---
+
+V1
+
+GitHub Intelligence Platform
+
+↓
+
+V2
+
+GitHub Intelligence Agent
+
+↓
+
+V3
+
+Multi-Agent Intelligence Platform
 
 ---

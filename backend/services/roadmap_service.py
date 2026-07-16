@@ -1,12 +1,13 @@
 from services.evidence_service import RepositoryEvidenceService
 
 from llms.qwen import qwen_model
-from prompts.profile import PROFILE_PROMPT
+from prompts.roadmap import ROADMAP_PROMPT
 
-from schemas.profile import RepositoryProfile
+from schemas.roadmap import RoadmapReport
 
 
-class RepositoryProfileService:
+
+class RepositoryRoadmapService:
 
 
     def __init__(self):
@@ -16,14 +17,15 @@ class RepositoryProfileService:
         )
 
 
-    def generate(
+
+    def predict(
         self,
-        owner: str,
-        repo: str
-    ) -> RepositoryProfile:
+        owner:str,
+        repo:str
+    ) -> RoadmapReport:
 
 
-        # ① 获取统一 Evidence
+        # ① Evidence
 
         evidence = self.evidence_service.collect(
             owner,
@@ -34,40 +36,45 @@ class RepositoryProfileService:
         # ② structured output
 
         llm = qwen_model.with_structured_output(
-            RepositoryProfile
+            RoadmapReport
         )
 
 
         # ③ Prompt
 
-        prompt = f"""
-{PROFILE_PROMPT}
+        prompt=f"""
+{ROADMAP_PROMPT}
 
 
 Repository Evidence:
 
 {evidence.model_dump_json(indent=2)}
+
 """
 
 
         # ④ LLM
 
-        # profile = llm.invoke(
+        # roadmap = llm.invoke(
         #     prompt
         # )
 
-        try:
-            profile = llm.invoke(prompt)
 
-            print("========== PROFILE DEBUG ==========")
-            print(profile)
-            print(type(profile))
+        # return roadmap
+
+
+        try:
+            roadmap = llm.invoke(prompt)
+
+            print("==========  DEBUG ==========")
+            print(roadmap)
+            print(type(roadmap))
             print("===================================")
 
-            return profile
+            return roadmap
 
         except Exception as e:
-                print("========== PROFILE ERROR ==========")
+                print("========== roadmap ERROR ==========")
                 print(e)
                 print("===================================")
                 raise
