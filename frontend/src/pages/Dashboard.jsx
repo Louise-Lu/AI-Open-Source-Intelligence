@@ -8,23 +8,27 @@ import {
   FileText,
   GitBranch,
   Diff,
+  Map,
 } from 'lucide-react';
 
 import { getAnalysis } from '../api/analysis';
 import { getComparison } from '../api/comparison';
 import { getProfile } from '../api/profile';
 import { getReleaseDiff } from '../api/releaseDiff';
+import { getRoadmap } from '../api/roadmap';
 import Loading from '../components/Loading';
 import MarkdownViewer from '../components/MarkdownViewer';
 import ProfileCard from '../components/ProfileCard';
+import RoadmapCard from '../components/RoadmapCard';
 import RepositoryForm from '../components/RepositoryForm';
 import UiCard from '../components/UiCard';
 
 const tabs = [
   { id: 'profile', label: 'Profile', icon: FileText },
+  { id: 'releaseDiff', label: 'Release Diff', icon: Diff },
+  { id: 'roadmap', label: 'Roadmap', icon: Map },
   { id: 'analysis', label: 'Analysis', icon: BarChart3 },
   { id: 'comparison', label: 'Comparison', icon: ArrowRightLeft },
-  { id: 'releaseDiff', label: 'Release Diff', icon: Diff },
 ];
 
 function extractMarkdown(payload, fallbackKey) {
@@ -57,10 +61,10 @@ export default function Dashboard() {
   const [repo, setRepo] = useState('');
 
   const [profile, setProfile] = useState(null);
+  const [roadmap, setRoadmap] = useState(null);
   const [analysis, setAnalysis] = useState('');
   const [topError, setTopError] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-
   const [activeTab, setActiveTab] = useState('profile');
 
   const [compareRepoAOwner, setCompareRepoAOwner] = useState('');
@@ -92,12 +96,14 @@ export default function Dashboard() {
 
     setTopError('');
     setProfile(null);
+    setRoadmap(null);
     setAnalysis('');
     setIsAnalyzing(true);
 
-    const [analysisResult, profileResult] = await Promise.allSettled([
+    const [analysisResult, profileResult, roadmapResult] = await Promise.allSettled([
       getAnalysis(trimmedOwner, trimmedRepo),
       getProfile(trimmedOwner, trimmedRepo),
+      getRoadmap(trimmedOwner, trimmedRepo),
     ]);
 
     const errors = [];
@@ -112,6 +118,12 @@ export default function Dashboard() {
       setProfile(profileResult.value);
     } else {
       errors.push(profileResult.reason?.message || 'Failed to load profile.');
+    }
+
+    if (roadmapResult.status === 'fulfilled') {
+      setRoadmap(roadmapResult.value);
+    } else {
+      errors.push(roadmapResult.reason?.message || 'Failed to load roadmap.');
     }
 
     setTopError(errors.join(' | '));
@@ -187,20 +199,26 @@ export default function Dashboard() {
             bodyClassName="space-y-6 pt-6"
           >
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Profile</p>
                 <p className="mt-2 text-sm text-slate-700">Repository metadata and score cards</p>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Analysis</p>
-                <p className="mt-2 text-sm text-slate-700">Markdown intelligence report</p>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Release Diff
                 </p>
                 <p className="mt-2 text-sm text-slate-700">Compare release notes quickly</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Roadmap
+                </p>
+                <p className="mt-2 text-sm text-slate-700">Stage, direction, and risk forecast</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Analysis</p>
+                <p className="mt-2 text-sm text-slate-700">Markdown intelligence report</p>
               </div>
             </div>
 
@@ -212,7 +230,7 @@ export default function Dashboard() {
           <form onSubmit={handleAnalyze}>
             <RepositoryForm
               title="Repository"
-              helperText="Enter the repository owner and name. Analyze Repository fetches Profile and Analysis together."
+              helperText="Enter the repository owner and name. Analyze Repository fetches Profile, Roadmap, and Analysis together."
               owner={owner}
               repo={repo}
               onOwnerChange={setOwner}
@@ -273,6 +291,8 @@ export default function Dashboard() {
             <div className="space-y-6 p-4 sm:p-6">
               {activeTab === 'profile' ? <ProfileCard profile={profile} /> : null}
 
+              {activeTab === 'roadmap' ? <RoadmapCard roadmap={roadmap} /> : null}
+
               {activeTab === 'analysis' ? (
                 <MarkdownViewer
                   title="Analysis"
@@ -281,8 +301,7 @@ export default function Dashboard() {
                 />
               ) : null}
 
-              {activeTab === 'comparison' ? (
-                <div className="space-y-6">
+              {activeTab === 'comparison' ? (                <div className="space-y-6">
                   <div className="grid gap-4 xl:grid-cols-2">
                     <RepositoryForm
                       title="Repository A"
