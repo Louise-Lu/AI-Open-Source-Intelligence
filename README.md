@@ -31,38 +31,43 @@ GitHub AI Intelligence Platform 是一个利用 Large Language Model（LLM）分
 - 企业成熟度
 - 未来发展方向
 
-输出：
-
-Markdown Report
+输出：Markdown Report
 
 ---
 
 ## Repository Profile
 
 自动生成：
-
 结构化项目画像。
 
-输出：
-
-JSON
+输出：JSON
 
 例如：
 
 ```json
 {
-  "full_name":"langchain-ai/langgraph",
-  "stars":37281,
-  "maintenance_score":8,
-  "enterprise_score":9,
-  "community_score":8,
-  "summary":"..."
+  "full_name": "langchain-ai/langgraph",
+  "description": "Build resilient agents.",
+  "language": "Python",
+  "license": "MIT License",
+  "stars": 37383,
+  "forks": 6265,
+  "topics": [
+    "agents",
+    "ai-agents",
+    "generative-ai",
+    "langchain",
+    "langgraph",
+  ],
+  "maintenance_score": 7,
+  "enterprise_score": 8,
+  "community_score": 9,
+  "summary": "这个项目是一个用于构建、管理和部署长期运行的、有状态代理的低级编排框架，核心价值在于提供稳定和可扩展的基础架构。",
+  "recommendation": "推荐给需要构建复杂、长期运行的AI代理或工作流的开发者和团队。适合的应用场景包括需要高度定制化和灵活性的企业级应用，例如自动化任务处理、智能客服系统等。"
 }
 ```
 
-方便：
-
-Dashboard
+方便：Dashboard
 
 搜索
 
@@ -76,15 +81,9 @@ Dashboard
 
 比较两个项目：
 
-例如：
+例如：LangGraph VS AutoGen
 
-LangGraph
-
-VS
-
-AutoGen
-
-输出：
+输出：JSON
 
 - 项目定位
 - 技术路线

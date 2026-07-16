@@ -7,7 +7,7 @@ from llms.qwen import qwen_model
 from prompts.profile import PROFILE_PROMPT
 
 from schemas.profile import RepositoryProfile
-
+from tools.github.utils import GitHubAPIError
 
 class RepositoryProfileService:
 
@@ -16,10 +16,16 @@ class RepositoryProfileService:
         self.builder = EvidenceBuilder()
 
     def generate(self, owner: str, repo: str):
-        repository = self.github.get_repository(owner, repo)
-        readme = self.github.get_readme(owner, repo)
-        releases = self.github.get_releases(owner, repo)
-        issues = self.github.get_issues(owner=owner, repo=repo)
+        try:
+            repository = self.github.get_repository(owner, repo)
+            readme = self.github.get_readme(owner, repo)
+            releases = self.github.get_releases(owner, repo)
+            issues = self.github.get_issues(owner=owner, repo=repo)
+
+        except GitHubAPIError as e:
+            # 可以在这里记录日志
+            print(f"GitHub API 调用失败: {e}")
+            raise  # 重新抛出，让全局异常处理器处理
 
         evidence = self.builder.build(
             repository=repository,

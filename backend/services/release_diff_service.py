@@ -3,11 +3,10 @@ from __future__ import annotations
 from tools.github.client import GitHubAPI
 
 from llms.qwen import qwen_model
-
 from prompts.release_diff import RELEASE_DIFF_PROMPT
 
 from schemas.release_diff import ReleaseDiffEvidence
-
+from tools.github.utils import GitHubAPIError
 
 class ReleaseDiffService:
 
@@ -21,8 +20,14 @@ class ReleaseDiffService:
         old_tag: str,
         new_tag: str,
     ) -> str:
+        
+        try:
+            releases = self.github.get_releases(owner, repo)
 
-        releases = self.github.get_releases(owner, repo)
+        except GitHubAPIError as e:
+            # 可以在这里记录日志
+            print(f"GitHub API 调用失败: {e}")
+            raise  # 重新抛出，让全局异常处理器处理
 
         old_release = next(
             release

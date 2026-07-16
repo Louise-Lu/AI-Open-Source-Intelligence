@@ -1,10 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from api.analysis import router as analysis_router
 from api.compare import router as compare_router
 from api.profile import router as profile_router
 from api.release_diff import router as release_diff_router
 from api.routes import router as base_router
 from api.chat import router as chat_router
+
+from fastapi.responses import JSONResponse
+from tools.github.utils import GitHubAPIError
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,3 +29,50 @@ app.include_router(analysis_router)
 app.include_router(compare_router)
 app.include_router(release_diff_router)
 app.include_router(chat_router)
+
+# 处理 GitHub API 错误
+@app.exception_handler(GitHubAPIError)
+async def github_api_error_handler(request: Request, exc: GitHubAPIError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": {
+                "type": "GitHubAPIError",
+                "status_code": exc.status_code,
+                "message": exc.message,
+                "details": exc.details,
+                "timestamp": "2026-07-16T12:00:00Z"  # 可以添加时间戳
+            }
+        }
+    )
+
+# 处理一般的 ValueError
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    return JSONResponse(
+        status_code=400,
+        content={
+            "success": False,
+            "error": {
+                "type": "ValidationError",
+                "message": str(exc),
+                "timestamp": "2026-07-16T12:00:00Z"
+            }
+        }
+    )
+
+# 处理其他未预期的异常
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": {
+                "type": "InternalServerError",
+                "message": "服务器内部错误，请稍后再试",
+                "timestamp": "2026-07-16T12:00:00Z"
+            }
+        }
+    )
