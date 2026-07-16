@@ -4,8 +4,7 @@
 
 目标：
 
-完成 GitHub Repository Intelligence。
-
+完成 GitHub Intelligence Platform
 功能：
 
 - Repository
@@ -19,13 +18,23 @@
 
 Repository Intelligence Report
 
-架构：workflow
-GitHub API
-↓
-EvidenceBuilder
-↓
-LLM Analysis - markdown 
+架构：LLM workflow
 
+```
+GitHub API
+
+↓
+
+EvidenceBuilder
+
+↓
+
+LLM
+
+↓
+
+markdown / JSON
+```
 
 ---
 
@@ -33,37 +42,14 @@ LLM Analysis - markdown
 
 目标：
 
-AI Open Source Intelligence
+GitHub Intelligence Agent
 
 新增：
-
-Project Compare
+Chat
 
 Trending
 
 Weekly Report
-
-Follow
-
-Notification
-
-todo:
-Repository Analysis        ✅ 已完成
-↓
-
-Project Profile           ✅ 已完成
-↓
-
-Release Diff
-
-↓
-
-Repository Comparison  ✅ 已完成
-
-↓
-
-Roadmap Prediction
-
 
 ---
 
@@ -71,7 +57,7 @@ Roadmap Prediction
 
 目标：
 
-AI Research Copilot
+Multi-Agent Intelligence Platform
 
 新增：
 
@@ -90,23 +76,3 @@ X
 统一情报分析。
 
 ---
-
-## 当前开发进度
-
-✅ GitHub API
-
-✅ Tool Layer
-
-✅ LangGraph Agent
-
-⬜ Evidence Builder
-
-⬜ Structured Report
-
-⬜ FastAPI API
-
-⬜ React Dashboard
-
-⬜ Docker
-
-⬜ Deployment
