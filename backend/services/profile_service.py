@@ -1,10 +1,10 @@
 from services.evidence_service import RepositoryEvidenceService
 
-from llms.qwen import qwen_model
+# from llms.qwen import qwen_model
+from llms.deepseek import deepseek_model
 from prompts.profile import PROFILE_PROMPT
 
 from schemas.profile import RepositoryProfile
-
 
 class RepositoryProfileService:
 
@@ -33,10 +33,12 @@ class RepositoryProfileService:
 
         # ② structured output
 
-        llm = qwen_model.with_structured_output(
+        # llm = qwen_model.with_structured_output(
+        #     RepositoryProfile
+        # )
+        llm = deepseek_model.with_structured_output(
             RepositoryProfile
         )
-
 
         # ③ Prompt
 

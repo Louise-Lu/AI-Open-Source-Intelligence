@@ -1,6 +1,7 @@
 from services.evidence_service import RepositoryEvidenceService
 
-from llms.qwen import qwen_model
+# from llms.qwen import qwen_model
+from llms.deepseek import deepseek_model
 from prompts.analysis import ANALYSIS_PROMPT
 # from tools.github.utils import GitHubAPIError
 
@@ -22,8 +23,8 @@ class RepositoryAnalysisService:
 Evidence:
 {evidence.model_dump_json(indent=2)}
 """
-        response = qwen_model.invoke(prompt)
-
+        # response = qwen_model.invoke(prompt)
+        response = deepseek_model.invoke(prompt)
         return response.content
     ## 直接返回 字符串 markdown 
 

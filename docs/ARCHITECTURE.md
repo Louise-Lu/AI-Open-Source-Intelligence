@@ -84,7 +84,7 @@ Reports
                   │
          Structured Evidence
                   │
-             Qwen-Max LLM 
+        Qwen-Max LLM / DeepSeek
                   │
         Markdown / JSON Report
                   │
@@ -308,23 +308,40 @@ Which framework is better for enterprise AI?
 Agent：
 
 ```
-                 Agent
+                    Frontend
 
 
-                  |
-
-       ----------------------
-
-       |                    |
-
- Data Tools       Intelligence Tools
+          Dashboard              Chat
 
 
- GitHub API          ProfileService
+              |                    |
 
-                    RoadmapService
 
-                    ComparisonService
+        Intelligence          Agent
+
+
+              |                    |
+
+
+       Report Services       Tool Calling
+
+
+              |                    |
+
+
+          Evidence Layer <---------
+
+
+                    |
+
+
+              GitHub Data Tools
+
+
+                    |
+
+
+              GitHub API
 
 
 ```

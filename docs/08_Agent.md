@@ -537,6 +537,99 @@ Sorry need more steps
 ```
 
 ---
+# Agent Evaluation Framework
+
+- 第一层：Intent 是否理解正确
+    - 是否正确理解用户问题
+    - 是否正确识别 repository
+    - 是否正确识别任务类型
+
+- 第二层：Tool Selection（最重要）
+    - Tool Precision
+    - Tool Recall
+    - 是否遗漏 Tool
+    - 是否多调用 Tool
+    - Tool Call Order
+
+- 第三层：Evidence Quality
+    - Evidence Completeness
+    - Evidence Relevance
+    - Evidence Freshness
+    - 是否足够支持回答
+
+- 第四层：Reasoning Quality
+    - Logical Consistency
+    - Grounded Reasoning
+    - Unsupported Claims
+    - Hallucination
+    - Evidence → Reasoning → Conclusion
+- 第五层：Final Answer Quality
+    - Correctness
+    - Completeness
+    - Helpfulness
+    - Structure
+    - Readability
+
+```
+User Query
+     │
+     ▼
+──────────────────────────────────────
+Layer 1
+Intent Understanding
+──────────────────────────────────────
+Agent 是否理解了用户真正的问题？
+
+↓
+
+──────────────────────────────────────
+Layer 2
+Tool Selection
+──────────────────────────────────────
+是否选择了正确的工具？
+是否遗漏？
+是否多调用？
+调用顺序是否合理？
+
+↓
+
+──────────────────────────────────────
+Layer 3
+Evidence Collection
+──────────────────────────────────────
+Evidence 是否完整？
+是否来自正确的数据源？
+是否足够支持回答？
+
+↓
+
+──────────────────────────────────────
+Layer 4
+Reasoning / Intelligence
+──────────────────────────────────────
+Evidence
+      ↓
+Reasoning
+      ↓
+Conclusion
+
+分析逻辑是否合理？
+有没有跳跃推理？
+有没有幻觉？
+结论是否被 Evidence 支撑？
+
+↓
+
+──────────────────────────────────────
+Layer 5
+Final Answer
+──────────────────────────────────────
+是否真正回答用户问题？
+是否清晰？
+是否结构化？
+是否可执行？
+```
+---
 
 | 问题    | 期望工具                         |
 | ----- | ---------------------------- |

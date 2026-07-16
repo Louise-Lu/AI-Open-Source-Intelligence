@@ -263,9 +263,9 @@ Tool Trace 可以帮助：
         v          v          v
 
 
- Repository    README    Release
+ Repository    README    Release ....
 
-   Tool        Tool       Tool
+   Tool        Tool       Tool   ....
 
 
         |
@@ -307,49 +307,25 @@ Tool Trace 可以帮助：
 
 
 ```
-用户输入问题
-
-        |
-
-        v
-
-  Agent 理解任务
-
-        |
-
-        v
-
-    选择 Tool
-
-        |
-
-        v
-
-  调用 GitHub API
-
-        |
-
-        v
-
-   获取真实数据
-
-        |
-
-        v
-
-Evidence Builder 数据整理
-
-        |
-
-        v
-
-   LLM 分析推理
-
-        |
-
-        v
-
-    返回最终回答
+User Query
+    |
+    v
+Intent 判断
+    |
+    v
+Tool Selection
+    |
+    v
+Tool Arguments
+    |
+    v
+Evidence Quality
+    |
+    v
+Reasoning
+    |
+    v
+Final Answer
 ```
 
 

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from tools.github.client import GitHubAPI
 
-from llms.qwen import qwen_model
+# from llms.qwen import qwen_model
+from llms.deepseek import deepseek_model
 from prompts.release_diff import RELEASE_DIFF_PROMPT
 
 from schemas.release_diff import ReleaseDiffEvidence
@@ -48,7 +49,13 @@ class ReleaseDiffService:
             new_body=new_release.get("body"),
         )
 
-        response = qwen_model.invoke(
+        # response = qwen_model.invoke(
+        #     RELEASE_DIFF_PROMPT
+        #     + "\n\n"
+        #     + evidence.model_dump_json(indent=2)
+        # )
+
+        response = deepseek_model.invoke(
             RELEASE_DIFF_PROMPT
             + "\n\n"
             + evidence.model_dump_json(indent=2)

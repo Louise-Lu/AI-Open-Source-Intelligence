@@ -1,5 +1,5 @@
-from llms.qwen import qwen_model
-
+# from llms.qwen import qwen_model
+from llms.deepseek import deepseek_model
 from prompts.comparison import COMPARISON_PROMPT
 
 from schemas.comparison import RepositoryComparisonReport
@@ -42,8 +42,8 @@ Repository B
 {profile2.model_dump_json(indent=2)}
 """
 
-        response = qwen_model.invoke(prompt)
-
+        # response = qwen_model.invoke(prompt)
+        response = deepseek_model.invoke(prompt)
         return RepositoryComparisonReport(
             comparison=response.content
         )
