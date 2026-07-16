@@ -30,19 +30,24 @@ app.include_router(compare_router)
 app.include_router(release_diff_router)
 app.include_router(chat_router)
 
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from tools.github.utils import GitHubAPIError
+
+
 # 处理 GitHub API 错误
 @app.exception_handler(GitHubAPIError)
 async def github_api_error_handler(request: Request, exc: GitHubAPIError):
     return JSONResponse(
-        status_code=exc.status_code,
+        status_code=exc.status_code or 500,
         content={
             "success": False,
             "error": {
                 "type": "GitHubAPIError",
                 "status_code": exc.status_code,
-                "message": exc.message,
+                "message": str(exc),  # 使用 str(exc) 获取异常消息
                 "details": exc.details,
-                "timestamp": "2026-07-16T12:00:00Z"  # 可以添加时间戳
+                "timestamp": "2026-07-16T12:00:00Z"
             }
         }
     )

@@ -95,9 +95,7 @@ GitHub AI Intelligence Platform 是一个利用 Large Language Model（LLM）分
 
 ## Release Diff
 
-比较：
-
-两个 Release。
+比较：两个 Release。
 
 自动总结：
 
