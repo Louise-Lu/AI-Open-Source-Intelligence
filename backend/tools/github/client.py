@@ -12,6 +12,9 @@ from .pull_request import PullRequestTool
 from .readme import ReadmeTool
 from .release import ReleaseTool
 from .repository import RepositoryTool
+from .commit import CommitActivityTool
+from .discussion import DiscussionTool
+from .planning import PlanningTool
 from .utils import build_query, raise_for_github_response
 
 
@@ -76,6 +79,9 @@ class GitHubAPI(
     IssueTool,
     PullRequestTool,
     # ContributorTool,
+    CommitActivityTool,
+    PlanningTool,
+    DiscussionTool,
 ):
 
     def __init__(self, token: str | None = None):

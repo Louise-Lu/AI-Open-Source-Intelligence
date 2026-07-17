@@ -69,7 +69,7 @@ Repository Evidence:
             return profile
 
         except Exception as e:
-                print("========== PROFILE ERROR ==========")
-                print(e)
-                print("===================================")
-                raise
+            print("========== PROFILE ERROR ==========")
+            print(e)
+            print("===================================")
+            raise

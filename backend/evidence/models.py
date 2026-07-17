@@ -1,3 +1,4 @@
+# evidence 模型定义 
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
@@ -33,8 +34,6 @@ class RepositoryInfo(BaseModel):
 
     updated_at: str | None = None
 
-
-
 class ReleaseInfo(BaseModel):
     """
     Release 信息
@@ -48,8 +47,6 @@ class ReleaseInfo(BaseModel):
 
     body: str | None = None
 
-
-
 class IssueInfo(BaseModel):
 
     title: str | None = None
@@ -59,8 +56,6 @@ class IssueInfo(BaseModel):
     created_at: str | None = None
 
     comments: int = 0
-
-
 
 class PullRequestInfo(BaseModel):
 
@@ -72,8 +67,20 @@ class PullRequestInfo(BaseModel):
 
     merged: bool = False
 
+class CommitActivity(BaseModel):
+    commits_last_30_days: int = 0
+    commits_last_90_days: int = 0
+    active_contributors_count: int = 0
 
+class PlanningSignal(BaseModel):
+    roadmap_text: str | None = None          # ROADMAP.md 全文
+    milestones: list[dict] = []              # {title, due_on, progress}
+    enhancement_issues: list[str] = []       # 标记为 enhancement/proposal 的 issue 标题摘要
 
+class DiscussionSignal(BaseModel):
+    hot_topics: list[str] = []       # 最近最热的讨论标题 + 是否有维护者回复
+
+    
 # class ContributorInfo(BaseModel):
 
 #     login: str | None = None
@@ -95,32 +102,19 @@ class GitHubEvidence(BaseModel):
     只保存事实
     """
 
-
     repository: RepositoryInfo | None = None
-
-
     readme: str | None = None
+    releases: list[ReleaseInfo] = Field(default_factory=list)
+    issues: list[IssueInfo] = Field(default_factory=list)
+    pull_requests: list[PullRequestInfo] = Field(default_factory=list)
 
-
-    releases: list[ReleaseInfo] = Field(
-        default_factory=list
-    )
-
-
-    issues: list[IssueInfo] = Field(
-        default_factory=list
-    )
-
-
-    pull_requests: list[PullRequestInfo] = Field(
-        default_factory=list
-    )
-
+    commit_activity: CommitActivity | None = None
+    planning: PlanningSignal | None = None
+    discussions: DiscussionSignal | None = None
 
     # contributors: list[ContributorInfo] = Field(
     #     default_factory=list
     # )
-
 
 
 # =========================

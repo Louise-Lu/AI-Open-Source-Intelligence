@@ -1,37 +1,32 @@
-from __future__ import annotations
+# GitHub 返回的 预处理后的 data -> Structured Evidence: 类型 IntelligenceEvidence
 
+from __future__ import annotations
 
 from typing import Any
 
-
 from .models import (
-
     IntelligenceEvidence,
-
     GitHubEvidence,
-
     RepositoryInfo,
-
     ReleaseInfo,
-
     IssueInfo,
-
     PullRequestInfo,
-
+    CommitActivity,
+    PlanningSignal,
+    DiscussionSignal,
     # ContributorInfo,
-
 )
 
+# build() 
+# 参数 GitHub 返回的 预处理后的 data : repository releases 等等... 
+# return 结构化的evidence: 类型 IntelligenceEvidence
 
-# 生成的Structured Evidence 格式是 evidence 规定的 models： IntelligenceEvidence
 class EvidenceBuilder:
     """
     Raw Data
         |
-        |
         v
     Structured Evidence
-
 
     负责:
     
@@ -40,8 +35,6 @@ class EvidenceBuilder:
     3. 类型转换
     4. 聚合
     """
-
-
 
     def build(
         self,
@@ -56,36 +49,34 @@ class EvidenceBuilder:
 
         pull_requests: dict[str,Any] | list[dict[str,Any]] | None = None,
 
+        commit_activity: dict[str, Any] | None = None,
+        planning: dict[str, Any] | None = None,
+        discussions: dict[str, Any] | None = None,
+
         # contributors: list[dict[str,Any]] | None = None,
-
-
     ) -> IntelligenceEvidence:
 
-
-
         github = GitHubEvidence(
-
 
             repository=
                 self._build_repository(repository),
 
-
             readme=readme,
-
 
             releases=
                 self._build_releases(releases),
 
-
             issues=
                 self._build_issues(issues),
-
 
             pull_requests=
                 self._build_pull_requests(
                     pull_requests
                 ),
 
+            commit_activity=self._build_commit_activity(commit_activity),
+            planning=self._build_planning(planning),
+            discussions=self._build_discussions(discussions),
 
             # contributors=
             #     self._build_contributors(
@@ -94,19 +85,13 @@ class EvidenceBuilder:
 
         )
 
-
         return IntelligenceEvidence(
-
             github=github
-
         )
-
-
 
     # =====================
     # Repository
     # =====================
-
 
     def _build_repository(
         self,
@@ -351,7 +336,41 @@ class EvidenceBuilder:
 
         ]
 
+    def _build_commit_activity(self, data: dict[str, Any] | None) -> CommitActivity | None:
+        if not data:
+            return None
+        return CommitActivity(
+            commits_last_30_days=data.get("commits_last_30_days", 0),
+            commits_last_90_days=data.get("commits_last_90_days", 0),
+            active_contributors_count=data.get("active_contributors_count", 0),
+        )
 
+    def _build_planning(self, data: dict[str, Any] | None) -> PlanningSignal | None:
+        if not data:
+            return None
+        return PlanningSignal(
+            roadmap_text=data.get("roadmap_text"),
+            milestones=data.get("milestones", []),
+            enhancement_issues=data.get("enhancement_issues", []),
+        )
+
+    def _build_discussions(self, data: dict[str, Any] | None) -> DiscussionSignal | None:
+        if not data:
+            return None
+        hot_topics_raw = data.get("hot_topics", [])
+        # 将 [{"title": ..., "has_official_answer": bool, "maintainer_involved": bool}] 
+        # 转为简单的摘要字符串列表，方便 LLM 消费
+        hot_topics_str = []
+        for topic in hot_topics_raw:
+            title = topic.get("title", "")
+            tags = []
+            if topic.get("has_official_answer"):
+                tags.append("官方回答")
+            if topic.get("maintainer_involved"):
+                tags.append("维护者参与")
+            tag_str = f"[{', '.join(tags)}]" if tags else ""
+            hot_topics_str.append(f"{title} {tag_str}".strip())
+        return DiscussionSignal(hot_topics=hot_topics_str)
 
     # =====================
     # Contributor
@@ -382,138 +401,3 @@ class EvidenceBuilder:
     #         for c in contributors or []
 
     #     ]
-
-# from __future__ import annotations
-
-# from typing import Any
-
-# from .models import (
-#     GitHubEvidence,
-#     IssueInfo,
-#     PullRequestInfo,
-#     ReleaseInfo,
-#     RepositoryInfo,
-# )
-# # Builder 只负责：① 调 Tool ② 清洗 ③ 聚合 ④ 给 llm
-# # 数据整理 
-# class EvidenceBuilder:
-#     """Aggregate and normalize GitHub tool outputs into structured evidence."""
-#     # 接收 仓的 各种源信息 -> 返回 实例化的一个对象：固定格式的佐证github的证据信息
-#     def build(
-#         self,
-#         repository: dict[str, Any] | None,
-#         readme: str | None,
-#         releases: list[dict[str, Any]] | None = None,
-#         issues: list[dict[str, Any]] | None = None,
-#         pull_requests: list[dict[str, Any]] | None = None,
-#     ) -> GitHubEvidence:
-#         """Convert raw GitHub payloads into a unified evidence object."""
-#         return GitHubEvidence(
-#             repository=self._build_repository(repository),
-#             readme=readme,
-#             releases=[self._build_release(release) for release in releases or []],
-#             issues=[self._build_issue(issue) for issue in issues or []],
-#             pull_requests=[
-#                 self._build_pull_request(pull_request)
-#                 for pull_request in pull_requests or []
-#             ],
-#         )
-
-#     def _build_repository(
-#         self,
-#         repository: dict[str, Any] | None
-#     ) -> RepositoryInfo | None:
-
-#         if not repository:
-#             return None
-
-#         return RepositoryInfo(
-
-#             full_name=repository.get("full_name"),
-
-#             description=repository.get("description"),
-
-#             language=repository.get("language"),
-
-#             stars=int(repository.get("stars") or 0),
-
-#             forks=int(repository.get("forks") or 0),
-
-#             topics=repository.get("topics", []),
-
-#             license=repository.get("license"),
-
-#             created_at=repository.get("created_at"),
-
-#             updated_at=repository.get("updated_at"),
-#         )
-
-
-#     def _build_release(
-#         self,
-#         release: dict[str, Any]
-#     ) -> ReleaseInfo:
-
-#         return ReleaseInfo(
-
-#             tag_name=release.get("tag_name"),
-
-#             name=release.get("name"),
-
-#             published_at=release.get("published_at"),
-
-#             body=release.get("body"),
-#     )
-
-#     def _build_issue(
-#         self,
-#         issue: dict[str, Any]
-#     ) -> IssueInfo:
-
-#         labels=[]
-
-#         for label in issue.get("labels", []):
-#             if isinstance(label, dict):
-#                 labels.append(
-#                     label.get("name")
-#                 )
-
-
-#         return IssueInfo(
-#             title=issue.get("title"),
-#             state=issue.get("state"),
-#             created_at=issue.get("created_at"),
-#             comments=int(issue.get("comments") or 0),
-#             labels=labels
-#     )
-
-#     def _build_pull_request(
-#     self,
-#     pull_request: dict[str, Any]
-#     ) -> PullRequestInfo:
-
-#         return PullRequestInfo(
-
-#             title=pull_request.get("title"),
-
-#             state=pull_request.get("state"),
-
-#             created_at=pull_request.get("created_at"),
-
-#             merged=pull_request.get("merged", False)
-
-#         )
-
-
-# #   GitHub API JSON
-# #         |
-# #         v
-# #   EvidenceBuilder
-# #         |
-# #         v
-# # Pydantic Evidence Model
-# #         |
-# #         v
-# #        LLM
-
-

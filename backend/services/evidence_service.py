@@ -1,9 +1,11 @@
 from tools.github.client import GitHubAPI
 from evidence import EvidenceBuilder
 
+# 业务：生成 GitHub Evidence : IntelligenceEvidence
+# 调用了 builder()
 # RepositoryEvidenceService:
 # 1. 请求 github api：github tools 
-# 2. 构建 structured evidence
+# 2. 构建 structured evidence: IntelligenceEvidence
 class RepositoryEvidenceService:
 
     def __init__(self):
@@ -44,13 +46,21 @@ class RepositoryEvidenceService:
             repo=repo
         )
         
-        # 构建 structured evidence
+        commit_activity = self.github.get_commit_activity(owner, repo, days=30)
+        planning = self.github.get_planning_signals(owner, repo)
+        discussions = self.github.get_discussion_signals(owner, repo)
+
+
+        # 构建 structured evidence: 类型 IntelligenceEvidence
         evidence = self.builder.build(
             repository=repository,
             readme=readme,
             releases=releases,
             issues=issues,
             pull_requests=pull_requests,
+            commit_activity=commit_activity,      
+            planning=planning,                    
+            discussions=discussions,              
         )
 
         return evidence

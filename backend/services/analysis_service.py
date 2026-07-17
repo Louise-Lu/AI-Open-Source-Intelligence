@@ -31,25 +31,32 @@ Evidence:
 
 # React
 # ↓
-# GET /repositories/analyze
+# GET /repositories/${owner}/${repo}/analysis
 # ↓
-# api/repository.py
+# 后端API
 # ↓
-# RepositoryAnalysisService
+# api/analysis.py -> analyze_repository()
 # ↓
-# GitHubAPI
+# services/analysis_service.py -> RepositoryAnalysisService.analyze(owner, repo)
+# ↓
+
+# 调用 GitHubAPI 封装的TOOLS
 # ├── get_repository()
 # ├── get_readme()
 # ├── get_releases()
 # ├── get_issues()
 # └── get_pull_requests()
-
+#  ......
+  
+# ↓ 真实数据
+# 
+# EvidenceBuilder.build() -> GitHubEvidence 结构化证据
 # ↓
 
-# EvidenceBuilder.build() = GitHubEvidence
-# ↓
 # LLM
 # ↓
+
 # Markdown - string
 # ↓
+
 # React
