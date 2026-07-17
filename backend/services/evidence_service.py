@@ -1,7 +1,9 @@
 from tools.github.client import GitHubAPI
 from evidence import EvidenceBuilder
 
-
+# RepositoryEvidenceService:
+# 1. 请求 github api：github tools 
+# 2. 构建 structured evidence
 class RepositoryEvidenceService:
 
     def __init__(self):
@@ -15,7 +17,8 @@ class RepositoryEvidenceService:
         owner: str,
         repo: str
     ):
-
+        
+        # 1. 请求调用 github api：github tools 
         repository = self.github.get_repository(
             owner,
             repo
@@ -40,8 +43,8 @@ class RepositoryEvidenceService:
             owner=owner,
             repo=repo
         )
-
-
+        
+        # 构建 structured evidence
         evidence = self.builder.build(
             repository=repository,
             readme=readme,

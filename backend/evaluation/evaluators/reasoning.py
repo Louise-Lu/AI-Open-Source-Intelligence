@@ -385,7 +385,14 @@ def _score_completeness(
     if not answer.strip():
         return 0.0
 
-    intent = (item.get("intent") or "").strip()
+    intents = list(item.get("expected_intents") or [])
+    if not intents:
+        legacy = item.get("intent")
+        if isinstance(legacy, str) and legacy:
+            intents = [legacy]
+        elif isinstance(legacy, list):
+            intents = list(legacy)
+
     question = (item.get("question") or "").lower()
     lower = answer.lower()
     length = len(answer.strip())
@@ -399,7 +406,13 @@ def _score_completeness(
     else:
         length_score = 95.0
 
-    keywords = INTENT_KEYWORDS.get(intent, [])
+    keywords: list[str] = []
+    seen_kw: set[str] = set()
+    for intent in intents:
+        for kw in INTENT_KEYWORDS.get(intent, []):
+            if kw not in seen_kw:
+                seen_kw.add(kw)
+                keywords.append(kw)
     keyword_hits = sum(1 for kw in keywords if kw in lower or kw in question)
     if keywords:
         keyword_score = min(100.0, 40.0 + (keyword_hits / max(len(keywords), 1)) * 60.0)

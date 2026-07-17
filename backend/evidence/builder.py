@@ -23,7 +23,7 @@ from .models import (
 )
 
 
-
+# 生成的Structured Evidence 格式是 evidence 规定的 models： IntelligenceEvidence
 class EvidenceBuilder:
     """
     Raw Data

@@ -52,7 +52,7 @@ class ReadmeTool:
             },
             tool_output={
                 "length": len(content),
-                "preview": clean_preview(content)
+                # "preview": clean_preview(content)
             }
         )
 

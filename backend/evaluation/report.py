@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -10,8 +11,46 @@ from evaluation.metrics import mean, percent
 
 
 EVAL_DIR = Path(__file__).resolve().parent
-DEFAULT_REPORT_PATH = EVAL_DIR / "report.md"
-DEFAULT_RESULTS_PATH = EVAL_DIR / "results" / "latest.json"
+REPORTS_DIR = EVAL_DIR / "reports"
+RESULTS_DIR = EVAL_DIR / "results"
+
+
+def _default_output_paths() -> tuple[Path, Path]:
+    """Timestamped paths so each run keeps its own report / results file."""
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return (
+        REPORTS_DIR / f"report_{stamp}.md",
+        RESULTS_DIR / f"results_{stamp}.json",
+    )
+
+
+def _collect_intent_scores(results: list[dict[str, Any]]) -> dict[str, float | None]:
+    f1s: list[float] = []
+    precisions: list[float] = []
+    recalls: list[float] = []
+
+    for item in results:
+        intent = (item.get("evaluations") or {}).get("intent") or {}
+        if not intent.get("implemented"):
+            continue
+        score = intent.get("score") or {}
+        if "f1" in score:
+            f1s.append(float(score["f1"]))
+        if "precision" in score:
+            precisions.append(float(score["precision"]))
+        if "recall" in score:
+            recalls.append(float(score["recall"]))
+
+    if not f1s:
+        return {"accuracy": None, "precision": None, "recall": None, "f1": None}
+
+    return {
+        # 准确率：多标签场景下使用平均 F1
+        "accuracy": mean(f1s),
+        "precision": mean(precisions),
+        "recall": mean(recalls),
+        "f1": mean(f1s),
+    }
 
 
 def _collect_tool_scores(results: list[dict[str, Any]]) -> dict[str, float]:
@@ -105,6 +144,7 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
         if item.get("latency_seconds") is not None and not item.get("error")
     ]
     errors = [item for item in results if item.get("error")]
+    intent_scores = _collect_intent_scores(results)
     tool_scores = _collect_tool_scores(results)
     evidence_scores = _collect_evidence_scores(results)
     reasoning_scores = _collect_reasoning_scores(results)
@@ -112,7 +152,10 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "total": len(results),
         "errors": len(errors),
-        "intent_accuracy": None,
+        "intent_accuracy": intent_scores["accuracy"],
+        "intent_precision": intent_scores["precision"],
+        "intent_recall": intent_scores["recall"],
+        "intent_f1": intent_scores["f1"],
         "tool_precision": tool_scores["precision"],
         "tool_recall": tool_scores["recall"],
         "tool_f1": tool_scores["f1"],
@@ -133,90 +176,107 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
 def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> str:
     def fmt_ratio(value: float | None) -> str:
         if value is None:
-            return "N/A (stub)"
+            return "暂未实现"
         return percent(value)
 
     def fmt_score_100(value: float | None) -> str:
         if value is None:
-            return "N/A (stub)"
-        return f"{value:.1f}"
+            return "暂未实现"
+        return f"{value:.0f}" if float(value).is_integer() else f"{value:.1f}"
 
     lines = [
-        "# Agent Evaluation Report",
+        "# Agent 评测报告",
         "",
-        f"Total questions: {summary.get('total', 0)}",
-        f"Errors: {summary.get('errors', 0)}",
+        "## 基础信息",
         "",
-        "## Aggregate Metrics",
+        f"测试问题数量：",
+        f"{summary.get('total', 0)}",
         "",
-        "Intent Accuracy",
+        f"错误数量：",
+        f"{summary.get('errors', 0)}",
+        "",
+        "",
+        "## 综合指标",
+        "",
+        "",
+        "### 意图理解",
+        "",
+        "",
+        "准确率：",
         "",
         f"{fmt_ratio(summary.get('intent_accuracy'))}",
         "",
-        "Tool Precision",
+        "",
+        "",
+        "### 工具选择能力",
+        "",
+        "",
+        "工具 Precision:",
         "",
         f"{fmt_ratio(summary.get('tool_precision'))}",
         "",
-        "Tool Recall",
+        "",
+        "工具 Recall:",
         "",
         f"{fmt_ratio(summary.get('tool_recall'))}",
         "",
-        "Tool F1",
+        "",
+        "工具 F1:",
         "",
         f"{fmt_ratio(summary.get('tool_f1'))}",
         "",
-        "Tool Call Order",
         "",
-        f"{fmt_ratio(summary.get('tool_order'))}",
         "",
-        "## Evidence Quality",
+        "### 证据质量",
         "",
-        "Average Score:",
+        "",
+        "平均分:",
         "",
         f"{fmt_score_100(summary.get('evidence_quality'))}",
         "",
-        "Evidence Completeness",
+        "",
+        "证据完整性:",
         "",
         f"{fmt_score_100(summary.get('evidence_completeness'))}",
         "",
-        "Evidence Freshness",
+        "",
+        "证据新鲜度:",
         "",
         f"{fmt_score_100(summary.get('evidence_freshness'))}",
         "",
-        "Evidence Coverage",
+        "",
+        "证据覆盖:",
         "",
         f"{fmt_score_100(summary.get('evidence_coverage'))}",
         "",
-        "## Reasoning Quality",
         "",
-        "Average Score:",
+        "",
+        "### 推理质量",
+        "",
+        "",
+        "平均分:",
         "",
         f"{fmt_score_100(summary.get('reasoning_quality'))}",
         "",
-        "Evidence Grounding",
         "",
-        f"{fmt_score_100(summary.get('reasoning_grounding'))}",
         "",
-        "Contradiction Detection",
+        "### 响应质量",
         "",
-        f"{fmt_score_100(summary.get('reasoning_contradictions'))}",
         "",
-        "Reasoning Completeness",
+        "暂未实现",
         "",
-        f"{fmt_score_100(summary.get('reasoning_completeness'))}",
         "",
-        "Answer Quality",
         "",
-        "N/A (stub)",
+        "### 平均延迟",
         "",
-        "Average Latency",
         "",
-        f"{summary.get('average_latency_seconds', 0.0):.2f} seconds",
+        f"{summary.get('average_latency_seconds', 0.0):.1f} 秒",
         "",
-        "## Per-Question Results",
         "",
-        "| ID | Intent | Tool P | Tool R | Evidence | Reasoning | Unsupported | Latency (s) |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        "## 逐题结果",
+        "",
+        "| ID | 预期意图 | 预测意图 | 意图分 | 工具P | 工具R | 证据 | 推理 | 延迟(秒) |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
 
     for item in results:
@@ -224,24 +284,29 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
         tool_score = tool.get("score") or {}
         evidence = (item.get("evaluations") or {}).get("evidence") or {}
         reasoning = (item.get("evaluations") or {}).get("reasoning") or {}
-        reasoning_details = reasoning.get("details") or {}
+        expected = ", ".join(item.get("expected_intents") or []) or "-"
+        predicted = ", ".join(item.get("predicted_intents") or []) or "-"
+        intent_score = item.get("intent_score")
+        intent_display = "-" if intent_score is None else str(intent_score)
+
         if item.get("error"):
             lines.append(
-                f"| {item.get('id')} | {item.get('intent', '')} | ERR | ERR | "
-                f"ERR | ERR | - | {item.get('latency_seconds', 0):.2f} |"
+                f"| {item.get('id')} | {expected} | {predicted} | {intent_display} | "
+                f"错误 | 错误 | 错误 | 错误 | {item.get('latency_seconds', 0):.2f} |"
             )
             continue
 
-        unsupported = ", ".join(reasoning_details.get("unsupported_claims") or []) or "-"
         lines.append(
-            "| {id} | {intent} | {prec} | {rec} | {ev} | {rs} | {unsupported} | {lat:.2f} |".format(
+            "| {id} | {expected} | {predicted} | {intent} | {prec} | {rec} | "
+            "{ev} | {rs} | {lat:.2f} |".format(
                 id=item.get("id"),
-                intent=item.get("intent", ""),
+                expected=expected,
+                predicted=predicted,
+                intent=intent_display,
                 prec=percent(float(tool_score.get("precision", 0.0))),
                 rec=percent(float(tool_score.get("recall", 0.0))),
-                ev=evidence.get("score", "N/A"),
-                rs=reasoning.get("score", "N/A"),
-                unsupported=unsupported,
+                ev=evidence.get("score", "-"),
+                rs=reasoning.get("score", "-"),
                 lat=float(item.get("latency_seconds") or 0.0),
             )
         )
@@ -249,10 +314,10 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
     lines.extend(
         [
             "",
-            "## Notes",
+            "## 说明",
             "",
-            "- Layer 2 Tool Selection, Layer 3 Evidence Quality, and Layer 4 Reasoning Quality are implemented.",
-            "- Intent / Answer evaluators remain stubs.",
+            "- Layer 1 意图理解、Layer 2 工具选择、Layer 3 证据质量、Layer 4 推理质量已实现。",
+            "- 响应质量评测暂未实现。",
             "",
         ]
     )
@@ -264,8 +329,10 @@ def write_report(
     report_path: Path | None = None,
     results_path: Path | None = None,
 ) -> dict[str, Any]:
-    report_path = report_path or DEFAULT_REPORT_PATH
-    results_path = results_path or DEFAULT_RESULTS_PATH
+    if report_path is None or results_path is None:
+        default_report, default_results = _default_output_paths()
+        report_path = report_path or default_report
+        results_path = results_path or default_results
 
     summary = summarize(results)
     markdown = render_markdown(summary, results)
@@ -279,4 +346,6 @@ def write_report(
         encoding="utf-8",
     )
 
+    summary["report_path"] = str(report_path)
+    summary["results_path"] = str(results_path)
     return summary

@@ -1,7 +1,7 @@
 """
 Evaluation runner.
 
-Reads dataset → calls Agent via ChatService → evaluates → writes report.
+Reads dataset → Intent Router → Agent → evaluates → writes report.
 
 Usage (from backend/):
 
@@ -34,6 +34,7 @@ from evaluation.evaluators import (  # noqa: E402
     evaluate_tool_selection,
 )
 from evaluation.evidence_from_trace import evidence_from_trace  # noqa: E402
+from evaluation.intent_router import IntentRouter  # noqa: E402
 from evaluation.report import write_report  # noqa: E402
 from services.chat_service import ChatService  # noqa: E402
 
@@ -58,10 +59,36 @@ def build_prompt(item: dict[str, Any]) -> str:
     return item["question"]
 
 
-def run_one(service: ChatService, item: dict[str, Any]) -> dict[str, Any]:
+def _expected_intents(item: dict[str, Any]) -> list[str]:
+    if "expected_intents" in item:
+        return list(item.get("expected_intents") or [])
+    legacy = item.get("intent")
+    if isinstance(legacy, str) and legacy:
+        return [legacy]
+    if isinstance(legacy, list):
+        return list(legacy)
+    return []
+
+
+def run_one(
+    service: ChatService,
+    intent_router: IntentRouter,
+    item: dict[str, Any],
+) -> dict[str, Any]:
     question = build_prompt(item)
+    expected_intents = _expected_intents(item)
+
+    # 1. Intent Router (Layer 1)
+    predicted_intents: list[str] = []
+    intent_error = None
+    try:
+        predicted_intents = intent_router.classify(question)
+    except Exception as exc:  # noqa: BLE001
+        intent_error = f"{type(exc).__name__}: {exc}"
+        traceback.print_exc()
+
     started = time.perf_counter()
-    error = None
+    error = intent_error
     answer = ""
     trace: list[dict[str, Any]] = []
 
@@ -70,17 +97,24 @@ def run_one(service: ChatService, item: dict[str, Any]) -> dict[str, Any]:
         answer = result.get("answer") or ""
         trace = result.get("trace") or []
     except Exception as exc:  # noqa: BLE001 — keep run going across dataset
-        error = f"{type(exc).__name__}: {exc}"
+        agent_error = f"{type(exc).__name__}: {exc}"
+        error = f"{error}; {agent_error}" if error else agent_error
         traceback.print_exc()
 
     latency = time.perf_counter() - started
     evidence = evidence_from_trace(trace)
 
+    # 2–4. Tool / Evidence / Reasoning (+ answer stub)
+    intent_eval = evaluate_intent(item, predicted_intents)
+    intent_score = (intent_eval.get("score") or {}).get("intent_score")
+
     record: dict[str, Any] = {
         "id": item.get("id"),
         "question": question,
         "repo": item.get("repo"),
-        "intent": item.get("intent"),
+        "expected_intents": expected_intents,
+        "predicted_intents": predicted_intents,
+        "intent_score": intent_score,
         "expected_tools": item.get("expected_tools"),
         "required_evidence": item.get("required_evidence"),
         "answer": answer,
@@ -88,16 +122,13 @@ def run_one(service: ChatService, item: dict[str, Any]) -> dict[str, Any]:
         "evidence": evidence,
         "latency_seconds": round(latency, 3),
         "error": error,
-        "evaluations": {},
-    }
-
-    # Layer 1 Intent / Layer 2 Tool Selection / Layer 3 Evidence / Layer 4 Reasoning
-    record["evaluations"] = {
-        "intent": evaluate_intent(item, answer, trace),
-        "tool_selection": evaluate_tool_selection(item, answer, trace),
-        "evidence": evaluate_evidence(item, evidence, answer),
-        "reasoning": evaluate_reasoning(item, evidence, answer),
-        "answer": evaluate_answer(item, answer, trace),
+        "evaluations": {
+            "intent": intent_eval,
+            "tool_selection": evaluate_tool_selection(item, answer, trace),
+            "evidence": evaluate_evidence(item, evidence, answer),
+            "reasoning": evaluate_reasoning(item, evidence, answer),
+            "answer": evaluate_answer(item, answer, trace),
+        },
     }
     return record
 
@@ -116,48 +147,56 @@ def run(
         dataset = dataset[:limit]
 
     service = ChatService()
+    intent_router = IntentRouter()
     results: list[dict[str, Any]] = []
 
-    print(f"Running evaluation on {len(dataset)} question(s)...")
+    print(f"正在评测 {len(dataset)} 个问题...")
     for index, item in enumerate(dataset, start=1):
-        print(f"[{index}/{len(dataset)}] id={item.get('id')} intent={item.get('intent')}")
-        record = run_one(service, item)
+        expected = _expected_intents(item)
+        print(f"[{index}/{len(dataset)}] id={item.get('id')} intents={expected}")
+        record = run_one(service, intent_router, item)
         results.append(record)
 
+        intent_score = record.get("intent_score")
         tool = record["evaluations"]["tool_selection"]["score"]
         evidence_score = record["evaluations"]["evidence"]["score"]
         reasoning_score = record["evaluations"]["reasoning"]["score"]
-        status = "ERROR" if record["error"] else "OK"
+        status = "错误" if record["error"] else "成功"
         print(
-            f"  → {status}  P={tool['precision']:.2f}  R={tool['recall']:.2f}  "
-            f"evidence={evidence_score}  reasoning={reasoning_score}  "
-            f"latency={record['latency_seconds']:.2f}s"
+            f"  → {status}  意图={intent_score}  "
+            f"工具P={tool['precision']:.2f}  工具R={tool['recall']:.2f}  "
+            f"证据={evidence_score}  推理={reasoning_score}  "
+            f"延迟={record['latency_seconds']:.2f}s"
         )
 
     summary = write_report(results)
-    print("\n=== Summary ===")
-    print(f"Tool Precision:   {summary['tool_precision'] * 100:.1f}%")
-    print(f"Tool Recall:      {summary['tool_recall'] * 100:.1f}%")
-    print(f"Evidence Quality: {summary['evidence_quality']:.1f}")
-    print(f"Reasoning Quality:{summary['reasoning_quality']:.1f}")
-    print(f"Avg Latency:      {summary['average_latency_seconds']:.2f}s")
-    print(f"Report written:   {EVAL_DIR / 'report.md'}")
+    print("\n=== 评测摘要 ===")
+    intent_acc = summary.get("intent_accuracy")
+    intent_display = f"{intent_acc * 100:.1f}%" if intent_acc is not None else "暂未实现"
+    print(f"意图准确率:     {intent_display}")
+    print(f"工具 Precision: {summary['tool_precision'] * 100:.1f}%")
+    print(f"工具 Recall:    {summary['tool_recall'] * 100:.1f}%")
+    print(f"证据质量:       {summary['evidence_quality']:.1f}")
+    print(f"推理质量:       {summary['reasoning_quality']:.1f}")
+    print(f"平均延迟:       {summary['average_latency_seconds']:.2f}s")
+    print(f"报告已写入:     {summary.get('report_path')}")
+    print(f"结果已写入:     {summary.get('results_path')}")
     return results
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="AI Agent Evaluation Runner")
+    parser = argparse.ArgumentParser(description="AI Agent 评测 Runner")
     parser.add_argument(
         "--limit",
         type=int,
         default=None,
-        help="Only run the first N questions.",
+        help="只运行前 N 个问题。",
     )
     parser.add_argument(
         "--ids",
         type=str,
         default=None,
-        help="Comma-separated question ids, e.g. 1,2,5",
+        help="逗号分隔的问题 id，例如 1,2,5",
     )
     return parser.parse_args(argv)
 

@@ -228,7 +228,9 @@ def _score_coverage(
         "evidence_empty": not has_any_evidence,
         "unsupported_claims": unsupported,
         "unsupported_count": len(unsupported),
-        "intent": item.get("intent"),
+        "expected_intents": item.get("expected_intents") or (
+            [item["intent"]] if item.get("intent") else []
+        ),
     }
 
 
