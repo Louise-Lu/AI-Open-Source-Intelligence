@@ -44,17 +44,17 @@ class ReadmeTool:
         )
 
 
-        add_trace(
-            tool_name="get_readme",
-            tool_input={
-                "owner": owner,
-                "repo": repo
-            },
-            tool_output={
-                "length": len(content),
-                # "preview": clean_preview(content)
-            }
-        )
+        # add_trace(
+        #     tool_name="get_readme",
+        #     tool_input={
+        #         "owner": owner,
+        #         "repo": repo
+        #     },
+        #     tool_output={
+        #         "length": len(content),
+        #         # "preview": clean_preview(content)
+        #     }
+        # )
 
 
         return content

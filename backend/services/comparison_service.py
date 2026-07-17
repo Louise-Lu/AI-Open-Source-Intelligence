@@ -12,7 +12,7 @@ class RepositoryComparisonService:
     def __init__(self):
         self.profile_service = RepositoryProfileService()
 
-    def analyze(
+    def compare(
         self,
         owner1: str,
         repo1: str,

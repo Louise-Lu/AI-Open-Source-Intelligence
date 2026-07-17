@@ -47,13 +47,13 @@ class PullRequestTool:
             )
 
         
-        add_trace(
-        "get_pull_requests",
-                {
-                "owner":owner,
-                "repo":repo
-                },
-                formatted
-            )
+        # add_trace(
+        # "get_pull_requests",
+        #         {
+        #         "owner":owner,
+        #         "repo":repo
+        #         },
+        #         formatted
+        #     )
         
         return formatted

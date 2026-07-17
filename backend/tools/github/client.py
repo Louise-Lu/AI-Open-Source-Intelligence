@@ -52,7 +52,7 @@ class GitHubClient:
 
         print("GitHub API calling:", url)
 
-        start = time.time()
+        # start = time.time()
 
         response = self.session.get(
             url,
@@ -60,12 +60,12 @@ class GitHubClient:
             timeout=30
         )
 
-        print(
-            "GitHub API finished:",
-            response.status_code,
-            round(time.time()-start, 2),
-            "seconds"
-        )
+        # print(
+        #     "GitHub API finished:",
+        #     response.status_code,
+        #     round(time.time()-start, 2),
+        #     "seconds"
+        # )
 
         raise_for_github_response(response)
 

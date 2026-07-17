@@ -52,13 +52,13 @@ class RepositoryTool:
             "updated_at": data.get("updated_at"),
         }
 
-        add_trace(
-        tool_name="get_repository",
-        tool_input={
-            "owner": owner,
-            "repo": repo
-        },
-        tool_output=result
-    )
+    #     add_trace(
+    #     tool_name="get_repository",
+    #     tool_input={
+    #         "owner": owner,
+    #         "repo": repo
+    #     },
+    #     tool_output=result
+    # )
 
         return result

@@ -21,7 +21,7 @@ def compare_repositories(
     owner1, name1 = repo1.split("/")
     owner2, name2 = repo2.split("/")
 
-    return service.analyze(
+    return service.compare(
         owner1,
         name1,
         owner2,

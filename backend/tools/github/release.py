@@ -43,13 +43,10 @@ class ReleaseTool:
                 }
             )
 
-        add_trace(
-                "get_releases",
-                {
-                "owner":owner,
-                "repo":repo
-                },
-                formatted
-            )
+        # add_trace(
+        #     "get_releases",
+        #     {"owner": owner, "repo": repo},
+        #     f"[{len(formatted)} releases, body hidden]"  
+        # )
         
         return formatted

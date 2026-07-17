@@ -83,15 +83,15 @@ class CommitActivityTool:
             "active_contributors_count": len(contributors),
         }
 
-        add_trace(
-            tool_name="get_commit_activity",
-            tool_input={
-                "owner": owner,
-                "repo": repo,
-                "since_90d": since_90d,
-                "until": until,
-            },
-            tool_output=result,
-        )
+        # add_trace(
+        #     tool_name="get_commit_activity",
+        #     tool_input={
+        #         "owner": owner,
+        #         "repo": repo,
+        #         "since_90d": since_90d,
+        #         "until": until,
+        #     },
+        #     tool_output=result,
+        # )
 
         return result

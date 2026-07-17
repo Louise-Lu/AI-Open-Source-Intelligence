@@ -92,13 +92,13 @@ class DiscussionTool:
 
         result = {"hot_topics": hot_topics}
 
-        add_trace(
-            tool_name="get_discussion_signals",
-            tool_input={
-                "owner": owner,
-                "repo": repo,
-            },
-            tool_output=result,
-        )
+        # add_trace(
+        #     tool_name="get_discussion_signals",
+        #     tool_input={
+        #         "owner": owner,
+        #         "repo": repo,
+        #     },
+        #     tool_output=result,
+        # )
 
         return result

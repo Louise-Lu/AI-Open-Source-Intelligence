@@ -60,13 +60,13 @@ class IssueTool:
             if len(formatted) >= 5:
                 break
 
-        add_trace(
-                "get_issues",
-                {
-                "owner":owner,
-                "repo":repo
-                },
-                formatted
-            )
+        # add_trace(
+        #         "get_issues",
+        #         {
+        #         "owner":owner,
+        #         "repo":repo
+        #         },
+        #         formatted
+        #     )
         
         return formatted

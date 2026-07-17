@@ -86,13 +86,13 @@ class PlanningTool:
             "enhancement_issues": enhancement_issues,
         }
 
-        add_trace(
-            tool_name="get_planning_signals",
-            tool_input={
-                "owner": owner,
-                "repo": repo,
-            },
-            tool_output=result,
-        )
+        # add_trace(
+        #     tool_name="get_planning_signals",
+        #     tool_input={
+        #         "owner": owner,
+        #         "repo": repo,
+        #     },
+        #     tool_output=result,
+        # )
 
         return result
