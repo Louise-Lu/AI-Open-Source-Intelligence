@@ -46,7 +46,7 @@ class RepositoryEvidenceService:
             repo=repo
         )
         
-        commit_activity = self.github.get_commit_activity(owner, repo, days=30)
+        commit_activity = self.github.get_commit_activity(owner, repo)
         planning = self.github.get_planning_signals(owner, repo)
         discussions = self.github.get_discussion_signals(owner, repo)
 

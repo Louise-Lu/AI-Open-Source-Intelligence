@@ -18,16 +18,16 @@ class RepositoryRoadmapService:
     @staticmethod
     def format_roadmap_evidence(evidence):
         """将 IntelligenceEvidence 整理成三层情报文本，供 LLM 阅读"""
-        github_evidence = evidence.github
-        if not github_evidence:
+        github = evidence.github
+        if not github:
             return "无 GitHub 数据"
 
-        repo = github_evidence.repository
-        planning = github_evidence.planning
-        discussions = github_evidence.discussions
-        commits = github_evidence.commit_activity
-        prs = github_evidence.pull_requests
-        readme = github_evidence.readme
+        repo = github.repository
+        planning = github.planning
+        discussions = github.discussions
+        commits = github.commit_activity
+        prs = github.pull_requests
+        readme = github.readme
 
         parts = []
 
@@ -137,7 +137,7 @@ Repository Evidence:
         try:
             roadmap = llm.invoke(prompt)
 
-            print("==========  DEBUG ==========")
+            print("==========  ROADMAP DEBUG ==========")
             print(roadmap)
             print(type(roadmap))
             print("===================================")

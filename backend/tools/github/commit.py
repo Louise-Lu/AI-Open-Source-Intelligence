@@ -8,12 +8,11 @@ from agent.trace import add_trace
 class CommitActivityTool:
     """
     获取仓库提交活跃度
-    若需要同时提供 30 天和 90 天，可在外层分别调用此方法两次，或扩展此方法
 
     返回：
     - commits_last_30_days: int
     - commits_last_90_days: int
-    - active_contributors_count: int
+    - active_contributors_count: int (90天内去重)
     """
 
     client: Any
@@ -22,26 +21,23 @@ class CommitActivityTool:
         self,
         owner: str,
         repo: str,
-        days: int = 30
-    ) -> dict[str, Any]: ## {"a":xxx,...}
+    ) -> dict[str, Any]:
         """
-        拉取指定天数内的提交，并统计活跃贡献者。
-        默认 30 天。
+        一次拉取近 90 天的所有提交，然后分别统计 30 天和 90 天。
         """
         now = datetime.now(timezone.utc)
-        since = (now - timedelta(days=days)).isoformat()
+        since_90d = (now - timedelta(days=90)).isoformat()
         until = now.isoformat()
 
         all_commits = []
         page = 1
         per_page = 100
 
-        # 分页抓取所有提交（GitHub 最多返回 1000 条，实际项目 30 天内一般不会超）
         while True:
             response = self.client.get(
                 f"/repos/{owner}/{repo}/commits",
                 params={
-                    "since": since,
+                    "since": since_90d,
                     "until": until,
                     "per_page": per_page,
                     "page": page,
@@ -55,24 +51,35 @@ class CommitActivityTool:
                 break
             page += 1
 
-        # 统计提交次数
-        commits_count = len(all_commits)
+        # 统计 90 天总提交数
+        commits_90d = len(all_commits)
 
-        # 去重统计活跃贡献者
+        # 统计 30 天提交数：筛选 committer date 在近 30 天内的
+        cutoff_30d = now - timedelta(days=30)
+        commits_30d = 0
         contributors = set()
+
         for commit in all_commits:
+            # 提取作者
             author = commit.get("author")
             if author and author.get("login"):
                 contributors.add(author["login"])
             else:
-                # 有时候 commit.author 为 null，回退到 commit.commit.author.name
-                committer = commit.get("commit", {}).get("author", {}).get("name")
+                # 回退到 commit.committer.name
+                committer = commit.get("commit", {}).get("committer", {}).get("name")
                 if committer:
                     contributors.add(committer)
 
+            # 判断是否在 30 天内
+            commit_date_str = commit.get("commit", {}).get("committer", {}).get("date")
+            if commit_date_str:
+                commit_date = datetime.fromisoformat(commit_date_str.replace("Z", "+00:00"))
+                if commit_date >= cutoff_30d:
+                    commits_30d += 1
+
         result = {
-            "commits_last_30_days": commits_count if days == 30 else 0,
-            "commits_last_90_days": commits_count if days == 90 else 0,
+            "commits_last_30_days": commits_30d,
+            "commits_last_90_days": commits_90d,
             "active_contributors_count": len(contributors),
         }
 
@@ -81,8 +88,7 @@ class CommitActivityTool:
             tool_input={
                 "owner": owner,
                 "repo": repo,
-                "days": days,
-                "since": since,
+                "since_90d": since_90d,
                 "until": until,
             },
             tool_output=result,
