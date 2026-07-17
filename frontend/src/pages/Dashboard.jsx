@@ -61,6 +61,7 @@ export default function Dashboard() {
   const [repo, setRepo] = useState('');
 
   const [profile, setProfile] = useState(null);
+  const [profileError, setProfileError] = useState('');
   const [roadmap, setRoadmap] = useState(null);
   const [analysis, setAnalysis] = useState('');
   const [topError, setTopError] = useState('');
@@ -96,6 +97,7 @@ export default function Dashboard() {
 
     setTopError('');
     setProfile(null);
+    setProfileError('');
     setRoadmap(null);
     setAnalysis('');
     setIsAnalyzing(true);
@@ -116,8 +118,11 @@ export default function Dashboard() {
 
     if (profileResult.status === 'fulfilled') {
       setProfile(profileResult.value);
+      setProfileError('');
     } else {
-      errors.push(profileResult.reason?.message || 'Failed to load profile.');
+      const message = profileResult.reason?.message || 'Failed to load profile.';
+      setProfileError(message);
+      errors.push(message);
     }
 
     if (roadmapResult.status === 'fulfilled') {
@@ -289,7 +294,9 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-6 p-4 sm:p-6">
-              {activeTab === 'profile' ? <ProfileCard profile={profile} /> : null}
+              {activeTab === 'profile' ? (
+                <ProfileCard profile={profile} error={profileError} />
+              ) : null}
 
               {activeTab === 'roadmap' ? <RoadmapCard roadmap={roadmap} /> : null}
 

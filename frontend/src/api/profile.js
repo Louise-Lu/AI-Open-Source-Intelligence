@@ -1,3 +1,5 @@
+/** @typedef {import('../types.js').ProfileResponse} ProfileResponse */
+
 const API_BASE_URL = 'http://127.0.0.1:8000';
 
 async function requestJson(url, options) {
@@ -15,6 +17,12 @@ async function requestJson(url, options) {
   return data;
 }
 
+/**
+ * Fetch repository profile. Returns the API payload as-is without field mapping.
+ * @param {string} owner
+ * @param {string} repo
+ * @returns {Promise<ProfileResponse>}
+ */
 export async function getProfile(owner, repo) {
   try {
     return await requestJson(`${API_BASE_URL}/profile`, {
