@@ -42,6 +42,62 @@ def _collect_tool_scores(results: list[dict[str, Any]]) -> dict[str, float]:
     }
 
 
+def _collect_evidence_scores(results: list[dict[str, Any]]) -> dict[str, float]:
+    overall: list[float] = []
+    completeness: list[float] = []
+    freshness: list[float] = []
+    coverage: list[float] = []
+
+    for item in results:
+        evidence = (item.get("evaluations") or {}).get("evidence") or {}
+        if not evidence.get("implemented"):
+            continue
+        if evidence.get("score") is not None:
+            overall.append(float(evidence["score"]))
+        details = evidence.get("details") or {}
+        if details.get("completeness") is not None:
+            completeness.append(float(details["completeness"]))
+        if details.get("freshness") is not None:
+            freshness.append(float(details["freshness"]))
+        if details.get("coverage") is not None:
+            coverage.append(float(details["coverage"]))
+
+    return {
+        "quality": mean(overall),
+        "completeness": mean(completeness),
+        "freshness": mean(freshness),
+        "coverage": mean(coverage),
+    }
+
+
+def _collect_reasoning_scores(results: list[dict[str, Any]]) -> dict[str, float]:
+    overall: list[float] = []
+    grounding: list[float] = []
+    contradictions: list[float] = []
+    completeness: list[float] = []
+
+    for item in results:
+        reasoning = (item.get("evaluations") or {}).get("reasoning") or {}
+        if not reasoning.get("implemented"):
+            continue
+        if reasoning.get("score") is not None:
+            overall.append(float(reasoning["score"]))
+        details = reasoning.get("details") or {}
+        if details.get("grounding") is not None:
+            grounding.append(float(details["grounding"]))
+        if details.get("contradictions") is not None:
+            contradictions.append(float(details["contradictions"]))
+        if details.get("completeness") is not None:
+            completeness.append(float(details["completeness"]))
+
+    return {
+        "quality": mean(overall),
+        "grounding": mean(grounding),
+        "contradictions": mean(contradictions),
+        "completeness": mean(completeness),
+    }
+
+
 def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     latencies = [
         float(item["latency_seconds"])
@@ -50,6 +106,8 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     ]
     errors = [item for item in results if item.get("error")]
     tool_scores = _collect_tool_scores(results)
+    evidence_scores = _collect_evidence_scores(results)
+    reasoning_scores = _collect_reasoning_scores(results)
 
     return {
         "total": len(results),
@@ -59,8 +117,14 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
         "tool_recall": tool_scores["recall"],
         "tool_f1": tool_scores["f1"],
         "tool_order": tool_scores["order"],
-        "evidence_completeness": None,
-        "reasoning": None,
+        "evidence_quality": evidence_scores["quality"],
+        "evidence_completeness": evidence_scores["completeness"],
+        "evidence_freshness": evidence_scores["freshness"],
+        "evidence_coverage": evidence_scores["coverage"],
+        "reasoning_quality": reasoning_scores["quality"],
+        "reasoning_grounding": reasoning_scores["grounding"],
+        "reasoning_contradictions": reasoning_scores["contradictions"],
+        "reasoning_completeness": reasoning_scores["completeness"],
         "answer_quality": None,
         "average_latency_seconds": mean(latencies),
     }
@@ -69,13 +133,13 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
 def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> str:
     def fmt_ratio(value: float | None) -> str:
         if value is None:
-            return "N/A (Phase 1 stub)"
+            return "N/A (stub)"
         return percent(value)
 
-    def fmt_score_5(value: float | None) -> str:
+    def fmt_score_100(value: float | None) -> str:
         if value is None:
-            return "N/A (Phase 1 stub)"
-        return f"{value:.1f} / 5"
+            return "N/A (stub)"
+        return f"{value:.1f}"
 
     lines = [
         "# Agent Evaluation Report",
@@ -85,72 +149,113 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
         "",
         "## Aggregate Metrics",
         "",
-        f"Intent Accuracy",
+        "Intent Accuracy",
         "",
         f"{fmt_ratio(summary.get('intent_accuracy'))}",
         "",
-        f"Tool Precision",
+        "Tool Precision",
         "",
         f"{fmt_ratio(summary.get('tool_precision'))}",
         "",
-        f"Tool Recall",
+        "Tool Recall",
         "",
         f"{fmt_ratio(summary.get('tool_recall'))}",
         "",
-        f"Tool F1",
+        "Tool F1",
         "",
         f"{fmt_ratio(summary.get('tool_f1'))}",
         "",
-        f"Tool Call Order",
+        "Tool Call Order",
         "",
         f"{fmt_ratio(summary.get('tool_order'))}",
         "",
-        f"Evidence Completeness",
+        "## Evidence Quality",
         "",
-        f"{fmt_ratio(summary.get('evidence_completeness'))}",
+        "Average Score:",
         "",
-        f"Reasoning",
+        f"{fmt_score_100(summary.get('evidence_quality'))}",
         "",
-        f"{fmt_score_5(summary.get('reasoning'))}",
+        "Evidence Completeness",
         "",
-        f"Answer Quality",
+        f"{fmt_score_100(summary.get('evidence_completeness'))}",
         "",
-        f"{fmt_score_5(summary.get('answer_quality'))}",
+        "Evidence Freshness",
         "",
-        f"Average Latency",
+        f"{fmt_score_100(summary.get('evidence_freshness'))}",
+        "",
+        "Evidence Coverage",
+        "",
+        f"{fmt_score_100(summary.get('evidence_coverage'))}",
+        "",
+        "## Reasoning Quality",
+        "",
+        "Average Score:",
+        "",
+        f"{fmt_score_100(summary.get('reasoning_quality'))}",
+        "",
+        "Evidence Grounding",
+        "",
+        f"{fmt_score_100(summary.get('reasoning_grounding'))}",
+        "",
+        "Contradiction Detection",
+        "",
+        f"{fmt_score_100(summary.get('reasoning_contradictions'))}",
+        "",
+        "Reasoning Completeness",
+        "",
+        f"{fmt_score_100(summary.get('reasoning_completeness'))}",
+        "",
+        "Answer Quality",
+        "",
+        "N/A (stub)",
+        "",
+        "Average Latency",
         "",
         f"{summary.get('average_latency_seconds', 0.0):.2f} seconds",
         "",
-        "## Per-Question Tool Selection",
+        "## Per-Question Results",
         "",
-        "| ID | Intent | Precision | Recall | Missed | Extra | Latency (s) |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| ID | Intent | Tool P | Tool R | Evidence | Reasoning | Unsupported | Latency (s) |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
 
     for item in results:
         tool = (item.get("evaluations") or {}).get("tool_selection") or {}
-        score = tool.get("score") or {}
-        details = tool.get("details") or {}
+        tool_score = tool.get("score") or {}
+        evidence = (item.get("evaluations") or {}).get("evidence") or {}
+        reasoning = (item.get("evaluations") or {}).get("reasoning") or {}
+        reasoning_details = reasoning.get("details") or {}
         if item.get("error"):
             lines.append(
                 f"| {item.get('id')} | {item.get('intent', '')} | ERR | ERR | "
-                f"- | - | {item.get('latency_seconds', 0):.2f} |"
+                f"ERR | ERR | - | {item.get('latency_seconds', 0):.2f} |"
             )
             continue
 
+        unsupported = ", ".join(reasoning_details.get("unsupported_claims") or []) or "-"
         lines.append(
-            "| {id} | {intent} | {prec} | {rec} | {missed} | {extra} | {lat:.2f} |".format(
+            "| {id} | {intent} | {prec} | {rec} | {ev} | {rs} | {unsupported} | {lat:.2f} |".format(
                 id=item.get("id"),
                 intent=item.get("intent", ""),
-                prec=percent(float(score.get("precision", 0.0))),
-                rec=percent(float(score.get("recall", 0.0))),
-                missed=", ".join(details.get("missed_tools") or []) or "-",
-                extra=", ".join(details.get("extra_tools") or []) or "-",
+                prec=percent(float(tool_score.get("precision", 0.0))),
+                rec=percent(float(tool_score.get("recall", 0.0))),
+                ev=evidence.get("score", "N/A"),
+                rs=reasoning.get("score", "N/A"),
+                unsupported=unsupported,
                 lat=float(item.get("latency_seconds") or 0.0),
             )
         )
 
-    lines.extend(["", "## Notes", "", "- Phase 1 implements Tool Selection only.", ""])
+    lines.extend(
+        [
+            "",
+            "## Notes",
+            "",
+            "- Layer 2 Tool Selection, Layer 3 Evidence Quality, and Layer 4 Reasoning Quality are implemented.",
+            "- Intent / Answer evaluators remain stubs.",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 

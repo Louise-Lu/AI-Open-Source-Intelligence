@@ -552,6 +552,7 @@ Sorry need more steps
     - Tool Call Order
 
 - 第三层：Evidence Quality
+Agent 生成答案的时候，拿到的证据够不够？相关不相关？新不新？    
     - Evidence Completeness
     - Evidence Relevance
     - Evidence Freshness

@@ -1,13 +1,14 @@
 """
-Evaluation runner — Phase 1.
+Evaluation runner.
 
 Reads dataset → calls Agent via ChatService → evaluates → writes report.
 
 Usage (from backend/):
 
+    python -m evaluation.run
     python -m evaluation.runner
-    python -m evaluation.runner --limit 5
-    python -m evaluation.runner --ids 1,2,3
+    python -m evaluation.run --limit 5
+    python -m evaluation.run --ids 1,2,3
 """
 
 from __future__ import annotations
@@ -32,6 +33,7 @@ from evaluation.evaluators import (  # noqa: E402
     evaluate_reasoning,
     evaluate_tool_selection,
 )
+from evaluation.evidence_from_trace import evidence_from_trace  # noqa: E402
 from evaluation.report import write_report  # noqa: E402
 from services.chat_service import ChatService  # noqa: E402
 
@@ -72,6 +74,7 @@ def run_one(service: ChatService, item: dict[str, Any]) -> dict[str, Any]:
         traceback.print_exc()
 
     latency = time.perf_counter() - started
+    evidence = evidence_from_trace(trace)
 
     record: dict[str, Any] = {
         "id": item.get("id"),
@@ -79,19 +82,21 @@ def run_one(service: ChatService, item: dict[str, Any]) -> dict[str, Any]:
         "repo": item.get("repo"),
         "intent": item.get("intent"),
         "expected_tools": item.get("expected_tools"),
+        "required_evidence": item.get("required_evidence"),
         "answer": answer,
         "trace": trace,
+        "evidence": evidence,
         "latency_seconds": round(latency, 3),
         "error": error,
         "evaluations": {},
     }
 
-    # Always run evaluators (tool selection still scores empty trace on failure).
+    # Layer 1 Intent / Layer 2 Tool Selection / Layer 3 Evidence / Layer 4 Reasoning
     record["evaluations"] = {
         "intent": evaluate_intent(item, answer, trace),
         "tool_selection": evaluate_tool_selection(item, answer, trace),
-        "evidence": evaluate_evidence(item, answer, trace),
-        "reasoning": evaluate_reasoning(item, answer, trace),
+        "evidence": evaluate_evidence(item, evidence, answer),
+        "reasoning": evaluate_reasoning(item, evidence, answer),
         "answer": evaluate_answer(item, answer, trace),
     }
     return record
@@ -120,24 +125,28 @@ def run(
         results.append(record)
 
         tool = record["evaluations"]["tool_selection"]["score"]
+        evidence_score = record["evaluations"]["evidence"]["score"]
+        reasoning_score = record["evaluations"]["reasoning"]["score"]
         status = "ERROR" if record["error"] else "OK"
         print(
             f"  → {status}  P={tool['precision']:.2f}  R={tool['recall']:.2f}  "
-            f"order={tool['order']:.2f}  latency={record['latency_seconds']:.2f}s"
+            f"evidence={evidence_score}  reasoning={reasoning_score}  "
+            f"latency={record['latency_seconds']:.2f}s"
         )
 
     summary = write_report(results)
     print("\n=== Summary ===")
-    print(f"Tool Precision: {summary['tool_precision'] * 100:.1f}%")
-    print(f"Tool Recall:    {summary['tool_recall'] * 100:.1f}%")
-    print(f"Tool Order:     {summary['tool_order'] * 100:.1f}%")
-    print(f"Avg Latency:    {summary['average_latency_seconds']:.2f}s")
-    print(f"Report written: {EVAL_DIR / 'report.md'}")
+    print(f"Tool Precision:   {summary['tool_precision'] * 100:.1f}%")
+    print(f"Tool Recall:      {summary['tool_recall'] * 100:.1f}%")
+    print(f"Evidence Quality: {summary['evidence_quality']:.1f}")
+    print(f"Reasoning Quality:{summary['reasoning_quality']:.1f}")
+    print(f"Avg Latency:      {summary['average_latency_seconds']:.2f}s")
+    print(f"Report written:   {EVAL_DIR / 'report.md'}")
     return results
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="AI Agent Evaluation Runner (Phase 1)")
+    parser = argparse.ArgumentParser(description="AI Agent Evaluation Runner")
     parser.add_argument(
         "--limit",
         type=int,
