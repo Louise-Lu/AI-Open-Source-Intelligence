@@ -104,7 +104,7 @@ def run_one(
     latency = time.perf_counter() - started
     evidence = evidence_from_trace(trace)
 
-    # 2–4. Tool / Evidence / Reasoning (+ answer stub)
+    # 2–5. Tool / Evidence / Reasoning / Answer
     intent_eval = evaluate_intent(item, predicted_intents)
     intent_score = (intent_eval.get("score") or {}).get("intent_score")
 
@@ -161,11 +161,13 @@ def run(
         tool = record["evaluations"]["tool_selection"]["score"]
         evidence_score = record["evaluations"]["evidence"]["score"]
         reasoning_score = record["evaluations"]["reasoning"]["score"]
+        answer_score = record["evaluations"]["answer"]["score"]
         status = "错误" if record["error"] else "成功"
         print(
             f"  → {status}  意图={intent_score}  "
             f"工具P={tool['precision']:.2f}  工具R={tool['recall']:.2f}  "
             f"证据={evidence_score}  推理={reasoning_score}  "
+            f"响应={answer_score}  "
             f"延迟={record['latency_seconds']:.2f}s"
         )
 
@@ -178,6 +180,11 @@ def run(
     print(f"工具 Recall:    {summary['tool_recall'] * 100:.1f}%")
     print(f"证据质量:       {summary['evidence_quality']:.1f}")
     print(f"推理质量:       {summary['reasoning_quality']:.1f}")
+    answer_quality = summary.get("answer_quality")
+    answer_display = (
+        f"{answer_quality:.1f}" if answer_quality is not None else "暂未实现"
+    )
+    print(f"响应质量:       {answer_display}")
     print(f"平均延迟:       {summary['average_latency_seconds']:.2f}s")
     print(f"报告已写入:     {summary.get('report_path')}")
     print(f"结果已写入:     {summary.get('results_path')}")

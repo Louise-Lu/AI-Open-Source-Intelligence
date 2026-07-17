@@ -137,6 +137,47 @@ def _collect_reasoning_scores(results: list[dict[str, Any]]) -> dict[str, float]
     }
 
 
+def _collect_answer_scores(results: list[dict[str, Any]]) -> dict[str, float | None]:
+    overall: list[float] = []
+    relevance: list[float] = []
+    completeness: list[float] = []
+    clarity: list[float] = []
+    conciseness: list[float] = []
+
+    for item in results:
+        answer = (item.get("evaluations") or {}).get("answer") or {}
+        if not answer.get("implemented"):
+            continue
+        if answer.get("score") is not None:
+            overall.append(float(answer["score"]))
+        details = answer.get("details") or {}
+        if details.get("relevance") is not None:
+            relevance.append(float(details["relevance"]))
+        if details.get("completeness") is not None:
+            completeness.append(float(details["completeness"]))
+        if details.get("clarity") is not None:
+            clarity.append(float(details["clarity"]))
+        if details.get("conciseness") is not None:
+            conciseness.append(float(details["conciseness"]))
+
+    if not overall:
+        return {
+            "quality": None,
+            "relevance": None,
+            "completeness": None,
+            "clarity": None,
+            "conciseness": None,
+        }
+
+    return {
+        "quality": mean(overall),
+        "relevance": mean(relevance),
+        "completeness": mean(completeness),
+        "clarity": mean(clarity),
+        "conciseness": mean(conciseness),
+    }
+
+
 def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     latencies = [
         float(item["latency_seconds"])
@@ -148,6 +189,7 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     tool_scores = _collect_tool_scores(results)
     evidence_scores = _collect_evidence_scores(results)
     reasoning_scores = _collect_reasoning_scores(results)
+    answer_scores = _collect_answer_scores(results)
 
     return {
         "total": len(results),
@@ -168,7 +210,11 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
         "reasoning_grounding": reasoning_scores["grounding"],
         "reasoning_contradictions": reasoning_scores["contradictions"],
         "reasoning_completeness": reasoning_scores["completeness"],
-        "answer_quality": None,
+        "answer_quality": answer_scores["quality"],
+        "answer_relevance": answer_scores["relevance"],
+        "answer_completeness": answer_scores["completeness"],
+        "answer_clarity": answer_scores["clarity"],
+        "answer_conciseness": answer_scores["conciseness"],
         "average_latency_seconds": mean(latencies),
     }
 
@@ -263,7 +309,29 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
         "### 响应质量",
         "",
         "",
-        "暂未实现",
+        "平均分:",
+        "",
+        f"{fmt_score_100(summary.get('answer_quality'))}",
+        "",
+        "",
+        "相关性:",
+        "",
+        f"{fmt_score_100(summary.get('answer_relevance'))}",
+        "",
+        "",
+        "完整性:",
+        "",
+        f"{fmt_score_100(summary.get('answer_completeness'))}",
+        "",
+        "",
+        "清晰度:",
+        "",
+        f"{fmt_score_100(summary.get('answer_clarity'))}",
+        "",
+        "",
+        "简洁性:",
+        "",
+        f"{fmt_score_100(summary.get('answer_conciseness'))}",
         "",
         "",
         "",
@@ -275,8 +343,8 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
         "",
         "## 逐题结果",
         "",
-        "| ID | 预期意图 | 预测意图 | 意图分 | 工具P | 工具R | 证据 | 推理 | 延迟(秒) |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        "| ID | 预期意图 | 预测意图 | 意图分 | 工具P | 工具R | 证据 | 推理 | 响应 | 延迟(秒) |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
 
     for item in results:
@@ -284,21 +352,23 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
         tool_score = tool.get("score") or {}
         evidence = (item.get("evaluations") or {}).get("evidence") or {}
         reasoning = (item.get("evaluations") or {}).get("reasoning") or {}
+        answer = (item.get("evaluations") or {}).get("answer") or {}
         expected = ", ".join(item.get("expected_intents") or []) or "-"
         predicted = ", ".join(item.get("predicted_intents") or []) or "-"
         intent_score = item.get("intent_score")
         intent_display = "-" if intent_score is None else str(intent_score)
+        answer_display = "-" if answer.get("score") is None else str(answer.get("score"))
 
         if item.get("error"):
             lines.append(
                 f"| {item.get('id')} | {expected} | {predicted} | {intent_display} | "
-                f"错误 | 错误 | 错误 | 错误 | {item.get('latency_seconds', 0):.2f} |"
+                f"错误 | 错误 | 错误 | 错误 | 错误 | {item.get('latency_seconds', 0):.2f} |"
             )
             continue
 
         lines.append(
             "| {id} | {expected} | {predicted} | {intent} | {prec} | {rec} | "
-            "{ev} | {rs} | {lat:.2f} |".format(
+            "{ev} | {rs} | {ans} | {lat:.2f} |".format(
                 id=item.get("id"),
                 expected=expected,
                 predicted=predicted,
@@ -307,6 +377,7 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
                 rec=percent(float(tool_score.get("recall", 0.0))),
                 ev=evidence.get("score", "-"),
                 rs=reasoning.get("score", "-"),
+                ans=answer_display,
                 lat=float(item.get("latency_seconds") or 0.0),
             )
         )
@@ -316,8 +387,8 @@ def render_markdown(summary: dict[str, Any], results: list[dict[str, Any]]) -> s
             "",
             "## 说明",
             "",
-            "- Layer 1 意图理解、Layer 2 工具选择、Layer 3 证据质量、Layer 4 推理质量已实现。",
-            "- 响应质量评测暂未实现。",
+            "- Layer 1 意图理解、Layer 2 工具选择、Layer 3 证据质量、"
+            "Layer 4 推理质量、Layer 5 响应质量已实现。",
             "",
         ]
     )
