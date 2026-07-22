@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 from datetime import datetime, timedelta, timezone
-from agent.trace import add_trace
 
 
 class CommitActivityTool:

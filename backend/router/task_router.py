@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import re
-
 from llms.deepseek import deepseek_model
 from schemas.task import TaskRoute
 
@@ -22,21 +20,43 @@ class TaskRouter:
     @staticmethod
     def _build_prompt(query: str) -> str:
         return f"""
-你是一个任务路由器。
-只判断用户想执行什么任务，不要解析 repo，也不要抽取实体。
+你是 AI 开源情报系统任务路由器。
 
-可选 route:
+你的职责：
+1. 判断用户想完成什么任务
+2. 判断需要生成哪些报告
+
+不要：
+- 提取项目名称
+- 判断 GitHub owner/repo
+- 选择具体工具
+
+Task:
+- single_project_analysis
+- project_comparison
+- project_search
+- update_tracking
+- general_question
+
+Reports:
 - profile
+- project_health
+- analysis
 - roadmap
 - comparison
+- recommendation
 - release_diff
-- analysis_report
-- agent
+
+只返回 JSON。
+
+路由示例：
+- "LangGraph怎么样" -> {{"task":"single_project_analysis","reports":["profile","analysis"],"need_entity_resolution":true}}
+- "LangGraph未来发展趋势" -> {{"task":"single_project_analysis","reports":["roadmap"],"need_entity_resolution":true}}
+- "比较LangGraph和CrewAI" -> {{"task":"project_comparison","reports":["comparison"],"need_entity_resolution":true}}
+- "CrewAI怎么样" -> {{"task":"single_project_analysis","reports":["profile","analysis"],"need_entity_resolution":true}}
 
 用户问题：
 {query}
-
-只返回结构化结果。
 """.strip()
 
     @staticmethod
@@ -44,19 +64,48 @@ class TaskRouter:
         text = query.lower()
 
         if any(keyword in text for keyword in ["比较", "对比", "compare"]):
-            route = "comparison"
-        elif any(keyword in text for keyword in ["未来三个月", "未来发展", "路线", "roadmap", "下一步"]):
-            route = "roadmap"
-        elif any(keyword in text for keyword in ["分析一下", "帮我分析", "analysis", "分析报告", "报告"]):
-            route = "analysis_report"
-        elif any(keyword in text for keyword in ["release", "版本", "更新", "最近版本", "diff"]):
-            route = "release_diff"
-        elif any(keyword in text for keyword in ["是什么", "介绍", "项目是什么", "技术栈", "profile"]):
-            route = "profile"
-        else:
-            route = "agent"
+            return {
+                "task": "project_comparison",
+                "reports": ["comparison"],
+                "need_entity_resolution": True,
+                "confidence": 0.95,
+            }
+
+        if any(keyword in text for keyword in ["更新", "release", "版本", "变更", "diff"]):
+            return {
+                "task": "update_tracking",
+                "reports": ["release_diff"],
+                "need_entity_resolution": True,
+                "confidence": 0.9,
+            }
+
+        if any(keyword in text for keyword in ["未来", "发展", "roadmap", "趋势", "下一步", "未来三个月", "未来发展方向"]):
+            return {
+                "task": "single_project_analysis",
+                "reports": ["roadmap"],
+                "need_entity_resolution": True,
+                "confidence": 0.92,
+            }
+
+        if any(keyword in text for keyword in ["分析", "怎么样", "是什么", "介绍", "值不值得", "值得", "好不好", "评价"]):
+            return {
+                "task": "single_project_analysis",
+                "reports": ["profile", "analysis"],
+                "need_entity_resolution": True,
+                "confidence": 0.9,
+            }
+
+        if any(keyword in text for keyword in ["搜索", "查找", "找一下", "有哪些"]):
+            return {
+                "task": "project_search",
+                "reports": [],
+                "need_entity_resolution": True,
+                "confidence": 0.85,
+            }
 
         return {
-            "route": route,
-            "reason": "rule-based fallback",
+            "task": "general_question",
+            "reports": [],
+            "need_entity_resolution": False,
+            "confidence": 0.7,
         }

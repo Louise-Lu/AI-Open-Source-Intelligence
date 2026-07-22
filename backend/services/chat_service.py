@@ -5,10 +5,8 @@ from agent.trace import clear_trace
 from router.entity_extractor import EntityExtractor
 from router.entity_resolver import EntityResolver
 from router.task_router import TaskRouter
-from services.analysis_service import RepositoryAnalysisService
-from services.comparison_service import RepositoryComparisonService
-from services.profile_service import RepositoryProfileService
-from services.roadmap_service import RepositoryRoadmapService
+from services.report_composer import ReportComposer
+from services.report_orchestrator import ReportOrchestrator
 
 
 class ChatService:
@@ -16,66 +14,130 @@ class ChatService:
         self.router = TaskRouter()
         self.entity_extractor = EntityExtractor()
         self.entity_resolver = EntityResolver()
+        self.report_orchestrator = ReportOrchestrator()
+        self.report_composer = ReportComposer()
         self.agent = github_agent
-        self.profile = RepositoryProfileService()
-        self.roadmap = RepositoryRoadmapService()
-        self.comparison = RepositoryComparisonService()
-        self.analysis_report = RepositoryAnalysisService()
 
-    def chat(self, message: str, owner: str, repo: str) -> dict:
+    def chat(self, message: str) -> dict:
         clear_trace()
 
         task = self.router.route(message)
-        print("task是", task)
         entity = self.entity_extractor.extract(message)
-        print("entity是", entity)
         task_dict = task if isinstance(task, dict) else task.model_dump()
         entity_dict = entity if isinstance(entity, dict) else entity.model_dump()
-
+        # print(entity_dict)
         resolved_entities = self._resolve_entities(entity_dict.get("projects", []))
-        resolved_payload = (
-            resolved_entities[0]
-            if len(resolved_entities) == 1
-            else {"projects": resolved_entities}
-        )
+        
+        route = task_dict.get("task", "general_question")
+        reports = task_dict.get("reports", [])
+        
+        # print(task_dict, reports)
+        # # {'task': 'single_project_analysis', 'reports': ['profile', 'analysis'], 'need_entity_resolution': True, 'confidence': 0.95} 
+        # # ['profile', 'analysis']
 
-        route = task_dict.get("route", "agent")
+        if route == "general_question":
+            return self._agent_response(message, task_dict, entity_dict, resolved_entities)
 
-        if route in {"profile", "roadmap", "analysis_report"}:
-            resolved = resolved_entities[0] if resolved_entities else None
-            if not resolved or not resolved.get("owner") or not resolved.get("repo"):
-                return self._not_found_response(task_dict, resolved_payload)
-            
-            print("task_dict是",task_dict,"resolved_payload是",resolved_payload)
+        if task_dict.get("need_entity_resolution", False) and not resolved_entities:
+            return self._not_found_response(task_dict, entity_dict)
 
-            if route == "profile":
-                result = self.profile.generate(resolved["owner"], resolved["repo"])
-                print("profile的结果", result)
-                return self._wrap_result(result, task_dict, resolved_payload, "summary")
-
-            if route == "roadmap":
-                result = self.roadmap.predict(resolved["owner"], resolved["repo"])
-                return self._wrap_result(result, task_dict, resolved_payload, "prediction_reasoning")
-
-            result = self.analysis_report.analyze(resolved["owner"], resolved["repo"])
-            return self._wrap_result(result, task_dict, resolved_payload, "analysis")
-
-        if route == "comparison":
+        if route == "project_comparison":
             if len(resolved_entities) < 2:
-                return self._not_found_response(task_dict, resolved_payload)
-
-            left, right = resolved_entities[0], resolved_entities[1]
-            if not all([left.get("owner"), left.get("repo"), right.get("owner"), right.get("repo")]):
-                return self._not_found_response(task_dict, resolved_payload)
-
-            result = self.comparison.compare(
-                left["owner"],
-                left["repo"],
-                right["owner"],
-                right["repo"],
+                return self._not_found_response(task_dict, entity_dict)
+            structured_reports = self.report_orchestrator.generate_comparison(
+                resolved_entities[0],
+                resolved_entities[1],
+                reports,
             )
-            return self._wrap_result(result, task_dict, resolved_payload, "comparison")
+            project_name = f"{resolved_entities[0]['name']} vs {resolved_entities[1]['name']}"
+            composed = self.report_composer.compose(project_name, structured_reports)
+            return self._response(task_dict, entity_dict, resolved_entities, structured_reports, composed.answer)
 
+        if route in {"single_project_analysis", "update_tracking"}:
+            project = resolved_entities[0] if resolved_entities else None
+            if not project:
+                return self._not_found_response(task_dict, entity_dict)
+
+            structured_reports = self.report_orchestrator.generate_single_project(
+                project["owner"],
+                project["repo"],
+                reports,
+            )
+            
+            composed = self.report_composer.compose(message, project["name"] or project["repo"], structured_reports)
+
+            print(task_dict, entity_dict, "--------------", resolved_entities, "--------------------", composed.answer)
+            
+            # {'task': 'single_project_analysis', 'reports': ['roadmap'], 'need_entity_resolution': True, 'confidence': 0.9} 
+            # {'projects': [{'name': 'LangGraph'}]}
+            # [{'name': 'LangGraph', 'owner': 'langchain-ai', 'repo': 'langgraph'}] 
+            return self._response(task_dict, entity_dict, resolved_entities, composed.answer)
+
+        if route == "project_search":
+            return {
+                "answer": "已识别项目名称，可以继续解析为 GitHub 仓库。",
+                "trace": {
+                    "task": task_dict,
+                    "entity": entity_dict,
+                    "resolved_entities": resolved_entities,
+                },
+                "task": task_dict,
+                "entity": entity_dict,
+                "resolved_entities": resolved_entities,
+            }
+
+        return self._agent_response(message, task_dict, entity_dict, resolved_entities)
+
+    def _resolve_entities(self, projects: list[dict]) -> list[dict]:
+        resolved_entities: list[dict] = []
+        for project in projects:
+            name = project.get("name")
+            if not name:
+                continue
+            resolved = self.entity_resolver.resolve(name)
+            if resolved.get("owner") and resolved.get("repo"):
+                resolved_entities.append(resolved)
+        return resolved_entities
+
+    @staticmethod
+    def _response(
+        task: dict,
+        entity: dict,
+        resolved_entities: list[dict],
+        answer: str,
+    ) -> dict:
+        print(answer)
+        return {
+            "answer": answer,
+            "trace": {
+                "task": task,
+                "entity": entity,
+                "resolved_entities": resolved_entities,
+            },
+        }
+
+    @staticmethod
+    def _not_found_response(task: dict, entity: dict) -> dict:
+        return {
+            "answer": "",
+            "error": "无法确定项目，请提供 GitHub 地址",
+            "trace": {
+                "task": task,
+                "entity": entity,
+                "resolved_entities": [],
+            },
+            "task": task,
+            "entity": entity,
+            "resolved_entities": [],
+        }
+
+    def _agent_response(
+        self,
+        message: str,
+        task: dict,
+        entity: dict,
+        resolved_entities: list[dict],
+    ) -> dict:
         config = {"recursion_limit": 12}
         result = self.agent.invoke(
             {"messages": [{"role": "user", "content": message}]},
@@ -85,57 +147,11 @@ class ChatService:
         return {
             "answer": answer,
             "trace": {
-                "task": task_dict,
-                "entity": resolved_payload,
-            },
-            "task": task_dict,
-            "entity": resolved_payload,
-        }
-
-    def _resolve_entities(self, projects: list[dict]) -> list[dict]:
-        resolved_entities: list[dict] = []
-        for project in projects:
-            name = project.get("name")
-            if not name:
-                continue
-            resolved_entities.append(self.entity_resolver.resolve(name))
-        return resolved_entities
-
-    @staticmethod
-    def _not_found_response(task: dict, entity: dict) -> dict:
-        return {
-            "answer": "没有找到对应的 GitHub 项目，请提供准确仓库地址",
-            "trace": {
                 "task": task,
                 "entity": entity,
+                "resolved_entities": resolved_entities,
             },
-            "task": task,
-            "entity": entity,
-        }
-    
-    # task: {'route': 'profile'}
-    # entity: {'name': 'dify', 'owner': 'langgenius', 'repo': 'dify'}
-    # answer_key : summary 
-    @staticmethod
-    def _wrap_result(result: object, task: dict, entity: dict, answer_key: str) -> dict:
-        if hasattr(result, "model_dump"):
-            payload = result.model_dump()
-        elif isinstance(result, dict):
-            payload = dict(result)
-        else:
-            payload = {"answer": str(result)}
-
-        answer = payload.get("answer") or payload.get(answer_key)
-        if not answer:
-            answer = str(payload)
-
-        print(answer)
-        return {
-            "answer": answer,
-            "trace": {
-                "task": task,
-                "entity": entity,
-            },
-            "task": task,
-            "entity": entity,
+            # "task": task,
+            # "entity": entity,
+            # "resolved_entities": resolved_entities,
         }

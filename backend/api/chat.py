@@ -14,14 +14,8 @@ service = ChatService()
 @router.post("", response_model=ChatResponse)
 async def chat(request: Request):
     body = await request.json()  # ① 拿到前端的请求：JSON 字符串
-    print(body) # ② 终端打印：{'message':'你好','owner':'langchain-ai','repo':'langgraph'}
     payload = ChatRequest.model_validate(body)  # ③ 校验字段是否存在
-
-    result = service.chat(
-        message=payload.message,
-        owner=payload.owner,
-        repo=payload.repo,
-    )
+    result = service.chat(message=payload.message)
 
     if hasattr(result, "model_dump"):
         result = result.model_dump()
@@ -31,4 +25,5 @@ async def chat(request: Request):
         trace=result.get("trace", {}),
         task=result.get("task"),
         entity=result.get("entity"),
+        error=result.get("error"),
     )

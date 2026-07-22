@@ -12,8 +12,6 @@ export default function ChatBox() {
     },
   ]);
   const [input, setInput] = useState('');
-  const [owner, setOwner] = useState('langchain-ai');
-  const [repo, setRepo] = useState('langgraph');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
 
@@ -34,15 +32,14 @@ export default function ChatBox() {
     setLoading(true);
 
     try {
-      const response = await sendMessage(trimmed, owner.trim(), repo.trim());
-      // const response = await sendMessage(trimmed);
+      const response = await sendMessage(trimmed);
       setMessages((current) => [
         ...current,
         {
           role: 'assistant',
-          content: response?.answer || 'No answer returned from the server.',
+          content: response?.error || response?.answer || 'No answer returned from the server.',
           trace: response?.trace || {},
-          task: response?.task || null,
+          // task: response?.task || null,
         },
       ]);
     } catch (error) {
@@ -93,23 +90,6 @@ export default function ChatBox() {
             </div>
 
             <form onSubmit={handleSend} className="border-t border-slate-200 bg-slate-50 p-4 sm:p-6">
-              <div className="mb-3 grid gap-3 sm:grid-cols-2">
-                <input
-                  type="text"
-                  value={owner}
-                  onChange={(event) => setOwner(event.target.value)}
-                  placeholder="owner"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
-                />
-                <input
-                  type="text"
-                  value={repo}
-                  onChange={(event) => setRepo(event.target.value)}
-                  placeholder="repo"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
-                />
-              </div>
-
               <div className="flex flex-col gap-3 sm:flex-row">
                 <input
                   type="text"

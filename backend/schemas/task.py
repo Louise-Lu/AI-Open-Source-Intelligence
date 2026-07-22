@@ -1,15 +1,26 @@
-from typing import Literal, Optional
+from __future__ import annotations
 
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 
 class TaskRoute(BaseModel):
-    route: Literal[
+    task: Literal[
+        "single_project_analysis",
+        "project_comparison",
+        "project_search",
+        "update_tracking",
+        "general_question",
+    ]
+    reports: list[Literal[
         "profile",
+        "project_health",
+        "analysis",
         "roadmap",
         "comparison",
+        "recommendation",
         "release_diff",
-        "analysis_report",
-        "agent",
-    ]
-    reason: Optional[str] = None
+    ]] = Field(default_factory=list)
+    need_entity_resolution: bool = False
+    confidence: float = 0.0

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from tools.github.client import GitHubAPI
-
+# 根据entity -> 搜索仓的github链接
 
 @dataclass
 class ResolvedEntity:
@@ -33,11 +33,14 @@ class EntityResolver:
         if not query:
             return {"name": "", "owner": None, "repo": None}
 
-        result = self._search_repository(query)
-        if result:
-            return result
+        try:
+            result = self._search_repository(query)
+            if result:
+                return result
+        except Exception as exc:
+            print(f"EntityResolver fallback: {exc}")
 
-        return {"name": query, "owner": None, "repo": None}
+        # return self._rule_based_resolve(query)
 
     def _search_repository(self, project_name: str) -> dict[str, str | None] | None:
         response = self.github.client.get(
@@ -79,3 +82,22 @@ class EntityResolver:
             if name == lowered_query or full_name.endswith(f"/{lowered_query}"):
                 return item
         return items[0] or {}
+
+    @staticmethod
+    def _rule_based_resolve(project_name: str) -> dict[str, str | None]:
+        text = project_name.lower()
+        aliases = {
+            "dify": {"owner": "langgenius", "repo": "dify"},
+            "langgraph": {"owner": "langchain-ai", "repo": "langgraph"},
+            "crewai": {"owner": "crewAIInc", "repo": "crewAI"},
+            "autogen": {"owner": "microsoft", "repo": "autogen"},
+        }
+
+        for key, value in aliases.items():
+            if key in text:
+                return {"name": project_name, "owner": value["owner"], "repo": value["repo"]}
+
+        if "langchain" in text:
+            return {"name": project_name, "owner": "langchain-ai", "repo": "langgraph"}
+
+        return {"name": project_name, "owner": None, "repo": None}

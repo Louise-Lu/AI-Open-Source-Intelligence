@@ -15,14 +15,13 @@ async function requestJson(url, options) {
   return data;
 }
 
-export async function sendMessage(message, owner, repo) {
-  // export async function sendMessage(message) {
+export async function sendMessage(message) {
   // Return the full response so callers can consume answer + trace.
   return requestJson(`${API_BASE_URL}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ message, owner, repo }),
+    body: JSON.stringify({ message }),
   });
 }

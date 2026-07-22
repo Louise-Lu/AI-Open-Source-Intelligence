@@ -9,8 +9,6 @@ class EntityExtractor:
     def __init__(self):
         self.llm = deepseek_model.with_structured_output(EntityExtraction)
 
-
-
     def extract(self, query: str) -> dict:
 
         prompt = f"""
@@ -24,46 +22,26 @@ class EntityExtractor:
             return result.model_dump() if hasattr(result, "model_dump") else dict(result)
         except Exception as exc:
             print(f"EntityExtractor fallback: {exc}")
-            # return self._rule_based_extract(query)
+            return self._rule_based_extract(query)
 
-#     @staticmethod
-#     def _build_prompt(query: str) -> str:
-#         return f"""
-# 从用户问题中提取项目名称。
-# 只负责识别项目名字。
-# 不要猜测 GitHub owner/repo。
-# 输出 projects 数组。
+    @staticmethod
+    def _rule_based_extract(query: str) -> dict:
+        text = query.lower()
+        projects: list[dict[str, str]] = []
 
-# 用户问题：
-# {query}
-# """.strip()
+        known_projects = [
+            ("langgraph", {"name": "LangGraph"}),
+            ("crewai", {"name": "CrewAI"}),
+            ("autogen", {"name": "AutoGen"}),
+            ("dify", {"name": "dify"}),
+        ]
 
-    # @staticmethod
-    # def _rule_based_extract(query: str) -> dict:
-    #     text = query.lower()
-    #     projects: list[dict[str, str]] = []
+        for keyword, project in known_projects:
+            if keyword in text:
+                projects.append(project)
 
-    #     known_projects = [
-    #         ("langgraph", {"name": "LangGraph"}),
-    #         ("crewai", {"name": "CrewAI"}),
-    #         ("autogen", {"name": "AutoGen"}),
-    #         ("dify", {"name": "dify"}),
-    #     ]
+        if not projects:
+            if "langchain" in text:
+                projects.append({"name": "LangGraph"})
 
-    #     for keyword, project in known_projects:
-    #         if keyword in text:
-    #             projects.append(project)
-
-    #     if not projects:
-    #         if "langgraph" in text or "langchain" in text:
-    #             projects.append({"name": "LangGraph"})
-    #         elif "crewai" in text:
-    #             projects.append({"name": "CrewAI"})
-
-    #     if len(projects) == 0:
-    #         return {"projects": []}
-
-    #     if len(projects) > 2:
-    #         projects = projects[:2]
-
-    #     return {"projects": projects}
+        return {"projects": projects}

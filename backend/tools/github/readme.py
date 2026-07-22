@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from .utils import decode_base64_content
-from agent.trace import add_trace
 
 import re
 
