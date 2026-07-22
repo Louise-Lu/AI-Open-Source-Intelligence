@@ -1,4 +1,7 @@
 from fastapi import FastAPI, Request
+
+from fastapi.openapi.docs import get_swagger_ui_html
+
 from api.analysis import router as analysis_router
 from api.compare import router as compare_router
 from api.profile import router as profile_router
@@ -13,7 +16,7 @@ from tools.github.utils import GitHubAPIError
 from fastapi.middleware.cors import CORSMiddleware
 
 # 创建应用实例：这个 app 对象会处理所有进来的 HTTP 请求
-app = FastAPI(title="GitHub Intelligence Agent")
+app = FastAPI(title="GitHub Intelligence Agent",docs_url=None, redoc_url=None)
 
 # 配置 CORS
 app.add_middleware(
@@ -24,17 +27,25 @@ app.add_middleware(
     allow_headers=["*"],  # 允许所有请求头
 )
 
+# 自定义 Swagger UI（/docs）
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,  # 默认为 /openapi.json
+        title=f"{app.title} - Swagger UI",
+        # 使用国内可用的 CDN（推荐 cdnjs 或 bootcdn）
+        swagger_js_url="https://cdn.bootcdn.net/ajax/libs/swagger-ui/5.10.3/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.bootcdn.net/ajax/libs/swagger-ui/5.10.3/swagger-ui.css",
+)
+
 app.include_router(base_router)
-app.include_router(profile_router)
 app.include_router(analysis_router)
+app.include_router(profile_router)
 app.include_router(compare_router)
 app.include_router(release_diff_router)
-app.include_router(chat_router)
 app.include_router(roadmap_router)
 
-from fastapi import Request
-from fastapi.responses import JSONResponse
-from tools.github.utils import GitHubAPIError
+app.include_router(chat_router)
 
 
 # 处理 GitHub API 错误

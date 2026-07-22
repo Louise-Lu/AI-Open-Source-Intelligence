@@ -1,10 +1,8 @@
 from fastapi import APIRouter
-
-from tools.github import GitHubAPI
+# from tools.github import GitHubAPI
 
 router = APIRouter()
-github = GitHubAPI()
-
+# github = GitHubAPI()
 
 @router.get("/")
 def root():

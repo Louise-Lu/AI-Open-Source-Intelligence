@@ -204,8 +204,8 @@ TOOLS = [
     get_commit_activity,
     get_planning_signals,
     get_discussion_signals,
-    analyze_repository,
-    get_repository_profile,
-    compare_repositories,
-    predict_roadmap,
+    # analyze_repository,
+    # get_repository_profile,
+    # compare_repositories,
+    # predict_roadmap,
 ]

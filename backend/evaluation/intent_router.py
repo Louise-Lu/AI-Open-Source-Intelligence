@@ -7,6 +7,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from llms.deepseek import deepseek_model
+# from llms.qwen import qwen_model
 
 VALID_INTENTS = [
     "project_overview",
@@ -80,6 +81,7 @@ class IntentClassification(BaseModel):
 class IntentRouter:
     def __init__(self) -> None:
         self._llm = deepseek_model.with_structured_output(IntentClassification)
+        # self._llm = qwen_model.with_structured_output(IntentClassification)
 
     def classify(self, question: str) -> list[str]:
         result = self._llm.invoke(ROUTER_PROMPT.format(question=question))

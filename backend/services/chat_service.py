@@ -1,122 +1,141 @@
+from __future__ import annotations
+
 from agent.github_agent import github_agent
-from agent.trace import (
-    clear_trace,
-    get_trace
-)
+from agent.trace import clear_trace
+from router.entity_extractor import EntityExtractor
+from router.entity_resolver import EntityResolver
+from router.task_router import TaskRouter
+from services.analysis_service import RepositoryAnalysisService
+from services.comparison_service import RepositoryComparisonService
+from services.profile_service import RepositoryProfileService
+from services.roadmap_service import RepositoryRoadmapService
+
 
 class ChatService:
+    def __init__(self):
+        self.router = TaskRouter()
+        self.entity_extractor = EntityExtractor()
+        self.entity_resolver = EntityResolver()
+        self.agent = github_agent
+        self.profile = RepositoryProfileService()
+        self.roadmap = RepositoryRoadmapService()
+        self.comparison = RepositoryComparisonService()
+        self.analysis_report = RepositoryAnalysisService()
 
-    def chat(self, message: str):
+    def chat(self, message: str, owner: str, repo: str) -> dict:
         clear_trace()
 
-        # 限制 Agent 递归深度，防止无限工具调用
+        task = self.router.route(message)
+        print("task是", task)
+        entity = self.entity_extractor.extract(message)
+        print("entity是", entity)
+        task_dict = task if isinstance(task, dict) else task.model_dump()
+        entity_dict = entity if isinstance(entity, dict) else entity.model_dump()
+
+        resolved_entities = self._resolve_entities(entity_dict.get("projects", []))
+        resolved_payload = (
+            resolved_entities[0]
+            if len(resolved_entities) == 1
+            else {"projects": resolved_entities}
+        )
+
+        route = task_dict.get("route", "agent")
+
+        if route in {"profile", "roadmap", "analysis_report"}:
+            resolved = resolved_entities[0] if resolved_entities else None
+            if not resolved or not resolved.get("owner") or not resolved.get("repo"):
+                return self._not_found_response(task_dict, resolved_payload)
+            
+            print("task_dict是",task_dict,"resolved_payload是",resolved_payload)
+
+            if route == "profile":
+                result = self.profile.generate(resolved["owner"], resolved["repo"])
+                print("profile的结果", result)
+                return self._wrap_result(result, task_dict, resolved_payload, "summary")
+
+            if route == "roadmap":
+                result = self.roadmap.predict(resolved["owner"], resolved["repo"])
+                return self._wrap_result(result, task_dict, resolved_payload, "prediction_reasoning")
+
+            result = self.analysis_report.analyze(resolved["owner"], resolved["repo"])
+            return self._wrap_result(result, task_dict, resolved_payload, "analysis")
+
+        if route == "comparison":
+            if len(resolved_entities) < 2:
+                return self._not_found_response(task_dict, resolved_payload)
+
+            left, right = resolved_entities[0], resolved_entities[1]
+            if not all([left.get("owner"), left.get("repo"), right.get("owner"), right.get("repo")]):
+                return self._not_found_response(task_dict, resolved_payload)
+
+            result = self.comparison.compare(
+                left["owner"],
+                left["repo"],
+                right["owner"],
+                right["repo"],
+            )
+            return self._wrap_result(result, task_dict, resolved_payload, "comparison")
+
         config = {"recursion_limit": 12}
-
-        #============== 生产模式 invoke =====================
-        # result = github_agent.invoke(
-        #     {"messages": [("user", message)]},
-        #     config=config
-        # )
-
-        # answer = result["messages"][-1].content
-        # trace = get_trace()
-
-        # return {
-        #     "answer": answer,
-        #     "trace": trace
-        # }
-
-
-       #=============== 开发模式 stream ==================
-        final_answer = ""
-        tool_calls_log = []
-
-        print(f"\n{'='*40}")
-        print(f"用户问题: {message}")
-        print(f"{'='*40}")
-
-        for event in github_agent.stream(
-            {"messages": [("user", message)]},
+        result = self.agent.invoke(
+            {"messages": [{"role": "user", "content": message}]},
             config=config,
-            stream_mode="values"
-        ):
-            if "messages" not in event:
-                continue
-
-            latest_msg = event["messages"][-1]
-
-            # ---------- 处理工具调用 ----------
-            if hasattr(latest_msg, "type") and latest_msg.type == "tool":
-                tool_name = getattr(latest_msg, "name", "unknown")
-                raw_output = latest_msg.content
-
-                # 根据工具名定制日志输出
-                display_output = self._format_tool_output_for_log(tool_name, raw_output)
-
-                print(f"\n🔧 调用工具: {tool_name}")
-                print(f"   返回: {display_output}")
-                tool_calls_log.append(f"{tool_name}: {display_output}")
-
-            # ---------- 处理 AI 回答 ----------
-            # if hasattr(latest_msg, "type") and latest_msg.type == "ai":
-            #     if isinstance(latest_msg.content, str) and latest_msg.content.strip():
-            #         final_answer = latest_msg.content
-            #         print(f"\n🤖 最终回答:\n{final_answer[:500]}...")
-
-        # 兜底
-        # if not final_answer:
-        #     result = github_agent.invoke(
-        #         {"messages": [("user", message)]},
-        #         config=config
-        #     )
-        #     final_answer = result["messages"][-1].content
-
-        trace = get_trace()
-
-        print(f"\n📊 Trace: {trace}")
-        print(f"{'='*40}\n")
-
+        )
+        answer = result["messages"][-1].content
         return {
-            "answer": final_answer,
-            "trace": trace,
-            "tool_calls": tool_calls_log
+            "answer": answer,
+            "trace": {
+                "task": task_dict,
+                "entity": resolved_payload,
+            },
+            "task": task_dict,
+            "entity": resolved_payload,
         }
 
-    # ========== 新增：工具输出格式化方法 ==========
+    def _resolve_entities(self, projects: list[dict]) -> list[dict]:
+        resolved_entities: list[dict] = []
+        for project in projects:
+            name = project.get("name")
+            if not name:
+                continue
+            resolved_entities.append(self.entity_resolver.resolve(name))
+        return resolved_entities
+
     @staticmethod
-    def _format_tool_output_for_log(tool_name: str, output: str, max_len: int = 200) -> str:
-        """根据不同工具，截断或清理日志输出，保留完整数据传给 LLM"""
-        # 如果是字符串，先尝试解析为 JSON
-        try:
-            import json
-            data = json.loads(output)
-        except (json.JSONDecodeError, TypeError):
-            data = output
+    def _not_found_response(task: dict, entity: dict) -> dict:
+        return {
+            "answer": "没有找到对应的 GitHub 项目，请提供准确仓库地址",
+            "trace": {
+                "task": task,
+                "entity": entity,
+            },
+            "task": task,
+            "entity": entity,
+        }
+    
+    # task: {'route': 'profile'}
+    # entity: {'name': 'dify', 'owner': 'langgenius', 'repo': 'dify'}
+    # answer_key : summary 
+    @staticmethod
+    def _wrap_result(result: object, task: dict, entity: dict, answer_key: str) -> dict:
+        if hasattr(result, "model_dump"):
+            payload = result.model_dump()
+        elif isinstance(result, dict):
+            payload = dict(result)
+        else:
+            payload = {"answer": str(result)}
 
-        # 针对特定工具定制显示
-        if tool_name in ("get_releases", "releases"):
-            if isinstance(data, list):
-                simplified = []
-                for item in data:
-                    simplified.append({
-                        "tag_name": item.get("tag_name"),
-                        "name": item.get("name"),
-                        "published_at": item.get("published_at")
-                    })
-                return json.dumps(simplified, indent=2, ensure_ascii=False)
-            elif isinstance(data, dict):
-                return json.dumps({
-                    "tag_name": data.get("tag_name"),
-                    "name": data.get("name"),
-                    "published_at": data.get("published_at")
-                }, indent=2, ensure_ascii=False)
+        answer = payload.get("answer") or payload.get(answer_key)
+        if not answer:
+            answer = str(payload)
 
-        # 默认：字符串过长则截断
-        if isinstance(data, str) and len(data) > max_len:
-            return data[:max_len] + f"... (截断，原长度 {len(data)})"
-        elif isinstance(data, (dict, list)):
-            text = json.dumps(data, indent=2, ensure_ascii=False)
-            if len(text) > max_len:
-                return text[:max_len] + "... (截断)"
-            return text
-        return str(data)
+        print(answer)
+        return {
+            "answer": answer,
+            "trace": {
+                "task": task,
+                "entity": entity,
+            },
+            "task": task,
+            "entity": entity,
+        }

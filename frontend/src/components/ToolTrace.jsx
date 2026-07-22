@@ -22,8 +22,16 @@ function TraceBlock({ label, value }) {
 }
 
 export default function ToolTrace({ trace }) {
-  if (!trace || trace.length === 0) {
+  if (!trace || (Array.isArray(trace) && trace.length === 0)) {
     return null;
+  }
+
+  if (!Array.isArray(trace)) {
+    return (
+      <div className="space-y-4 rounded-3xl border border-amber-200 bg-amber-50/60 p-4">
+        <TraceBlock label="Trace" value={trace} />
+      </div>
+    );
   }
 
   return (

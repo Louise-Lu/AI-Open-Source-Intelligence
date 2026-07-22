@@ -195,6 +195,7 @@ GitHub 原始 JSON 太复杂，抽取需要的字段。
 ### Evidence Builder
 
 #### 作用：Evidence Modeling（证据建模）
+**证据层统一采集，工作流按需消费**
 
 把 GitHub 原始 JSON 转换成 统一结构化 Evidence。
 

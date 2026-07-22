@@ -2,6 +2,7 @@
 Evaluation runner.
 
 Reads dataset → Intent Router → Agent → evaluates → writes report.
+读取数据集 → llm-based意图路由分类 → 智能体 → 评估 → 生成报告。
 
 Usage (from backend/):
 
@@ -55,6 +56,7 @@ def build_prompt(item: dict[str, Any]) -> str:
     """
     Keep the user question as-is. Dataset `repo` is metadata for evaluators;
     questions already name the repository when needed.
+    保持用户问题不变。数据集`repo`是评估者的元数据；问题在必要时已指明仓库名称。
     """
     return item["question"]
 
@@ -62,12 +64,12 @@ def build_prompt(item: dict[str, Any]) -> str:
 def _expected_intents(item: dict[str, Any]) -> list[str]:
     if "expected_intents" in item:
         return list(item.get("expected_intents") or [])
-    legacy = item.get("intent")
-    if isinstance(legacy, str) and legacy:
-        return [legacy]
-    if isinstance(legacy, list):
-        return list(legacy)
-    return []
+    # legacy = item.get("intent")
+    # if isinstance(legacy, str) and legacy:
+    #     return [legacy]
+    # if isinstance(legacy, list):
+    #     return list(legacy)
+    # return []
 
 
 def run_one(

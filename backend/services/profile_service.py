@@ -61,10 +61,10 @@ Repository Evidence:
         try:
             profile = llm.invoke(prompt)
 
-            print("========== PROFILE DEBUG ==========")
-            print(profile)
-            print(type(profile))
-            print("===================================")
+            # print("========== PROFILE DEBUG ==========")
+            # print(profile)
+            # print(type(profile))
+            # print("===================================")
 
             return profile
 
