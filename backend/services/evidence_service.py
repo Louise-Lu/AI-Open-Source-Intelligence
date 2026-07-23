@@ -5,7 +5,7 @@ from evidence import EvidenceBuilder
 from sources.github.client import GitHubAPI
 from sources.huggingface.client import HuggingFaceClient
 from sources.reddit.client import RedditClient
-from services.evidence_planner import EvidencePlanner
+# from backend.planner.evidence_planner import EvidencePlanner
 
 
 class RepositoryEvidenceService:
@@ -14,14 +14,14 @@ class RepositoryEvidenceService:
         self.huggingface = HuggingFaceClient()
         self.reddit = RedditClient()
         self.builder = EvidenceBuilder()
-        self.planner = EvidencePlanner()
+        # self.planner = EvidencePlanner()
 
     def collect(
         self,
         entity: ResolvedEntity | str | None = None,
         owner: str | None = None,
         repo: str | None = None,
-        huggingface_model_id: str | None = None,
+        # huggingface_model_id: str | None = None,
         include_reddit: bool = False,
     ):
         if isinstance(entity, str):
@@ -30,7 +30,7 @@ class RepositoryEvidenceService:
         if entity is None:
             raise ValueError("Entity is required")
 
-        plan = self.planner.plan(entity, include_reddit=include_reddit)
+        # plan = self.planner.plan(entity, include_reddit=include_reddit)
         github_source = self._get_source(entity, "github")
         print("evidence_from_git",github_source)
         huggingface_source = self._get_source(entity, "huggingface")

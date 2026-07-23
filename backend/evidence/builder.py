@@ -19,7 +19,7 @@ from .models import (
     # ContributorInfo,
 )
 
-# build() 
+# 将原始数据（字典/列表）转换为 Pydantic 模型（如 GitHubEvidence、HuggingFaceEvidence）。
 # 参数 GitHub 返回的 预处理后的 data : repository releases 等等... 
 # return 结构化的evidence: 类型 IntelligenceEvidence
 
@@ -40,65 +40,40 @@ class EvidenceBuilder:
 
     def build(
         self,
-
         repository: dict[str,Any] | None,
-
         readme: str | None,
-
         releases: dict[str,Any] | list[dict[str,Any]] | None = None,
-
         issues: dict[str,Any] | list[dict[str,Any]] | None = None,
-
         pull_requests: dict[str,Any] | list[dict[str,Any]] | None = None,
-
-        reddit: dict[str, Any] | list[str] | None = None,
-        huggingface: dict[str, Any] | None = None,
-
         commit_activity: dict[str, Any] | None = None,
         planning: dict[str, Any] | None = None,
         discussions: dict[str, Any] | None = None,
 
-        # contributors: list[dict[str,Any]] | None = None,
+        huggingface: dict[str, Any] | None = None,
+        reddit: dict[str, Any] | list[str] | None = None,   # 保留 reddit
+
     ) -> IntelligenceEvidence:
 
         github = GitHubEvidence(
-
-            repository=
-                self._build_repository(repository),
-
+            repository=self._build_repository(repository),
             readme=readme,
-
-            releases=
-                self._build_releases(releases),
-
-            issues=
-                self._build_issues(issues),
-
-            pull_requests=
-                self._build_pull_requests(
-                    pull_requests
-                ),
-
-            reddit=self._build_reddit(reddit),
+            releases=self._build_releases(releases),
+            issues=self._build_issues(issues),
+            pull_requests=self._build_pull_requests(pull_requests),
 
             commit_activity=self._build_commit_activity(commit_activity),
             planning=self._build_planning(planning),
             discussions=self._build_discussions(discussions),
-
-            # contributors=
-            #     self._build_contributors(
-            #         contributors
-            #     )
-
         )
+        huggingface_evidence = self._build_huggingface_evidence(huggingface)
+        # reddit_evidence = self._build_reddit(reddit)  # 如果你有 _build_reddit 方法
 
         return IntelligenceEvidence(
             github=github,
-            # reddit=self._build_reddit(reddit),
-            huggingface=self.build_huggingface_evidence(huggingface),
+            huggingface=huggingface_evidence,
         )
 
-    def build_huggingface_evidence(
+    def _build_huggingface_evidence(
         self,
         raw: dict[str, Any] | None,
     ) -> HuggingFaceEvidence | None:
@@ -113,62 +88,48 @@ class EvidenceBuilder:
             last_modified=raw.get("lastModified") or raw.get("last_modified"),
         )
 
-    def _build_reddit(self, reddit: dict[str, Any] | list[str] | None) -> RedditEvidence | None:
-        if reddit is None:
-            return None
+    # def _build_reddit(self, reddit: dict[str, Any] | list[str] | None) -> RedditEvidence | None:
+    #     if reddit is None:
+    #         return None
 
-        if isinstance(reddit, dict):
-            posts = reddit.get("posts", [])
-            sentiment = reddit.get("sentiment")
-            mentions = int(reddit.get("mentions", len(posts)) or 0)
-        else:
-            posts = reddit
-            sentiment = None
-            mentions = len(posts)
+    #     if isinstance(reddit, dict):
+    #         posts = reddit.get("posts", [])
+    #         sentiment = reddit.get("sentiment")
+    #         mentions = int(reddit.get("mentions", len(posts)) or 0)
+    #     else:
+    #         posts = reddit
+    #         sentiment = None
+    #         mentions = len(posts)
 
-        return RedditEvidence(
-            posts=[str(post) for post in posts or []],
-            sentiment=sentiment,
-            mentions=mentions,
-        )
+    #     return RedditEvidence(
+    #         posts=[str(post) for post in posts or []],
+    #         sentiment=sentiment,
+    #         mentions=mentions,
+    #     )
 
     # =====================
-    # Repository
+    # GITHUB
     # =====================
 
     def _build_repository(
         self,
         data:dict[str,Any] | None
     ) -> RepositoryInfo | None:
-
-
         if not data:
-
             return None
-
-
         license_info=data.get(
             "license"
         )
-
-
         return RepositoryInfo(
-
             full_name=data.get(
                 "full_name"
             ),
-
-
             description=data.get(
                 "description"
             ),
-
-
             language=data.get(
                 "language"
             ),
-
-
             stars=int(
                 data.get(
                     "stars",
@@ -179,8 +140,6 @@ class EvidenceBuilder:
                 )
                 or 0
             ),
-
-
             forks=int(
                 data.get(
                     "forks",
@@ -191,8 +150,6 @@ class EvidenceBuilder:
                 )
                 or 0
             ),
-
-
             topics=data.get(
                 "topics",
                 []
@@ -220,13 +177,6 @@ class EvidenceBuilder:
             )
 
         )
-
-
-
-    # =====================
-    # Release
-    # =====================
-
 
     def _build_releases(
         self,
@@ -274,13 +224,6 @@ class EvidenceBuilder:
 
         ]
 
-
-
-    # =====================
-    # Issue
-    # =====================
-
-
     def _build_issues(
         self,
         issues
@@ -327,13 +270,6 @@ class EvidenceBuilder:
             for i in issues or []
 
         ]
-
-
-
-    # =====================
-    # PR
-    # =====================
-
 
     def _build_pull_requests(
         self,
@@ -415,32 +351,3 @@ class EvidenceBuilder:
             hot_topics_str.append(f"{title} {tag_str}".strip())
         return DiscussionSignal(hot_topics=hot_topics_str)
 
-    # =====================
-    # Contributor
-    # =====================
-
-
-    # def _build_contributors(
-    #     self,
-    #     contributors
-    # ) -> list[ContributorInfo]:
-
-
-    #     return [
-
-    #         ContributorInfo(
-
-    #             login=c.get(
-    #                 "login"
-    #             ),
-
-    #             contributions=c.get(
-    #                 "contributions",
-    #                 0
-    #             )
-
-    #         )
-
-    #         for c in contributors or []
-
-    #     ]

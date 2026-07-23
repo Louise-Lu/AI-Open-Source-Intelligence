@@ -11,6 +11,6 @@ class EntityAdapter:
         )
 
     def from_extracted(self, entity: ExtractedEntity) -> ResolvedEntity:
-        from services.entity_resolver import EntityResolver
+        from router.entity_resolver import EntityResolver
 
         return EntityResolver().resolve(entity)

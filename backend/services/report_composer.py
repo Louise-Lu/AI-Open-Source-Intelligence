@@ -11,7 +11,7 @@ class ReportComposer:
     def __init__(self):
         self.llm = deepseek_model.with_structured_output(ComposedAnswer)
 
-    def compose(self, message: str, project_name: str, reports: dict[str, Any]) -> ComposedAnswer:
+    def compose(self, message: str, entity_name: str, evidence) -> ComposedAnswer:
         prompt = f"""
 你是 AI 开源项目分析助手。
 
@@ -21,11 +21,11 @@ class ReportComposer:
 用户的问题：
 {message}
 
-project:
-{project_name}
+entity_name:
+{entity_name}
 
-reports:
-{json.dumps(reports, ensure_ascii=False, indent=2)}
+evidences:
+{evidence}
 
 
 要求：
@@ -40,12 +40,6 @@ reports:
 - 只基于输入报告内容，不要编造数据
 - 保持简洁
 - 针对性回答用户的问题（不要泛泛而谈）
-
-例如输出：
-
-"这个项目主要用于...
-从技术定位来看...
-如果你关注企业应用，需要注意..."
 
 
 不要输出：

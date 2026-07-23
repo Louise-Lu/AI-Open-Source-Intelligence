@@ -24,7 +24,8 @@ class ReportPipeline:
         self.github = GitHubAPI()
 
     def build_evidence(self, entity: ResolvedEntity):
-        return self.collector.collect(entity=entity, include_reddit=True)
+        # 暂时 reddit 禁用 
+        return self.collector.collect(entity=entity, include_reddit=False)
 
     def generate_report(self, entity: ResolvedEntity, report_type: str):
         evidence = self.build_evidence(entity)
