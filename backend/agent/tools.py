@@ -1,6 +1,6 @@
 from langchain_core.tools import tool
 
-from tools.github.client import GitHubAPI
+from sources.github.client import GitHubAPI
 from services.analysis_service import RepositoryAnalysisService
 from services.profile_service import RepositoryProfileService
 # from services.release_diff_service import ReleaseDiffService

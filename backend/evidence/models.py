@@ -133,14 +133,16 @@ class RedditEvidence(BaseModel):
 
 
     sentiment: str | None = None
+    mentions: int = 0
 
 
 
 class HuggingFaceEvidence(BaseModel):
-
     downloads: int = 0
-
     likes: int = 0
+    pipeline_tag: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    last_modified: str | None = None
 
 
 

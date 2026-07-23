@@ -12,6 +12,7 @@ class TaskRouter:
         prompt = self._build_prompt(query)
         try:
             result = self.llm.invoke(prompt)
+            # print(result)
             return result.model_dump() if hasattr(result, "model_dump") else dict(result)
         except Exception as exc:
             print(f"TaskRouter fallback: {exc}")

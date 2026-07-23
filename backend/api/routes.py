@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-# from tools.github import GitHubAPI
+# from sources.github import GitHubAPI
 
 router = APIRouter()
 # github = GitHubAPI()

@@ -1,64 +1,11 @@
-from __future__ import annotations
-
-from tools.github.client import GitHubAPI
-
-# from llms.qwen import qwen_model
 from llms.deepseek import deepseek_model
 from prompts.release_diff import RELEASE_DIFF_PROMPT
-
 from schemas.release_diff import ReleaseDiffEvidence
-from tools.github.utils import GitHubAPIError
+
 
 class ReleaseDiffService:
-
-    def __init__(self):
-        self.github = GitHubAPI()
-
-    def compare(
-        self,
-        owner: str,
-        repo: str,
-        old_tag: str,
-        new_tag: str,
-    ) -> str:
-        
-        try:
-            releases = self.github.get_releases(owner, repo)
-
-        except GitHubAPIError as e:
-            # 可以在这里记录日志
-            print(f"GitHub API 调用失败: {e}")
-            raise  # 重新抛出，让全局异常处理器处理
-
-        old_release = next(
-            release
-            for release in releases
-            if release["tag_name"] == old_tag
-        )
-
-        new_release = next(
-            release
-            for release in releases
-            if release["tag_name"] == new_tag
-        )
-
-        evidence = ReleaseDiffEvidence(
-            old_tag=old_tag,
-            new_tag=new_tag,
-            old_body=old_release.get("body"),
-            new_body=new_release.get("body"),
-        )
-
-        # response = qwen_model.invoke(
-        #     RELEASE_DIFF_PROMPT
-        #     + "\n\n"
-        #     + evidence.model_dump_json(indent=2)
-        # )
-
+    def compare(self, evidence: ReleaseDiffEvidence) -> str:
         response = deepseek_model.invoke(
-            RELEASE_DIFF_PROMPT
-            + "\n\n"
-            + evidence.model_dump_json(indent=2)
+            RELEASE_DIFF_PROMPT + "\n\n" + evidence.model_dump_json(indent=2)
         )
-
         return response.content

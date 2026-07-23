@@ -11,7 +11,7 @@ from api.chat import router as chat_router
 from api.roadmap import router as roadmap_router
 
 from fastapi.responses import JSONResponse
-from tools.github.utils import GitHubAPIError
+from sources.github.utils import GitHubAPIError
 
 from fastapi.middleware.cors import CORSMiddleware
 

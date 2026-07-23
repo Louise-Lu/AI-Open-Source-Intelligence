@@ -7,6 +7,8 @@ from typing import Any
 from .models import (
     IntelligenceEvidence,
     GitHubEvidence,
+    RedditEvidence,
+    HuggingFaceEvidence,
     RepositoryInfo,
     ReleaseInfo,
     IssueInfo,
@@ -49,6 +51,9 @@ class EvidenceBuilder:
 
         pull_requests: dict[str,Any] | list[dict[str,Any]] | None = None,
 
+        reddit: dict[str, Any] | list[str] | None = None,
+        huggingface: dict[str, Any] | None = None,
+
         commit_activity: dict[str, Any] | None = None,
         planning: dict[str, Any] | None = None,
         discussions: dict[str, Any] | None = None,
@@ -74,6 +79,8 @@ class EvidenceBuilder:
                     pull_requests
                 ),
 
+            reddit=self._build_reddit(reddit),
+
             commit_activity=self._build_commit_activity(commit_activity),
             planning=self._build_planning(planning),
             discussions=self._build_discussions(discussions),
@@ -86,7 +93,43 @@ class EvidenceBuilder:
         )
 
         return IntelligenceEvidence(
-            github=github
+            github=github,
+            # reddit=self._build_reddit(reddit),
+            huggingface=self.build_huggingface_evidence(huggingface),
+        )
+
+    def build_huggingface_evidence(
+        self,
+        raw: dict[str, Any] | None,
+    ) -> HuggingFaceEvidence | None:
+        if not raw:
+            return None
+
+        return HuggingFaceEvidence(
+            downloads=int(raw.get("downloads", 0) or 0),
+            likes=int(raw.get("likes", 0) or 0),
+            pipeline_tag=raw.get("pipeline_tag"),
+            tags=[str(tag) for tag in raw.get("tags", []) or []],
+            last_modified=raw.get("lastModified") or raw.get("last_modified"),
+        )
+
+    def _build_reddit(self, reddit: dict[str, Any] | list[str] | None) -> RedditEvidence | None:
+        if reddit is None:
+            return None
+
+        if isinstance(reddit, dict):
+            posts = reddit.get("posts", [])
+            sentiment = reddit.get("sentiment")
+            mentions = int(reddit.get("mentions", len(posts)) or 0)
+        else:
+            posts = reddit
+            sentiment = None
+            mentions = len(posts)
+
+        return RedditEvidence(
+            posts=[str(post) for post in posts or []],
+            sentiment=sentiment,
+            mentions=mentions,
         )
 
     # =====================

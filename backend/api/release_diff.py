@@ -2,13 +2,13 @@ from fastapi import APIRouter
 
 from pydantic import BaseModel
 
-from services.release_diff_service import ReleaseDiffService
+from services.entity_adapter import EntityAdapter
+from services.report_pipeline import ReportPipeline
 
 
 router = APIRouter(prefix="/release-diff", tags=["Release Diff"])
-
-
-service = ReleaseDiffService()
+adapter = EntityAdapter()
+pipeline = ReportPipeline()
 
 
 class ReleaseDiffRequest(BaseModel):
@@ -24,10 +24,10 @@ class ReleaseDiffRequest(BaseModel):
 
 @router.post("")
 def release_diff(request: ReleaseDiffRequest):
+    entity = adapter.from_owner_repo(request.owner, request.repo)
     return {
-        "comparison": service.compare(
-            request.owner,
-            request.repo,
+        "comparison": pipeline.generate_release_diff(
+            entity,
             request.old_tag,
             request.new_tag,
         )

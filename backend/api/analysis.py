@@ -1,18 +1,18 @@
 from fastapi import APIRouter
 
-from services.analysis_service import RepositoryAnalysisService
+from services.entity_adapter import EntityAdapter
+from services.report_pipeline import ReportPipeline
 
 router = APIRouter(tags=["Analysis"])
-
-service = RepositoryAnalysisService()
+adapter = EntityAdapter()
+pipeline = ReportPipeline()
 
 
 @router.get("/repositories/{owner}/{repo}/analysis")
 def analyze_repository(owner: str, repo: str):
-
-    analysis = service.analyze(owner, repo)
+    entity = adapter.from_owner_repo(owner, repo)
+    analysis = pipeline.generate_report(entity, "analysis")
 
     return {
         "analysis": analysis
     }
-

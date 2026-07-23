@@ -1,15 +1,19 @@
 from pydantic import BaseModel, Field
 
 
-class ProjectEntity(BaseModel):
+class ExtractedEntity(BaseModel):
     name: str
 
 
 class EntityExtraction(BaseModel):
-    projects: list[ProjectEntity] = Field(default_factory=list)
+    entities: list[ExtractedEntity] = Field(default_factory=list)
 
 
-class ResolvedProjectEntity(BaseModel):
+class EntitySource(BaseModel):
+    source: str
+    identifier: str
+
+
+class ResolvedEntity(BaseModel):
     name: str
-    owner: str | None = None
-    repo: str | None = None
+    sources: list[EntitySource] = Field(default_factory=list)

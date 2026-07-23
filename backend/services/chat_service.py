@@ -7,8 +7,9 @@ from router.entity_resolver import EntityResolver
 from router.task_router import TaskRouter
 from services.report_composer import ReportComposer
 from services.report_orchestrator import ReportOrchestrator
+from schemas.entity import ResolvedEntity
 
-
+# 1. 任务识别 2. 主体识别 3. 主体解析搜索链接 4. 报告生成 5. 整合报告信息 + query 输出 
 class ChatService:
     def __init__(self):
         self.router = TaskRouter()
@@ -22,18 +23,24 @@ class ChatService:
         clear_trace()
 
         task = self.router.route(message)
+        print(task)
         entity = self.entity_extractor.extract(message)
+        print(entity)
+
         task_dict = task if isinstance(task, dict) else task.model_dump()
         entity_dict = entity if isinstance(entity, dict) else entity.model_dump()
-        # print(entity_dict)
-        resolved_entities = self._resolve_entities(entity_dict.get("projects", []))
-        
+
+        resolved_entities = self._resolve_entities(entity_dict.get("entities", []))
+        # print(resolved_entities)
+
+        # [ResolvedEntity(name='qwen', 
+        # sources=
+        # [EntitySource(source='github', identifier='QwenLM/Qwen'), 
+        #  EntitySource(source='huggingface', identifier='Qwen/Qwen2.5-7B')])]
+
         route = task_dict.get("task", "general_question")
         reports = task_dict.get("reports", [])
-        
-        # print(task_dict, reports)
-        # # {'task': 'single_project_analysis', 'reports': ['profile', 'analysis'], 'need_entity_resolution': True, 'confidence': 0.95} 
-        # # ['profile', 'analysis']
+        # {'task': 'single_project_analysis', 'reports': ['profile', 'analysis']
 
         if route == "general_question":
             return self._agent_response(message, task_dict, entity_dict, resolved_entities)
@@ -54,22 +61,24 @@ class ChatService:
             return self._response(task_dict, entity_dict, resolved_entities, structured_reports, composed.answer)
 
         if route in {"single_project_analysis", "update_tracking"}:
-            project = resolved_entities[0] if resolved_entities else None
-            if not project:
+            resolved_entity = resolved_entities[0] if resolved_entities else None
+            if not resolved_entity:
                 return self._not_found_response(task_dict, entity_dict)
 
+            # name='qwen' sources=[EntitySource(source='github', identifier='QwenLM/Qwen'), 
+            # EntitySource(source='huggingface', identifier='Qwen/Qwen2.5-7B')]
             structured_reports = self.report_orchestrator.generate_single_project(
-                project["owner"],
-                project["repo"],
+                resolved_entity,
                 reports,
             )
             
-            composed = self.report_composer.compose(message, project["name"] or project["repo"], structured_reports)
-
-            print(task_dict, entity_dict, "--------------", resolved_entities, "--------------------", composed.answer)
-            
+            composed = self.report_composer.compose(
+                message,
+                resolved_entity.name,     
+                structured_reports
+            )
             # {'task': 'single_project_analysis', 'reports': ['roadmap'], 'need_entity_resolution': True, 'confidence': 0.9} 
-            # {'projects': [{'name': 'LangGraph'}]}
+            # {'entities': [{'name': 'LangGraph'}]}
             # [{'name': 'LangGraph', 'owner': 'langchain-ai', 'repo': 'langgraph'}] 
             return self._response(task_dict, entity_dict, resolved_entities, composed.answer)
 
@@ -88,15 +97,11 @@ class ChatService:
 
         return self._agent_response(message, task_dict, entity_dict, resolved_entities)
 
-    def _resolve_entities(self, projects: list[dict]) -> list[dict]:
-        resolved_entities: list[dict] = []
-        for project in projects:
-            name = project.get("name")
-            if not name:
-                continue
-            resolved = self.entity_resolver.resolve(name)
-            if resolved.get("owner") and resolved.get("repo"):
-                resolved_entities.append(resolved)
+    def _resolve_entities(self, entities: list[dict]) -> list[ResolvedEntity]:
+        resolved_entities: list[ResolvedEntity] = []
+        for entity in entities:
+            resolved = self.entity_resolver.resolve(entity)
+            resolved_entities.append(resolved)
         return resolved_entities
 
     @staticmethod

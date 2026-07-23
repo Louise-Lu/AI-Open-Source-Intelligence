@@ -1,13 +1,16 @@
 ROADMAP_PROMPT = """
 你是一名 AI 开源项目分析专家。
 
-请基于提供的 GitHub Evidence（按三层情报体系组织），预测该项目的未来发展方向。
+请基于提供的 GitHub Evidence 和 HuggingFace Evidence（按三层情报体系组织），预测该项目的未来发展方向。
 
 分析时务必结合以下三层信息，不可凭空猜测：
 
 1. 显性规划：ROADMAP.md、里程碑、带 enhancement/proposal 的 Issue
 2. 隐性动态：提交频率、活跃贡献者数、近期 PR 主题
 3. 社区脉搏：Discussions 热门话题及维护者参与度
+4. HuggingFace Signals：downloads、likes、model popularity
+
+预测未来趋势时必须综合判断 GitHub engineering activity 与 HuggingFace adoption signals，不能只根据 downloads 单独下结论。
 
 必须严格输出一个 JSON object，字段说明如下：
 
