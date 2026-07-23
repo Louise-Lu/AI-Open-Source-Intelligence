@@ -9,6 +9,7 @@ from .models import (
     ReleaseInfo,
     RepositoryInfo,
 )
+from .executor.multi_source_evidence import EvidenceExecutor
 
 __all__ = [
     "EvidenceBuilder",
@@ -20,4 +21,5 @@ __all__ = [
     "PullRequestInfo",
     "ReleaseInfo",
     "RepositoryInfo",
+    "EvidenceExecutor",
 ]

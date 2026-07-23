@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
-
 from schemas.entity import ResolvedEntity
 from schemas.release_diff import ReleaseDiffEvidence
 from services.analysis_service import RepositoryAnalysisService
 from services.comparison_service import RepositoryComparisonService
-from services.evidence_service import RepositoryEvidenceService
+from evidence.executor.repo_evidence import RepositoryEvidenceService
 from services.profile_service import RepositoryProfileService
 from services.roadmap_service import RepositoryRoadmapService
 from services.release_diff_service import ReleaseDiffService
@@ -24,8 +22,8 @@ class ReportPipeline:
         self.github = GitHubAPI()
 
     def build_evidence(self, entity: ResolvedEntity):
-        # 暂时 reddit 禁用 
-        return self.collector.collect(entity=entity, include_reddit=False)
+        # 只构建 github evidence
+        return self.collector.collect(entity=entity)
 
     def generate_report(self, entity: ResolvedEntity, report_type: str):
         evidence = self.build_evidence(entity)

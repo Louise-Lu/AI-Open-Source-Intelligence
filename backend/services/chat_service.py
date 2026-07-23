@@ -7,17 +7,17 @@ from router.entity_extractor import EntityExtractor
 from router.entity_resolver import EntityResolver
 
 from planner.evidence_planner import EvidencePlanner
-from executor.evidence_executor import EvidenceExecutor
+from evidence.executor.multi_source_evidence import EvidenceExecutor
 from sources.github import GitHubAPI
 from sources.huggingface import HuggingFaceClient
 
-from services.report_composer import ReportComposer
-# from services.report_orchestrator import ReportOrchestrator
+from services.answer_composer import AnswerComposer
+
 from schemas.entity import ResolvedEntity
 
 # 1. 任务识别 2. 主体识别 3. 系统识别主体 -> sources 
 # 4. 根据 task -> reports -> 需要的 evidence tools 
-# 5. 执行 tools 
+# 5. 构建 多源 evidence 6. 根据 evidence -> llm -> composed answer
 class ChatService:
     def __init__(self):
         self.router = TaskRouter()
@@ -30,8 +30,7 @@ class ChatService:
             huggingface_client=HuggingFaceClient(),
             # reddit_client=RedditClient() if os.getenv("REDDIT_ENABLED") else None,
         )
-        # self.report_orchestrator = ReportOrchestrator()
-        self.report_composer = ReportComposer()
+        self.answer_composer = AnswerComposer()
         self.agent = github_agent
 
     def chat(self, message: str) -> dict:
@@ -46,27 +45,17 @@ class ChatService:
         print(task_dict, entity_dict)
 
         resolved_entities = self._resolve_entities(entity_dict.get("entities", []))
-        print("系统识别后的实体，包括sources：",resolved_entities)
-
-        # [ResolvedEntity(name='qwen', 
-        # sources=
-        # [EntitySource(source='github', identifier='QwenLM/Qwen'), 
-        #  EntitySource(source='huggingface', identifier='Qwen/Qwen2.5-7B')])]
+        print("系统识别后的实体即信息源",resolved_entities)
 
         task_type = task_dict.get("task")
         reports = task_dict.get("reports", [])
 
-        # 若任务是 general_question，直接调用通用agent对话代理，返回结果
+        # 若 任务是 general_question，直接调用通用agent对话代理，返回结果
         if task_type == "general_question":
             return self._agent_response(message, task_dict, entity_dict, resolved_entities)
 
         # 否则 执行正常的证据规划与收集流程
         evidence_plan = self.evidence_planner.plan(resolved_entities, reports)
-        print(evidence_plan)
-
-        # EvidencePlan(required_tools=['github_issue', 'github_pull_request', 
-        # 'github_readme', 'github_release', 'github_repository', 
-        # 'huggingface_model'])
 
         # 执行收集证据 先取 第一个实体 
         first_entity = resolved_entities[0]
@@ -75,7 +64,8 @@ class ChatService:
             evidence_plan
         )
 
-        composed = self.report_composer.compose(
+
+        composed = self.answer_composer.compose(
             message,
             first_entity.name,     
             evidence
@@ -143,7 +133,6 @@ class ChatService:
         resolved_entities: list[dict],
         answer: str,
     ) -> dict:
-        # print(answer)
         return {
             "answer": answer,
             "trace": {

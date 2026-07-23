@@ -16,12 +16,9 @@ from .models import (
     CommitActivity,
     PlanningSignal,
     DiscussionSignal,
-    # ContributorInfo,
 )
 
-# 将原始数据（字典/列表）转换为 Pydantic 模型（如 GitHubEvidence、HuggingFaceEvidence）。
-# 参数 GitHub 返回的 预处理后的 data : repository releases 等等... 
-# return 结构化的evidence: 类型 IntelligenceEvidence
+# 将原始数据（字典/列表）转换为 Pydantic 模型（如 GitHubEvidence、HuggingFaceEvidence）
 
 class EvidenceBuilder:
     """

@@ -7,7 +7,7 @@ from llms.deepseek import deepseek_model
 from schemas.composed_report import ComposedAnswer
 
 
-class ReportComposer:
+class AnswerComposer:
     def __init__(self):
         self.llm = deepseek_model.with_structured_output(ComposedAnswer)
 
@@ -56,15 +56,15 @@ evidences:
                 return result
             return ComposedAnswer.model_validate(result)
         except Exception as exc:
-            print(f"ReportComposer fallback: {exc}")
-            return ComposedAnswer(answer=self._fallback_answer(project_name, reports))
+            print(f"AnswerComposer fallback: {exc}")
+            # return ComposedAnswer(answer=self._fallback_answer(entity_name, evidence))
 
-    @staticmethod
-    def _fallback_answer(project_name: str, reports: dict[str, Any]) -> str:
-        parts = [f"项目：{project_name}"]
-        for key, value in reports.items():
-            if isinstance(value, dict):
-                parts.append(f"{key}：{json.dumps(value, ensure_ascii=False, indent=2)}")
-            else:
-                parts.append(f"{key}：{value}")
-        return "\n\n".join(parts)
+    # @staticmethod
+    # def _fallback_answer(project_name: str, reports: dict[str, Any]) -> str:
+    #     parts = [f"项目：{project_name}"]
+    #     for key, value in reports.items():
+    #         if isinstance(value, dict):
+    #             parts.append(f"{key}：{json.dumps(value, ensure_ascii=False, indent=2)}")
+    #         else:
+    #             parts.append(f"{key}：{value}")
+    #     return "\n\n".join(parts)

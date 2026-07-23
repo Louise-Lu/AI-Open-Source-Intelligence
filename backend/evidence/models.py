@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 # GitHub Raw Evidence Models
 # =========================
 
-
 class RepositoryInfo(BaseModel):
     """
     Repository 基础信息

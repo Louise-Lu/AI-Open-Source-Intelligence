@@ -2,19 +2,14 @@
 # 并构建成结构化证据（IntelligenceEvidence）。
 
 from typing import Any
-from evidence import EvidenceBuilder
-from evidence.models import IntelligenceEvidence
+from evidence import EvidenceBuilder, IntelligenceEvidence
+
 from schemas.entity import ResolvedEntity
 from planner.evidence_planner import EvidencePlan
 
 from sources.github.client import GitHubAPI
 from sources.huggingface.client import HuggingFaceClient
 from sources.reddit.client import RedditClient
-
-
-# EvidencePlan(required_tools=['github_commit_activity', 'github_issue', 
-# 'github_pull_request', 'github_readme', 'github_release', 'github_repository', 
-# 'huggingface_model'])
 
 class EvidenceExecutor:
     def __init__(
@@ -33,16 +28,16 @@ class EvidenceExecutor:
         根据 Evidence Plan 的 Tools 收集证据，返回结构化 IntelligenceEvidence
         """
 
-        print("=== DEBUG entity ===")
-        print(f"type: {type(entity)}")
-        print(f"content: {entity}")
-        if hasattr(entity, 'sources'):
-            print(f"sources: {entity.sources}")
-            for s in entity.sources:
-                print(f"  - source: {s.source}, identifier: {s.identifier}")
-        else:
-            print("entity has NO 'sources' attribute")
-        print("=====================")
+        # print("=== DEBUG entity ===")
+        # print(f"type: {type(entity)}")
+        # print(f"content: {entity}")
+        # if hasattr(entity, 'sources'):
+        #     print(f"sources: {entity.sources}")
+        #     for s in entity.sources:
+        #         print(f"  - source: {s.source}, identifier: {s.identifier}")
+        # else:
+        #     print("entity has NO 'sources' attribute")
+        # print("=====================")
 
 
         # 防御：如果 entity 是列表，取第一个
@@ -61,7 +56,7 @@ class EvidenceExecutor:
         github_tools = [t for t in plan.required_tools if t.startswith("github")]
         if github_tools:
             github_source = next((s for s in entity.sources if s.source == "github"), None)
-            print("github_source", github_source)
+            # print("github_source", github_source)
             if github_source:
                 try:
                     owner, repo = github_source.identifier.split("/", 1)
@@ -119,7 +114,6 @@ class EvidenceExecutor:
             try:
                 if tool == "github_repository":
                     result[tool] = self.github.get_repository(owner, repo)
-                    print()
                 elif tool == "github_readme":
                     result[tool] = self.github.get_readme(owner, repo)
                 elif tool == "github_release":
