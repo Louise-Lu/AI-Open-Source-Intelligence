@@ -1,6 +1,6 @@
 # 两级路由架构：LLM 先判任务Task → 任务映射固定功能列表 → 每个功能再映射到固定工具集。
 # 这本质上是一种确定性工作流，而非 Agent 自主规划
-# 但
+# 也有 general_question 即 Agent 自主规划
 
 from __future__ import annotations
 
@@ -35,34 +35,28 @@ class TaskRouter:
         if any(keyword in text for keyword in ["比较", "对比", "compare"]):
             return {
                 "task": "project_comparison",
-                "reports": ["comparison"],
+                "features": ["comparison"],
             }
 
         if any(keyword in text for keyword in ["更新", "release", "版本", "变更", "diff"]):
             return {
                 "task": "update_tracking",
-                "reports": ["release_diff"],
+                "features": ["release_diff"],
             }
 
         if any(keyword in text for keyword in ["未来", "发展", "roadmap", "趋势", "下一步", "未来三个月", "未来发展方向"]):
             return {
                 "task": "single_project_analysis",
-                "reports": ["roadmap"],
+                "features": ["roadmap"],
             }
 
         if any(keyword in text for keyword in ["分析", "怎么样", "是什么", "介绍", "值不值得", "值得", "好不好", "评价"]):
             return {
                 "task": "single_project_analysis",
-                "reports": ["profile", "analysis"],
+                "features": ["profile", "analysis"],
             }
-
-        # if any(keyword in text for keyword in ["搜索", "查找", "找一下", "有哪些"]):
-        #     return {
-        #         "task": "deep_search",
-        #         "reports": [],
-        #     }
 
         return {
             "task": "general_question",
-            "reports": [],
+            "features": [],
         }

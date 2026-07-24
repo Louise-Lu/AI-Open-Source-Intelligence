@@ -1,4 +1,4 @@
-# 根据 Report 类型 + Entity Source实体来源，生成需要的工具列表（EvidencePlan）。
+# 根据 Feature 类型 + Entity Source实体来源，生成需要的工具列表（EvidencePlan）。
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ class EvidencePlan:
     
 class EvidencePlanner:
     """
-    根据 Report 类型 + Entity Source
+    根据 Feature 类型 + Entity Source
     决定需要收集哪些 Evidence。
 
     不负责：
@@ -21,10 +21,10 @@ class EvidencePlanner:
     - 调用工具
 
     只负责：
-    Report -> Tools
+    Features + Entity Sources -> Tools
     """
 
-    REPORT_TOOL_MAP = {
+    FEATURE_TOOL_MAP = {
 
         # 项目基本信息
         "profile": [
@@ -45,47 +45,61 @@ class EvidencePlanner:
 
         # 技术路线预测
         "roadmap": [
-            "github_release",
+            "github_planning",
+            "github_discussion",
             "github_pull_request",
-            "github_commit_activity",
-            "github_issue",
+            "github_commit_activity"
+            "github_release",
         ],
 
 
         # 最近版本变化
         "release_diff": [
             "github_release",
-            "github_pull_request",
-            "github_commit_activity",
         ],
 
 
         # 项目比较
         "comparison": [
             "github_repository",
-            "github_readme",
-            "github_release",
+            "github_commit_activity",
+            "github_planning",
+            "github_ecosystem",
             "huggingface_model",
         ],
 
 
-        # 推荐
-        "recommendation": [
-            "github_repository",
-            "github_readme",
-            "github_release",
-            "github_issue",
-            "github_pull_request",
-            "huggingface_model",
-        ],
+        # # 推荐
+        # "recommendation": [
+        #     "github_repository",
+        #     "github_readme",
+        #     "github_release",
+        #     "github_issue",
+        #     "github_pull_request",
+        #     "huggingface_model",
+        # ],
 
 
         # 市场趋势（未来）
         "trend_report": [
-            "github_trending",
+            # "reddit_search",
+            "github_repository",
+            "github_commit_activity",
+            "github_discussion",
+            "github_ecosystem",
             "huggingface_trending",
-            "reddit_search",
-        ]
+        ],
+
+        "impact_analysis": [
+            "github_release",
+            "github_planning",
+            "github_ecosystem"
+        ],
+        "strategic_insight": [
+            "github_ecosystem",
+            "github_planning"
+        ],
+        "recommendation": []  # 汇总型，不直接调用工具，引用前置分析结果
     }
 
 # - profile
@@ -95,22 +109,22 @@ class EvidencePlanner:
 # - comparison
 # - recommendation
 # - release_diff
-# trend_report多
+# - trend_report多
 
     def plan(
         self,
         entities: list[ResolvedEntity],   # 改为接受列表
-        reports: list[str],
+        features: list[str],
         include_reddit: bool = False,
     ) -> EvidencePlan:
         if not entities:
             # 没有实体时，返回空计划（或根据需求抛出异常）
             return EvidencePlan(required_tools=[])
 
-        # 1. 根据 report 获取所有潜在需要的工具
+        # 1. 根据 features 获取所有潜在需要的工具
         tools: set[str] = set()
-        for report in reports:
-            required = self.REPORT_TOOL_MAP.get(report, [])
+        for feature in features:
+            required = self.FEATURE_TOOL_MAP.get(feature, [])
             tools.update(required)
 
         # 2. 收集所有实体的来源类型（并集）
@@ -129,6 +143,7 @@ class EvidencePlanner:
             elif tool.startswith("reddit") and include_reddit:
                 final_tools.append(tool)
             else:
+                print("其他未知工具",tool)
                 # 对其他未知工具，默认保留（或根据需求处理）
                 final_tools.append(tool)
 

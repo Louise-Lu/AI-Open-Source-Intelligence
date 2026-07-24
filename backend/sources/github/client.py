@@ -44,7 +44,7 @@ class GitHubClient:
     ) -> requests.Response:
         
         url = f"{self.BASE_URL}{path}"
-        print("GitHub API calling:", url)
+        # print("GitHub API calling:", url)
 
         # 合并自定义 headers（覆盖默认 headers）
         merged_headers = self.session.headers.copy()
@@ -75,6 +75,6 @@ class GitHubAPI(
     EcosystemSignalTool,
 ):
 
-    def __init__(self, token: str | None = None):
+    def __init__(self, token: str | None = None, competitor_map: dict[str, list[str]] | None = None):
         self.client = GitHubClient(token=token)
-
+        self.competitor_map = competitor_map or {}  

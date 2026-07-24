@@ -1,4 +1,4 @@
-# 根据entity和plan，调用具体的 API 客户端收集原始数据，
+# 根据 entity 和 plan，调用具体的 API 客户端收集原始数据，
 # 并构建成结构化证据（IntelligenceEvidence）。
 
 from typing import Any
@@ -54,12 +54,14 @@ class EvidenceExecutor:
 
         # ---------- 收集 GitHub raw data ----------
         github_tools = [t for t in plan.required_tools if t.startswith("github")]
+        print("git_tools: ",github_tools)
         if github_tools:
             github_source = next((s for s in entity.sources if s.source == "github"), None)
-            # print("github_source", github_source)
+            print("github_source", github_source)
             if github_source:
                 try:
                     owner, repo = github_source.identifier.split("/", 1)
+
                     github_raw = self._collect_github_raw_data(owner, repo, github_tools)
                 except Exception as e:
                     print(f"GitHub raw data collection error: {e}")
@@ -111,6 +113,7 @@ class EvidenceExecutor:
 
     def _collect_github_raw_data(self, owner: str, repo: str, tools: list[str]) -> dict[str, Any]:
         """调用 GitHubAPI 的各个工具方法，返回原始数据字典"""
+        print(f"[DEBUG] required_tools: {tools}")  # 加这行
         result = {}
         for tool in tools:
             try:
@@ -128,13 +131,20 @@ class EvidenceExecutor:
                     result[tool] = self.github.get_commit_activity(owner, repo)
                 elif tool == "github_planning":
                     result[tool] = self.github.get_planning_signals(owner, repo)
+                    print("github_planning: ", result[tool])
+                    
                 elif tool == "github_discussion":
                     result[tool] = self.github.get_discussion_signals(owner, repo)
+                    print("github_discussion: ", result[tool])
                 elif tool == "github_ecosystem":
                     result[tool] = self.github.get_ecosystem_signals(owner, repo)  # 新增
+                    print("github_ecosystem: ", result[tool])
                 else:
                     result[tool] = None
+
             except Exception as e:
+                import traceback
                 print(f"GitHub tool {tool} failed: {e}")
+                print(traceback.format_exc())  # 加这行
                 result[tool] = None
         return result

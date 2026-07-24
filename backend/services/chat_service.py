@@ -16,7 +16,7 @@ from services.answer_composer import AnswerComposer
 from schemas.entity import ResolvedEntity
 
 # 1. 任务识别 2. 主体识别 3. 系统识别主体 -> sources 
-# 4. 根据 task -> reports -> 需要的 evidence tools 
+# 4. 根据 task -> features -> 需要的 evidence tools 
 # 5. 构建 多源 evidence 6. 根据 evidence -> llm -> composed answer
 class ChatService:
     def __init__(self):
@@ -48,14 +48,16 @@ class ChatService:
         print("系统识别后的实体即信息源",resolved_entities)
 
         task_type = task_dict.get("task")
-        reports = task_dict.get("reports", [])
+        features = task_dict.get("features", [])
 
         # 若 任务是 general_question，直接调用通用agent对话代理，返回结果
         if task_type == "general_question":
             return self._agent_response(message, task_dict, entity_dict, resolved_entities)
 
         # 否则 执行正常的证据规划与收集流程
-        evidence_plan = self.evidence_planner.plan(resolved_entities, reports)
+        evidence_plan = self.evidence_planner.plan(resolved_entities, features)
+        print("planning后需要的tools:")
+        print(evidence_plan)
 
         # 执行收集证据 先取 第一个实体 
         first_entity = resolved_entities[0]
