@@ -34,6 +34,7 @@ class RepositoryEvidenceService:
         commit_activity = None
         planning = None
         discussions = None
+        ecosystem = None 
 
         if github_source:
             owner, repo = self._split_github_identifier(github_source.identifier)
@@ -45,7 +46,7 @@ class RepositoryEvidenceService:
             commit_activity = self.github.get_commit_activity(owner, repo)
             planning = self.github.get_planning_signals(owner, repo)
             discussions = self.github.get_discussion_signals(owner, repo)
-
+            ecosystem = self.github.get_ecosystem_signals(owner, repo)  # 新增
 
         evidence = self.builder.build(
             repository=repository,
@@ -56,6 +57,7 @@ class RepositoryEvidenceService:
             commit_activity=commit_activity,
             planning=planning,
             discussions=discussions,
+            ecosystem=ecosystem,  # 新增
         )
 
         return evidence

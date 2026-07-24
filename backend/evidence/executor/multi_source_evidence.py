@@ -103,6 +103,8 @@ class EvidenceExecutor:
             commit_activity=github_raw.get("github_commit_activity") if github_raw else None,
             planning=github_raw.get("github_planning") if github_raw else None,
             discussions=github_raw.get("github_discussion") if github_raw else None,
+            ecosystem=github_raw.get("github_ecosystem") if github_raw else None,  # 新增
+
             huggingface=huggingface_raw,
             # reddit=reddit_raw,
         )
@@ -128,6 +130,8 @@ class EvidenceExecutor:
                     result[tool] = self.github.get_planning_signals(owner, repo)
                 elif tool == "github_discussion":
                     result[tool] = self.github.get_discussion_signals(owner, repo)
+                elif tool == "github_ecosystem":
+                    result[tool] = self.github.get_ecosystem_signals(owner, repo)  # 新增
                 else:
                     result[tool] = None
             except Exception as e:

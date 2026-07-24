@@ -16,6 +16,7 @@ from .models import (
     CommitActivity,
     PlanningSignal,
     DiscussionSignal,
+    EcosystemSignal,
 )
 
 # 将原始数据（字典/列表）转换为 Pydantic 模型（如 GitHubEvidence、HuggingFaceEvidence）
@@ -45,6 +46,7 @@ class EvidenceBuilder:
         commit_activity: dict[str, Any] | None = None,
         planning: dict[str, Any] | None = None,
         discussions: dict[str, Any] | None = None,
+        ecosystem: dict[str, Any] | None = None, 
 
         huggingface: dict[str, Any] | None = None,
         reddit: dict[str, Any] | list[str] | None = None,   # 保留 reddit
@@ -61,6 +63,7 @@ class EvidenceBuilder:
             commit_activity=self._build_commit_activity(commit_activity),
             planning=self._build_planning(planning),
             discussions=self._build_discussions(discussions),
+            ecosystem=self._build_ecosystem(ecosystem),
         )
         huggingface_evidence = self._build_huggingface_evidence(huggingface)
         # reddit_evidence = self._build_reddit(reddit)  # 如果你有 _build_reddit 方法
@@ -151,7 +154,6 @@ class EvidenceBuilder:
                 "topics",
                 []
             ),
-
 
             license=
                 license_info.get(
@@ -348,3 +350,12 @@ class EvidenceBuilder:
             hot_topics_str.append(f"{title} {tag_str}".strip())
         return DiscussionSignal(hot_topics=hot_topics_str)
 
+    def _build_ecosystem(self, data: dict[str, Any] | None) -> EcosystemSignal | None:
+        if not data:
+            return None
+        return EcosystemSignal(
+            dependencies=data.get("dependencies", []),
+            dependents_count=int(data.get("dependents_count", 0) or 0),
+            awesome_list_mentions=bool(data.get("awesome_list_mentions", False)),
+            competitors=data.get("competitors", []),
+        )

@@ -79,13 +79,11 @@ class PlanningSignal(BaseModel):
 class DiscussionSignal(BaseModel):
     hot_topics: list[str] = []       # 最近最热的讨论标题 + 是否有维护者回复
 
-    
-# class ContributorInfo(BaseModel):
-
-#     login: str | None = None
-
-#     contributions: int = 0
-
+class EcosystemSignal(BaseModel):
+    dependencies: list[str] = Field(default_factory=list)      # PyPI 包名列表
+    dependents_count: int = 0                                   # 下游依赖项目数
+    awesome_list_mentions: bool = False                         # 是否被 awesome 列表收录
+    competitors: list[str] = Field(default_factory=list)        # 直接竞品项目列表
 
 
 # =========================
@@ -110,6 +108,8 @@ class GitHubEvidence(BaseModel):
     commit_activity: CommitActivity | None = None
     planning: PlanningSignal | None = None
     discussions: DiscussionSignal | None = None
+    
+    ecosystem: EcosystemSignal | None = None  
 
     # contributors: list[ContributorInfo] = Field(
     #     default_factory=list

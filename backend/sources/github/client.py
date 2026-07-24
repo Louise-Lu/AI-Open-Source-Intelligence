@@ -15,6 +15,7 @@ from .repository import RepositoryTool
 from .commit import CommitActivityTool
 from .discussion import DiscussionTool
 from .planning import PlanningTool
+from .ecosystem_signal import EcosystemSignalTool
 from .utils import build_query, raise_for_github_response
 
 
@@ -38,23 +39,26 @@ class GitHubClient:
     def get(
         self,
         path: str,
-        params: dict[str, Any] | None = None
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None   # 新增
     ) -> requests.Response:
-
+        
         url = f"{self.BASE_URL}{path}"
-
         print("GitHub API calling:", url)
 
-        # start = time.time()
+        # 合并自定义 headers（覆盖默认 headers）
+        merged_headers = self.session.headers.copy()
+        if headers:
+            merged_headers.update(headers)
 
         response = self.session.get(
             url,
             params=build_query(params),
+            headers=merged_headers,
             timeout=30
         )
-
         raise_for_github_response(response)
-
+        
         return response
 
 
@@ -68,6 +72,7 @@ class GitHubAPI(
     CommitActivityTool,
     PlanningTool,
     DiscussionTool,
+    EcosystemSignalTool,
 ):
 
     def __init__(self, token: str | None = None):

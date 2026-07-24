@@ -538,7 +538,17 @@ Sorry need more steps
 
 ---
 # Agent Evaluation Framework
+Layer 1 Task Understanding
 
+Layer 2 Entity Resolution   <-- 新增
+
+Layer 3 Tool Planning
+
+Layer 4 Evidence Quality
+
+Layer 5 Reasoning
+
+Layer 6 Answer Quality
 - 第一层：Intent 是否理解正确
     - 是否正确理解用户问题
     - 是否正确识别 repository
@@ -550,6 +560,7 @@ Sorry need more steps
     - 是否遗漏 Tool
     - 是否多调用 Tool
     - Tool Call Order
+    - Tool 的参数
 
 - 第三层：Evidence Quality
 Agent 生成答案的时候，拿到的证据够不够？相关不相关？新不新？    

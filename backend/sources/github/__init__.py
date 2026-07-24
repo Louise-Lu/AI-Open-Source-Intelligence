@@ -10,3 +10,4 @@ from .repository import RepositoryTool
 from .commit import CommitActivityTool
 from .discussion import DiscussionTool
 from .planning import PlanningTool
+from .ecosystem_signal import EcosystemSignalTool

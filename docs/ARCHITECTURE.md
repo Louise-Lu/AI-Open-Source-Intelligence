@@ -1,21 +1,56 @@
 # 整体架构
 ```
-                 GitHub
-                   |
-                   |
-             GitHub Tools
-                   |
-                   |
-              Evidence
-                   |
-        --------------------
-        |                  |
-        v                  v
+                 User
 
-  LLM Workflow         Chat Agent
+                  |
+                  v
 
- Dashboard             Conversation
+             TaskRouter  意图判断
+            (task+reports) 
+
+                  |
+                  v
+
+          EntityResolver 主体解析检索sources 
+
+                  |
+                  v
+
+          EvidencePlanner 根据 task + reports -> tools
+
+                  |
+                  v
+
+          Tool Executor   执行 tools -> evidence
+                  |
+       --------------------
+       |                  |
+    Github             HuggingFace
+       |                  |
+
+       --------------------
+
+                  |
+                  v
+
+       IntelligenceEvidence
+
+                  |
+       ------------------
+       |        |       |
+    Profile  Health  Roadmap
+
+                  |
+                  v
+
+             Composer
+
+                  |
+                  v
+
+              Chat UI
 ```
+
 # Workflow 分支（Dashboard）
 今日 AI 开源情报
 

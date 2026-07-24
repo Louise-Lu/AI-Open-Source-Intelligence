@@ -1,3 +1,7 @@
+# 两级路由架构：LLM 先判任务Task → 任务映射固定功能列表 → 每个功能再映射到固定工具集。
+# 这本质上是一种确定性工作流，而非 Agent 自主规划
+# 但
+
 from __future__ import annotations
 
 from llms.deepseek import deepseek_model
@@ -23,49 +27,6 @@ class TaskRouter:
         except Exception as exc:
             print(f"TaskRouter fallback: {exc}")
             # return self._rule_based_route(query)
-
-    # @staticmethod
-    # def _build_prompt(query: str) -> str:
-
-#         return f"""
-# 你是 AI 开源情报系统任务路由器。
-
-# 你的职责：
-# 1. 判断用户想完成什么任务
-# 2. 判断需要生成哪些报告
-
-# 不要：
-# - 提取项目名称
-# - 判断 GitHub owner/repo
-# - 选择具体工具
-
-# Task:
-# - single_project_analysis
-# - project_comparison
-# - project_search
-# - update_tracking
-# - general_question
-
-# Reports:
-# - profile
-# - project_health
-# - analysis
-# - roadmap
-# - comparison
-# - recommendation
-# - release_diff
-
-# 只返回 JSON。
-
-# 路由示例：
-# - "LangGraph怎么样" -> {{"task":"single_project_analysis","reports":["profile","analysis"],"need_entity_resolution":true}}
-# - "LangGraph未来发展趋势" -> {{"task":"single_project_analysis","reports":["roadmap"],"need_entity_resolution":true}}
-# - "比较LangGraph和CrewAI" -> {{"task":"project_comparison","reports":["comparison"],"need_entity_resolution":true}}
-# - "CrewAI怎么样" -> {{"task":"single_project_analysis","reports":["profile","analysis"],"need_entity_resolution":true}}
-
-# 用户问题：
-# {query}
-# """.strip()
 
     @staticmethod
     def _rule_based_route(query: str) -> dict:
