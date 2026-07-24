@@ -21,8 +21,8 @@ class ReleaseDiffRequest(BaseModel):
 
     new_tag: str
 
-
-@router.post("")
+# "/release-diff"
+@router.get("/repositories/{owner}/{repo}/releases/diff")
 def release_diff(request: ReleaseDiffRequest):
     entity = adapter.from_owner_repo(request.owner, request.repo)
     return {

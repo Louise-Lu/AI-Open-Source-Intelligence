@@ -113,11 +113,11 @@ class EvidencePlanner:
 
     def plan(
         self,
-        entities: list[ResolvedEntity],   # 改为接受列表
+        entity: ResolvedEntity,   
         features: list[str],
         include_reddit: bool = False,
     ) -> EvidencePlan:
-        if not entities:
+        if not entity:
             # 没有实体时，返回空计划（或根据需求抛出异常）
             return EvidencePlan(required_tools=[])
 
@@ -129,9 +129,8 @@ class EvidencePlanner:
 
         # 2. 收集所有实体的来源类型（并集）
         available_sources = set()
-        for entity in entities:
-            for src in entity.sources:
-                available_sources.add(src.source)
+        for src in entity.sources:
+            available_sources.add(src.source)
 
         # 3. 根据可用来源过滤工具
         final_tools = []
@@ -143,7 +142,7 @@ class EvidencePlanner:
             elif tool.startswith("reddit") and include_reddit:
                 final_tools.append(tool)
             else:
-                print("其他未知工具",tool)
+                print("其他未知工具:",tool)
                 # 对其他未知工具，默认保留（或根据需求处理）
                 final_tools.append(tool)
 

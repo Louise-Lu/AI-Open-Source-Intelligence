@@ -3,7 +3,6 @@ COMPARISON_PROMPT = """
 
 你的任务不是介绍两个 GitHub 项目，而是帮助 AI技术决策者，AI 创业者、技术负责人和投资人完成技术决策。
 
-你只能根据提供的 Repository Profile 进行分析。
 
 严禁：
 

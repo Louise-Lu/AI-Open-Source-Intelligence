@@ -17,8 +17,7 @@ Repository Evidence:
 """
         try:
             return llm.invoke(prompt)
+        
         except Exception as exc:
-            print("========== PROFILE ERROR ==========")
             print(exc)
-            print("===================================")
             raise

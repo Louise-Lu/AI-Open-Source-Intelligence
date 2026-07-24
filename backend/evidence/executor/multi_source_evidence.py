@@ -113,7 +113,6 @@ class EvidenceExecutor:
 
     def _collect_github_raw_data(self, owner: str, repo: str, tools: list[str]) -> dict[str, Any]:
         """调用 GitHubAPI 的各个工具方法，返回原始数据字典"""
-        print(f"[DEBUG] required_tools: {tools}")  # 加这行
         result = {}
         for tool in tools:
             try:
@@ -138,7 +137,7 @@ class EvidenceExecutor:
                     print("github_discussion: ", result[tool])
                 elif tool == "github_ecosystem":
                     result[tool] = self.github.get_ecosystem_signals(owner, repo)  # 新增
-                    print("github_ecosystem: ", result[tool])
+                    # print("github_ecosystem: ", result[tool])
                 else:
                     result[tool] = None
 

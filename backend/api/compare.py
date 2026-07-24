@@ -1,14 +1,15 @@
 from fastapi import APIRouter
 
-from services.comparison_service import RepositoryComparisonService
+from services.entity_adapter import EntityAdapter
+from services.report_pipeline import ReportPipeline
 
 
 router = APIRouter(tags=["Compare"])
 
-service = RepositoryComparisonService()
+adapter = EntityAdapter()
+pipeline = ReportPipeline()
 
-
-@router.get("/compare")
+@router.get("/repositories/compare")
 def compare_repositories(
     repo1: str,
     repo2: str,
@@ -21,9 +22,8 @@ def compare_repositories(
     owner1, name1 = repo1.split("/")
     owner2, name2 = repo2.split("/")
 
-    return service.compare(
-        owner1,
-        name1,
-        owner2,
-        name2,
-    )
+
+    entity1 = adapter.from_owner_repo(owner1, name1)
+    entity2 = adapter.from_owner_repo(owner2, name2)
+    
+    return pipeline.generate_comparison(entity1, entity2)

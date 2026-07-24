@@ -69,7 +69,7 @@ class EntityResolver:
         if hf_source:
             sources.append(hf_source)
 
-        print("搜索到的资源",sources)
+        print("搜索到的资源:",sources)
         # 3. 如果搜索结果为空，使用 LLM 作为备选
         if not sources:
             llm_result = self._llm_resolve(name)

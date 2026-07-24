@@ -39,13 +39,12 @@ class ChatService:
         task = self.router.route(message)
         entity = self.entity_extractor.extract(message)
 
-        # 目前只有单一task
         task_dict = task if isinstance(task, dict) else task.model_dump()
         entity_dict = entity if isinstance(entity, dict) else entity.model_dump()
         print(task_dict, entity_dict)
 
         resolved_entities = self._resolve_entities(entity_dict.get("entities", []))
-        print("系统识别后的实体即信息源",resolved_entities)
+        print("系统识别后的实体的信息源: ",resolved_entities)
 
         task_type = task_dict.get("task")
         features = task_dict.get("features", [])
@@ -54,72 +53,30 @@ class ChatService:
         if task_type == "general_question":
             return self._agent_response(message, task_dict, entity_dict, resolved_entities)
 
-        # 否则 执行正常的证据规划与收集流程
-        evidence_plan = self.evidence_planner.plan(resolved_entities, features)
-        print("planning后需要的tools:")
-        print(evidence_plan)
-
-        # 执行收集证据 先取 第一个实体 
-        first_entity = resolved_entities[0]
-        evidence = self.evidence_executor.collect(
-            first_entity,
-            evidence_plan
-        )
-
-
+        
+        # 若 任务是 比较，则 分别调用 plan 和 构建 evidence
+        elif task_type == "project_comparison":
+            evidences = []
+            for entity in resolved_entities:
+                evidence_plan = self.evidence_planner.plan(entity, features)
+    
+                evidence = self.evidence_executor.collect(entity, evidence_plan)
+                evidences.append(evidence)
+            
+        else:
+            evidences = []
+            first_entity = resolved_entities[0]
+            evidence_plan = self.evidence_planner.plan(first_entity, features)
+            evidence = self.evidence_executor.collect(first_entity, evidence_plan)
+            evidences.append(evidence)
+        
         composed = self.answer_composer.compose(
             message,
-            first_entity.name,     
-            evidence
+            entity_dict,     
+            evidences,
         )
         return self._response(task_dict, entity_dict, resolved_entities, composed.answer)
 
-        # if route == "general_question":
-        #     return self._agent_response(message, task_dict, entity_dict, resolved_entities)
-
-        # if route == "project_comparison":
-        #     if len(resolved_entities) < 2:
-        #         return self._not_found_response(task_dict, entity_dict)
-        #     structured_reports = self.report_orchestrator.generate_comparison(
-        #         resolved_entities[0],
-        #         resolved_entities[1],
-        #         reports,
-        #     )
-        #     project_name = f"{resolved_entities[0]['name']} vs {resolved_entities[1]['name']}"
-        #     composed = self.report_composer.compose(project_name, structured_reports)
-        #     return self._response(task_dict, entity_dict, resolved_entities, structured_reports, composed.answer)
-
-        # if route in {"single_project_analysis", "update_tracking"}:
-        #     resolved_entity = resolved_entities[0] if resolved_entities else None
-        #     if not resolved_entity:
-        #         return self._not_found_response(task_dict, entity_dict)
-
-        #     structured_reports = self.report_orchestrator.generate_single_project(
-        #         resolved_entity,
-        #         reports,
-        #     )
-            
-        #     composed = self.report_composer.compose(
-        #         message,
-        #         resolved_entity.name,     
-        #         structured_reports
-        #     )
-        #     return self._response(task_dict, entity_dict, resolved_entities, composed.answer)
-
-        # if route == "project_search":
-        #     return {
-        #         "answer": "已识别项目名称，可以继续解析为 GitHub 仓库。",
-        #         "trace": {
-        #             "task": task_dict,
-        #             "entity": entity_dict,
-        #             "resolved_entities": resolved_entities,
-        #         },
-        #         "task": task_dict,
-        #         "entity": entity_dict,
-        #         "resolved_entities": resolved_entities,
-        #     }
-
-        # return self._agent_response(message, task_dict, entity_dict, resolved_entities)
 
     def _resolve_entities(self, entities: list[dict]) -> list[ResolvedEntity]:
         resolved_entities: list[ResolvedEntity] = []
