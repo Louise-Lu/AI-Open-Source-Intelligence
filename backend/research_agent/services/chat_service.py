@@ -1,0 +1,460 @@
+# ChatService — AI Intelligence Research Agent 入口
+#
+# 流程（含 Guard）：
+#   User Query
+#     → IntentRouter
+#           ├── greeting/small_talk/help → Chat Response → END
+#           └── information_lookup/evaluation/comparison/... → Entity → Planner → Agent → Signals → Brief
+#
+# Fail Fast 原则：
+# - 非研究意图 → 立即结束
+# - 无实体 → Planner 返回 need_user_input，Agent 不启动
+# - 无证据 → Analyzer 返回空，Composer 返回 insufficient_information
+
+from __future__ import annotations
+
+import json
+from typing import Any
+
+from agent.intelligence_agent import build_intelligence_agent_prompt, intelligence_agent
+from agent.trace import clear_trace, get_discovered_resources, get_evidence_store, get_trace, populate_trace_from_agent_result
+
+from research_agent.intent import ResearchIntentRouter
+from research_agent.entity_extractor import EntityExtractor
+from research_agent.entity_resolver import EntityResolver
+
+from research_agent.planner import ResearchAgentPlanner
+
+from research_agent.signal_extractor import ResearchAgentAnalyzer
+from research_agent.composer import ResearchBriefComposer
+
+
+from research_agent.schemas.research import (
+    ResearchGoal,
+    ResearchIntent,
+    ResearchObjective,
+)
+
+from shared_schemas.entity import ResolvedEntity
+
+
+# 非研究类意图集合（不走 Research Pipeline）
+_CHAT_ONLY_OBJECTIVES: set[str] = {
+    ResearchObjective.greeting.value,
+    ResearchObjective.small_talk.value,
+    ResearchObjective.help.value,
+}
+
+
+def _build_chat_response(intent: ResearchIntent) -> dict:
+    """为非研究类意图生成直接回复。"""
+    obj = intent.objective
+    if obj == ResearchObjective.greeting.value:
+        answer = (
+            "你好！我是 AI Intelligence Research Agent，"
+            "可以帮你研究开源项目、技术趋势和竞品分析。"
+            "有什么想研究的吗？"
+        )
+    elif obj == ResearchObjective.small_talk.value:
+        answer = (
+            "你好！我专注于开源情报研究，"
+            "可以帮你分析项目、对比技术、追踪趋势。"
+            "有什么研究需求吗？"
+        )
+    elif obj == ResearchObjective.help.value:
+        answer = (
+            "我可以帮你做以下研究：\n"
+            "- 项目评估：分析 GitHub 项目的活跃度、社区健康度、风险\n"
+            "- 竞品对比：比较多个框架/工具的优劣\n"
+            "- 趋势分析：追踪技术方向的最新动态\n"
+            "- 技术研究：深入了解某项技术的原理和架构\n\n"
+            "请告诉我你想研究什么项目或技术？"
+        )
+    else:
+        answer = "你好！有什么可以帮你的吗？"
+
+    return {
+        "answer": answer,
+        "trace": {
+            "intent": intent.model_dump(),
+            "discovered_sources": {},
+            "steps": [],
+            "raw_tool_trace": [],
+        },
+        "error": None,
+    }
+
+
+class ChatService:
+    """AI Intelligence Research Agent 主服务。
+
+    混合架构 + Fail Fast Guard:
+    - Router / Entity 层保留确定性理解与解析
+    - Planner 输出 ResearchGoal，而不是步骤计划
+    - Intelligence Agent 用 ReAct 循环自主选择工具
+    - Analyzer / Composer 保留结构化输出层
+
+    - 非研究意图不走 Research Pipeline
+    - 无实体不启动 Agent
+    - 无证据不生成信号和简报
+    """
+
+    def __init__(self):
+        self.router = ResearchIntentRouter()
+        self.entity_extractor = EntityExtractor()
+        self.entity_resolver = EntityResolver()
+        self.planner = ResearchAgentPlanner()
+        self.agent = intelligence_agent
+        self.max_iterations = 12
+        self.analyzer = ResearchAgentAnalyzer()
+        self.composer = ResearchBriefComposer()
+
+
+    def chat(self, message: str) -> dict:
+        """主入口: 接收用户消息，返回研究结果。"""
+        clear_trace()
+
+        intent = self.router.route(message)
+
+        if intent.objective in _CHAT_ONLY_OBJECTIVES:
+            return _build_chat_response(intent)
+        
+        _, resolved_entities = self._extract_and_resolve(message, intent)
+
+        goal = self.planner.plan(intent, resolved_entities)
+
+        if goal.status == "need_user_input":
+            return self._build_need_user_response(
+                intent=intent,
+            )
+
+        agent_prompt = build_intelligence_agent_prompt(goal, resolved_entities)
+
+        agent_error = None
+        agent_result = None
+        try:
+            agent_result = self.agent.invoke(
+                {
+                    "messages": [
+                        ("system", agent_prompt),
+                        ("user", message),
+                    ]
+                },
+                config={"recursion_limit": 12},
+            )
+        except Exception as exc:  # noqa: BLE001
+            agent_error = f"{type(exc).__name__}: {exc}"
+            agent_result = {"error": agent_error, "messages": []}
+
+        populate_trace_from_agent_result(agent_result)
+
+        evidences = get_evidence_store()
+
+        if not evidences:
+            return self._build_insufficient_evidence_response(
+                intent=intent,
+                agent_result=agent_result,
+                agent_error=agent_error,
+            )
+
+        signals = self.analyzer.analyze(evidences, goal)
+        brief = self.composer.compose(message, evidences, signals)
+
+        return self._build_response(
+            intent=intent,
+            agent_result=agent_result,
+            agent_error=agent_error,
+            brief=brief,
+        )
+
+    # ── Entity Resolution ──────────────────────────────────────
+    def _extract_and_resolve(
+        self,
+        message: str,
+        intent: ResearchIntent,
+    ) -> tuple[dict[str, Any], list[ResolvedEntity]]:
+        # 1. 先直接用意图中的实体
+        all_entity_names = set(intent.entities) if intent.entities else set()
+
+        # 2. 只有在意图中没有实体时，才调实体提取
+        if not all_entity_names:
+            entity_result = self.entity_extractor.extract(message)
+            entity_dict = (
+                entity_result
+                if isinstance(entity_result, dict)
+                else entity_result.model_dump()
+            )
+            for entity in entity_dict.get("entities", []):
+                name = entity.get("name", "")
+                if name:
+                    all_entity_names.add(name)
+        else:
+            # 意图里已经有实体了，entity_dict 直接构造，不走 LLM
+            entity_dict = {
+                "entities": [{"name": name} for name in all_entity_names]
+            }
+
+        # 3. 解析实体
+        resolved = []
+        for name in all_entity_names:
+            if name:
+                result = self.entity_resolver.resolve(name)
+                if result and result.name:
+                    resolved.append(result)
+        return entity_dict, resolved
+
+
+    # ── Response Builders ───────────────────────────────────────
+    @staticmethod
+    def _build_need_user_response(
+        intent: ResearchIntent,
+    ) -> dict:
+        """当无法识别研究对象时，向用户请求补充信息。"""
+        answer = (
+            "未识别到需要研究的对象，请提供项目名称或 GitHub Repository。\n\n"
+            "例如：\n"
+            "- LangGraph\n"
+            "- OpenHands\n"
+            "- Mastra\n"
+            "- owner/repo"
+        )
+        trace = {
+            "intent": intent.model_dump(),
+            "discovered_sources": {},
+            "steps": [],
+            "raw_tool_trace": [],
+        }
+        return {"answer": answer, "trace": trace, "error": None}
+
+    @staticmethod
+    def _build_insufficient_evidence_response(
+        intent: ResearchIntent,
+        agent_result: Any,
+        agent_error: str | None,
+    ) -> dict:
+        """当 Agent 没有获取到任何证据时，直接返回失败信息。"""
+        answer = (
+            "没有获取到任何证据，因此无法继续研究。\n\n"
+            "可能原因：\n"
+            "- 目标仓库不存在或无法访问\n"
+            "- 网络/API 限制\n"
+            "- 研究对象没有公开数据\n\n"
+            "请尝试提供其他项目名称或 GitHub 仓库地址。"
+        )
+        trace = {
+            "intent": intent.model_dump(),
+            "discovered_sources": _sanitize_value(get_discovered_resources()),
+            "steps": _extract_agent_steps(agent_result),
+            "raw_tool_trace": _sanitize_trace(get_trace()),
+        }
+        return {"answer": answer, "trace": trace, "error": agent_error}
+
+    @staticmethod
+    def _build_response(
+        intent: ResearchIntent,
+        agent_result: Any,
+        agent_error: str | None,
+        brief,
+    ) -> dict:
+        """构建最终响应。"""
+        answer = brief.summary
+        if brief.key_findings:
+            answer += "\n\n**关键发现:**\n" + "\n".join(
+                f"- {finding}" for finding in brief.key_findings
+            )
+        if brief.analysis:
+            answer += f"\n\n**分析:**\n{brief.analysis}"
+        if brief.recommendations:
+            answer += "\n\n**建议:**\n" + "\n".join(
+                f"- {recommendation}" for recommendation in brief.recommendations
+            )
+        if brief.sources:
+            answer += "\n\n**信息来源:**\n" + "\n".join(
+                f"- {source}" for source in brief.sources
+            )
+
+        trace = {
+            "intent": intent.model_dump(),
+            "discovered_sources": _sanitize_value(get_discovered_resources()),
+            "steps": _extract_agent_steps(agent_result),
+            "raw_tool_trace": _sanitize_trace(get_trace()),
+        }
+
+        if agent_error:
+            answer = (
+                "研究 Agent 调用模型失败，当前没有完成自主工具探索。\n\n"
+                f"错误信息：`{agent_error}`"
+            )
+
+        # 响应体大小控制：截断过长的 answer
+        MAX_ANSWER_LENGTH = 5000
+        if len(answer) > MAX_ANSWER_LENGTH:
+            answer = answer[:MAX_ANSWER_LENGTH] + "\n\n...(报告过长已截断)"
+
+        return {"answer": answer, "trace": trace, "error": agent_error}
+
+
+# 单个工具输出最大字符数（防止 README 等大文本撑爆响应体）
+_MAX_TOOL_OUTPUT_CHARS = 2000
+_MAX_THOUGHT_CHARS = 200
+_MAX_OBSERVATION_CHARS = 300
+
+
+def _truncate_text(value: Any, max_chars: int) -> str:
+    """将任意值转换为字符串并截断，供前端 trace.steps 展示。"""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        text = value
+    else:
+        try:
+            text = json.dumps(value, ensure_ascii=False)
+        except (TypeError, ValueError):
+            text = str(value)
+    if len(text) <= max_chars:
+        return text
+    suffix = "...(truncated)"
+    return text[: max_chars - len(suffix)] + suffix
+
+
+def _parse_tool_content(content: Any) -> Any:
+    """尽量把 ToolMessage.content 解析为 JSON，失败时保留原字符串。"""
+    if not isinstance(content, str):
+        return content
+    try:
+        return json.loads(content)
+    except (json.JSONDecodeError, ValueError):
+        return content
+
+
+def _get_message_type(message: Any) -> str:
+    return str(getattr(message, "type", "") or "")
+
+
+def _extract_agent_steps(agent_result: dict | None) -> list[dict[str, Any]]:
+    """从 LangGraph agent_result 中提取前端可渲染的 ReAct 步骤。"""
+    if not isinstance(agent_result, dict):
+        return []
+
+    messages = agent_result.get("messages", [])
+    if not messages:
+        return []
+
+    steps: list[dict[str, Any]] = []
+    pending_tc: dict[str, tuple[str, dict[str, Any]]] = {}
+    step_by_tool_call_id: dict[str, dict[str, Any]] = {}
+
+    for msg_index, msg in enumerate(messages):
+        msg_type = _get_message_type(msg)
+        is_last_message = msg_index == len(messages) - 1
+
+        if msg_type == "ai":
+            tool_calls = getattr(msg, "tool_calls", []) or []
+            content = getattr(msg, "content", "") or ""
+
+            if tool_calls:
+                for call_index, tool_call in enumerate(tool_calls):
+                    tool_call_id = tool_call.get("id", "")
+                    tool_name = tool_call.get("name", "")
+                    tool_args = tool_call.get("args", {}) or {}
+                    pending_tc[tool_call_id] = (tool_name, tool_args)
+
+                    step = {
+                        "index": len(steps) + 1,
+                        "thought": _truncate_text(
+                            content if call_index == 0 else "同一轮工具调用",
+                            _MAX_THOUGHT_CHARS,
+                        ),
+                        "action": {
+                            "tool": tool_name,
+                            "input": _sanitize_value(tool_args),
+                        },
+                        "observation": "",
+                    }
+                    steps.append(step)
+                    if tool_call_id:
+                        step_by_tool_call_id[tool_call_id] = step
+                continue
+
+            if is_last_message:
+                steps.append(
+                    {
+                        "index": len(steps) + 1,
+                        "thought": _truncate_text(content, _MAX_THOUGHT_CHARS),
+                        "action": None,
+                        "observation": "（生成最终回答）",
+                    }
+                )
+
+        elif msg_type == "tool":
+            tool_call_id = getattr(msg, "tool_call_id", "") or ""
+            tool_name = getattr(msg, "name", "") or ""
+            content = getattr(msg, "content", "")
+            observation = _truncate_text(
+                _parse_tool_content(content),
+                _MAX_OBSERVATION_CHARS,
+            )
+
+            step = step_by_tool_call_id.get(tool_call_id)
+            if step is None:
+                # 兼容缺少 AIMessage tool_call 记录的异常情况。
+                pending_name, pending_args = pending_tc.get(
+                    tool_call_id,
+                    (tool_name, {}),
+                )
+                step = {
+                    "index": len(steps) + 1,
+                    "thought": "",
+                    "action": {
+                        "tool": pending_name or tool_name,
+                        "input": _sanitize_value(pending_args),
+                    },
+                    "observation": "",
+                }
+                steps.append(step)
+                if tool_call_id:
+                    step_by_tool_call_id[tool_call_id] = step
+
+            step["observation"] = observation
+
+    return steps
+
+
+def _sanitize_value(value: Any, max_str_len: int = _MAX_TOOL_OUTPUT_CHARS) -> Any:
+    """递归地将任意值转换为 JSON 安全的基本类型，并截断过长的字符串。"""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value[:max_str_len] + "...(truncated)" if len(value) > max_str_len else value
+    if isinstance(value, (int, float, bool)):
+        return value
+    if isinstance(value, (list, tuple)):
+        return [_sanitize_value(item, max_str_len) for item in value[:50]]
+    if isinstance(value, dict):
+        return {str(k): _sanitize_value(v, max_str_len) for k, v in list(value.items())[:50]}
+    # Pydantic models
+    if hasattr(value, "model_dump"):
+        return _sanitize_value(value.model_dump(), max_str_len)
+    if hasattr(value, "dict"):
+        return _sanitize_value(value.dict(), max_str_len)
+    # Fallback: stringify
+    return str(value)[:max_str_len]
+
+
+def _sanitize_trace(trace: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """清理 tool_trace：确保每条记录都是 JSON 可序列化的，且输出截断。"""
+    sanitized = []
+    for item in trace:
+        if not isinstance(item, dict):
+            sanitized.append({"raw": str(item)[:_MAX_TOOL_OUTPUT_CHARS]})
+            continue
+        sanitized.append(
+            {
+                "step_index": item.get("step_index", 0),
+                "timestamp": item.get("timestamp", ""),
+                "tool": str(item.get("tool", "unknown")),
+                "input": _sanitize_value(item.get("input", {})),
+                "output": _sanitize_value(item.get("output")),
+            }
+        )
+    return sanitized
