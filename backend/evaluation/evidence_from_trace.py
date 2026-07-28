@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 
-def evidence_from_trace(trace: list[dict[str, Any]] | None) -> dict[str, Any]:
+def evidence_from_trace(trace: list[dict[str, Any]] | dict[str, Any] | None) -> dict[str, Any]:
     """
     Convert ChatService tool trace into a flat evidence dict:
 
@@ -25,23 +25,30 @@ def evidence_from_trace(trace: list[dict[str, Any]] | None) -> dict[str, Any]:
     issues: list[Any] = []
     pull_requests: list[Any] = []
 
-    for step in trace or []:
+    if isinstance(trace, dict):
+        steps = trace.get("tool_trace") or []
+    else:
+        steps = trace or []
+
+    for step in steps:
+        if not isinstance(step, dict):
+            continue
         tool = step.get("tool")
         output = step.get("output")
 
-        if tool == "get_repository" and isinstance(output, dict):
+        if tool in {"get_repository", "get_repository_info"} and isinstance(output, dict):
             repository = output
 
-        elif tool == "get_readme":
+        elif tool in {"get_readme", "readme"}:
             readme = _normalize_readme(output)
 
-        elif tool == "get_releases":
+        elif tool in {"get_releases", "releases"}:
             releases = _normalize_list(output, "recent_releases")
 
-        elif tool == "get_issues":
+        elif tool in {"get_issues", "issues"}:
             issues = _normalize_list(output, "recent_issues")
 
-        elif tool == "get_pull_requests":
+        elif tool in {"get_pull_requests", "pull_requests"}:
             pull_requests = _normalize_list(output, "recent_pull_requests")
 
     return {

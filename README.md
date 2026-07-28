@@ -419,29 +419,44 @@ LLM Analysis
 ai-intelligence-agent
 
 │
-├── backend
+backend/
 │
-│   ├── agent
-│   │
-│   │   ├── graph.py
-│   │   └── tools.py
-│   │
-│   ├── tools
-│   │
-│   │   └── github
-│   │
-│   ├── evidence
-│   │
-│   │   ├── builder.py
-│   │   └── models.py
-│   │
-│   ├── services
-│   │
-│   └── api
+├── main.py                         # 🟢 入口
 │
+├── router/                         # 🟢 共享基础设施
+│   ├── entity_extractor.py         #    EntityExtractor
+│   └── entity_resolver.py          #    EntityResolver
+├── schemas/entity.py               #    共享 entity schema
+├── evidence/                       #    EvidenceBuilder + models
+├── sources/                        #    GitHub, HuggingFace, Reddit
+├── llms/                           #    DeepSeek, Qwen
+├── agent/                          #    ReAct Agent fallback
+├── config/                         #    配置
+├── evaluation/                     #    评估模块
 │
-└── frontend
-    │
+├── legacy/                         # 🔵 旧 Task-Based Workflow (仓的分析)
+│   ├── api/          (6 files)     #    /repositories/... 端点
+│   ├── services/     (7 files)     #    ReportPipeline, XxxService
+│   ├── schemas/      (7 files)     #    task, profile, analysis, ...
+│   ├── prompts/      (9 files)     #    task, profile, analysis, ...
+│   ├── router/       (1 file)      #    TaskRouter
+│   ├── planner/      (2 files)     #    EvidencePlanner
+│   └── evidence/executor/ (2 files)
+│
+└── research_agent/                 # 🟠 Research Agent 
+    ├── api/chat.py
+    ├── services/  (2 files)        #    ChatService, AnswerComposer
+    ├── schemas/   (2 files)        #    research, chat
+    ├── prompts/   (3 files)        #    intent, extraction, research_plan
+    ├── extraction/(2 files)        #    SignalExtractor
+    ├── intent.py                   #    ResearchIntentRouter
+    ├── planner.py                  #    ResearchAgentPlanner
+    ├── executor.py                 #    ResearchAgentExecutor
+    ├── analyzer.py                 #    ResearchAgentAnalyzer
+    ├── composer.py                 #    ResearchBriefComposer
+    └── research_planner.py         #    LLM Planner
+│
+frontend/
     ├── src
     │
     └── components

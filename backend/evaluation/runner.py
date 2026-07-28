@@ -37,7 +37,7 @@ from evaluation.evaluators import (  # noqa: E402
 from evaluation.evidence_from_trace import evidence_from_trace  # noqa: E402
 from evaluation.intent_router import IntentRouter  # noqa: E402
 from evaluation.report import write_report  # noqa: E402
-from services.chat_service import ChatService  # noqa: E402
+from research_agent.services.chat_service import ChatService  # noqa: E402
 
 
 EVAL_DIR = Path(__file__).resolve().parent

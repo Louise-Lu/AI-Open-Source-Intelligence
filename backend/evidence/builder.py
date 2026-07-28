@@ -66,11 +66,12 @@ class EvidenceBuilder:
             ecosystem=self._build_ecosystem(ecosystem),
         )
         huggingface_evidence = self._build_huggingface_evidence(huggingface)
-        # reddit_evidence = self._build_reddit(reddit)  # 如果你有 _build_reddit 方法
+        reddit_evidence = self._build_reddit(reddit)
 
         return IntelligenceEvidence(
             github=github,
             huggingface=huggingface_evidence,
+            reddit=reddit_evidence,
         )
 
     def _build_huggingface_evidence(
@@ -88,24 +89,24 @@ class EvidenceBuilder:
             last_modified=raw.get("lastModified") or raw.get("last_modified"),
         )
 
-    # def _build_reddit(self, reddit: dict[str, Any] | list[str] | None) -> RedditEvidence | None:
-    #     if reddit is None:
-    #         return None
+    def _build_reddit(self, reddit: dict[str, Any] | list[str] | None) -> RedditEvidence | None:
+        if reddit is None:
+            return None
 
-    #     if isinstance(reddit, dict):
-    #         posts = reddit.get("posts", [])
-    #         sentiment = reddit.get("sentiment")
-    #         mentions = int(reddit.get("mentions", len(posts)) or 0)
-    #     else:
-    #         posts = reddit
-    #         sentiment = None
-    #         mentions = len(posts)
+        if isinstance(reddit, dict):
+            posts = reddit.get("posts", [])
+            sentiment = reddit.get("sentiment")
+            mentions = int(reddit.get("mentions", len(posts)) or 0)
+        else:
+            posts = reddit
+            sentiment = None
+            mentions = len(posts)
 
-    #     return RedditEvidence(
-    #         posts=[str(post) for post in posts or []],
-    #         sentiment=sentiment,
-    #         mentions=mentions,
-    #     )
+        return RedditEvidence(
+            posts=[str(post) for post in posts or []],
+            sentiment=sentiment,
+            mentions=mentions,
+        )
 
     # =====================
     # GITHUB

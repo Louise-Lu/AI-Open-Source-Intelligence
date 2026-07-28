@@ -2,13 +2,13 @@ from fastapi import FastAPI, Request
 
 from fastapi.openapi.docs import get_swagger_ui_html
 
-from api.analysis import router as analysis_router
-from api.compare import router as compare_router
-from api.profile import router as profile_router
-from api.release_diff import router as release_diff_router
-from api.routes import router as base_router
-from api.chat import router as chat_router
-from api.roadmap import router as roadmap_router
+from legacy.api.analysis import router as analysis_router
+from legacy.api.compare import router as compare_router
+from legacy.api.profile import router as profile_router
+from legacy.api.release_diff import router as release_diff_router
+from legacy.api.routes import router as base_router
+from legacy.api.roadmap import router as roadmap_router
+from research_agent.api.chat import router as chat_router
 
 from fastapi.responses import JSONResponse
 from sources.github.utils import GitHubAPIError
