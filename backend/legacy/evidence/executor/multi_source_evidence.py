@@ -5,7 +5,7 @@ from typing import Any
 from evidence import EvidenceBuilder, IntelligenceEvidence
 
 from schemas.entity import ResolvedEntity
-from planner.evidence_planner import EvidencePlan
+from legacy.planner.evidence_planner import EvidencePlan
 
 from sources.github.client import GitHubAPI
 from sources.huggingface.client import HuggingFaceClient
