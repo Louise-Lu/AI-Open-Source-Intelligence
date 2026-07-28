@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from schemas.entity import ResolvedEntity
+from types import SimpleNamespace
+
+from shared_schemas.entity import ResolvedEntity
 from evidence.builder import EvidenceBuilder
 from sources.github.client import GitHubAPI
 
@@ -60,9 +62,23 @@ class RepositoryEvidenceService:
 
     @staticmethod
     def _get_source(entity: ResolvedEntity, source_name: str):
-        for source in entity.sources:
-            if source.source == source_name:
-                return source
+        sources = getattr(entity, "sources", None)
+        if sources:
+            for source in sources:
+                if source.source == source_name:
+                    return source
+
+        if source_name != "github":
+            return None
+
+        candidates = [
+            getattr(entity, "official_name", None),
+            getattr(entity, "name", None),
+            *list(getattr(entity, "aliases", []) or []),
+        ]
+        for candidate in candidates:
+            if isinstance(candidate, str) and "/" in candidate:
+                return SimpleNamespace(source="github", identifier=candidate)
         return None
 
     @staticmethod

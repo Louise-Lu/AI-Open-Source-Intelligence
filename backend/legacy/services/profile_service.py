@@ -1,7 +1,11 @@
+import logging
+
 from evidence import IntelligenceEvidence
 from llms.deepseek import deepseek_model
 from legacy.prompts.profile import PROFILE_PROMPT
 from legacy.schemas.profile import RepositoryProfile
+
+logger = logging.getLogger(__name__)
 
 
 class RepositoryProfileService:
@@ -19,5 +23,5 @@ Repository Evidence:
             return llm.invoke(prompt)
 
         except Exception as exc:
-            print(exc)
+            logger.warning("Repository profile generation failed: %s", exc)
             raise

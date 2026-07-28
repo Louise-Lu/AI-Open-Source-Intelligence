@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from schemas.entity import ResolvedEntity
+from shared_schemas.entity import ResolvedEntity
 from legacy.schemas.release_diff import ReleaseDiffEvidence
 from legacy.services.analysis_service import RepositoryAnalysisService
 from legacy.services.comparison_service import RepositoryComparisonService
-from legacy.evidence.executor.repo_evidence import RepositoryEvidenceService
+from legacy.evidence.repo_evidence import RepositoryEvidenceService
 from legacy.services.profile_service import RepositoryProfileService
 from legacy.services.roadmap_service import RepositoryRoadmapService
 from legacy.services.release_diff_service import ReleaseDiffService
