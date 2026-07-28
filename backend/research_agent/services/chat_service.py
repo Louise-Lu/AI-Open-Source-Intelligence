@@ -14,9 +14,17 @@
 from __future__ import annotations
 
 import json
+import time
 from typing import Any
 
 from agent.intelligence_agent import build_intelligence_agent_prompt, intelligence_agent
+from agent.research_policy import (
+    clear_research_policy,
+    needs_trend_single_source_warning,
+    start_research_policy,
+    sync_research_policy_from_trace,
+    trend_single_source_warning,
+)
 from agent.trace import clear_trace, get_discovered_resources, get_evidence_store, get_trace, populate_trace_from_agent_result
 
 from research_agent.intent import ResearchIntentRouter
@@ -79,7 +87,6 @@ def _build_chat_response(intent: ResearchIntent) -> dict:
             "intent": intent.model_dump(),
             "discovered_sources": {},
             "steps": [],
-            "raw_tool_trace": [],
         },
         "error": None,
     }
@@ -112,27 +119,56 @@ class ChatService:
 
     def chat(self, message: str) -> dict:
         """主入口: 接收用户消息，返回研究结果。"""
+        t0 = time.perf_counter()
+        print(f"[聊天服务] 开始处理用户消息: {message[:200]!r}")
+
         clear_trace()
 
         intent = self.router.route(message)
+        print(
+            "[聊天服务] 1. 意图识别完成: "
+            f"objective={intent.objective}, "
+            f"entities={intent.entities}, "
+            f"focus={intent.focus}, "
+            f"time_range={intent.time_range}, "
+            f"depth={intent.depth}"
+        )
 
         if intent.objective in _CHAT_ONLY_OBJECTIVES:
+            print(f"[聊天服务] 非研究类意图，直接返回: objective={intent.objective}")
             return _build_chat_response(intent)
         
-        _, resolved_entities = self._extract_and_resolve(message, intent)
+        resolved_entities = self._extract_and_resolve(message, intent)
+        print(
+            "[聊天服务] 2. 实体解析完成: "
+            f"数量={len(resolved_entities)}, "
+            f"名称={[e.name for e in resolved_entities]}"
+        )
 
         goal = self.planner.plan(intent, resolved_entities)
+        print(
+            "[聊天服务] 3. 研究目标规划完成: "
+            f"status={goal.status}, "
+            f"objective={goal.objective}, "
+            f"user_goal={goal.user_goal[:120]}, "
+            f"depth={goal.depth}, "
+            f"完成标准数量={len(goal.success_criteria)}"
+        )
 
         if goal.status == "need_user_input":
+            print("[聊天服务] 研究目标需要用户补充信息，提前返回")
             return self._build_need_user_response(
                 intent=intent,
             )
 
-        agent_prompt = build_intelligence_agent_prompt(goal, resolved_entities)
-
         agent_error = None
         agent_result = None
+        t_agent = time.perf_counter()
         try:
+            # 初始化 _policy_state
+            start_research_policy(goal.objective)
+            
+            agent_prompt = build_intelligence_agent_prompt(goal, resolved_entities)
             agent_result = self.agent.invoke(
                 {
                     "messages": [
@@ -145,12 +181,28 @@ class ChatService:
         except Exception as exc:  # noqa: BLE001
             agent_error = f"{type(exc).__name__}: {exc}"
             agent_result = {"error": agent_error, "messages": []}
+            print(f"[聊天服务] Agent 调用失败: {agent_error}")
+
+        print(
+            "[聊天服务] 4. Agent 调用结束: "
+            f"耗时={time.perf_counter() - t_agent:.2f}s, "
+            f"错误={agent_error}, "
+            f"消息数量={len(agent_result.get('messages', [])) if isinstance(agent_result, dict) else 0}"
+        )
 
         populate_trace_from_agent_result(agent_result)
+        sync_research_policy_from_trace(get_trace())
 
         evidences = get_evidence_store()
+        print(
+            "[聊天服务] 5. 证据收集完成: "
+            f"证据数量={len(evidences)}, "
+            f"trace数量={len(get_trace())}"
+        )
 
         if not evidences:
+            print("[聊天服务] 未获取到证据，返回证据不足响应")
+            clear_research_policy()
             return self._build_insufficient_evidence_response(
                 intent=intent,
                 agent_result=agent_result,
@@ -158,21 +210,51 @@ class ChatService:
             )
 
         signals = self.analyzer.analyze(evidences, goal)
-        brief = self.composer.compose(message, evidences, signals)
+        print(
+            "[聊天服务] 6. 信号提取完成: "
+            f"是否有信号={signals.has_any_signal}, "
+            f"技术={signals.technology is not None}, "
+            f"社区={signals.community is not None}, "
+            f"生态={signals.ecosystem is not None}, "
+            f"风险={signals.risks is not None}"
+        )
 
-        return self._build_response(
+        brief = self.composer.compose(message, evidences, signals)
+        if needs_trend_single_source_warning():
+            warning = trend_single_source_warning()
+            if warning not in brief.key_findings:
+                brief.key_findings.append(warning)
+            if warning not in brief.analysis:
+                brief.analysis = f"{brief.analysis}\n\n{warning}".strip()
+
+        print(
+            "[聊天服务] 7. 研究简报生成完成: "
+            f"summary长度={len(brief.summary)}, "
+            f"关键发现数量={len(brief.key_findings)}, "
+            f"来源数量={len(brief.sources)}"
+        )
+
+        response = self._build_response(
             intent=intent,
             agent_result=agent_result,
             agent_error=agent_error,
             brief=brief,
         )
+        print(
+            "[聊天服务] 处理完成: "
+            f"总耗时={time.perf_counter() - t0:.2f}s, "
+            f"回答长度={len(response.get('answer', ''))}, "
+            f"步骤数量={len(response.get('trace', {}).get('steps', []))}"
+        )
+        clear_research_policy()
+        return response
 
     # ── Entity Resolution ──────────────────────────────────────
     def _extract_and_resolve(
         self,
         message: str,
         intent: ResearchIntent,
-    ) -> tuple[dict[str, Any], list[ResolvedEntity]]:
+    ) -> list[ResolvedEntity]:
         # 1. 先直接用意图中的实体
         all_entity_names = set(intent.entities) if intent.entities else set()
 
@@ -188,11 +270,12 @@ class ChatService:
                 name = entity.get("name", "")
                 if name:
                     all_entity_names.add(name)
-        else:
-            # 意图里已经有实体了，entity_dict 直接构造，不走 LLM
-            entity_dict = {
-                "entities": [{"name": name} for name in all_entity_names]
-            }
+
+        # else:
+        #     # 意图里已经有实体了，entity_dict 直接构造，不走 LLM
+        #     entity_dict = {
+        #         "entities": [{"name": name} for name in all_entity_names]
+        #     }
 
         # 3. 解析实体
         resolved = []
@@ -201,7 +284,9 @@ class ChatService:
                 result = self.entity_resolver.resolve(name)
                 if result and result.name:
                     resolved.append(result)
-        return entity_dict, resolved
+                else:
+                    print(f"[聊天服务] 实体解析为空: name={name}")
+        return resolved
 
 
     # ── Response Builders ───────────────────────────────────────
@@ -222,7 +307,6 @@ class ChatService:
             "intent": intent.model_dump(),
             "discovered_sources": {},
             "steps": [],
-            "raw_tool_trace": [],
         }
         return {"answer": answer, "trace": trace, "error": None}
 
@@ -245,7 +329,6 @@ class ChatService:
             "intent": intent.model_dump(),
             "discovered_sources": _sanitize_value(get_discovered_resources()),
             "steps": _extract_agent_steps(agent_result),
-            "raw_tool_trace": _sanitize_trace(get_trace()),
         }
         return {"answer": answer, "trace": trace, "error": agent_error}
 
@@ -277,7 +360,6 @@ class ChatService:
             "intent": intent.model_dump(),
             "discovered_sources": _sanitize_value(get_discovered_resources()),
             "steps": _extract_agent_steps(agent_result),
-            "raw_tool_trace": _sanitize_trace(get_trace()),
         }
 
         if agent_error:
@@ -439,22 +521,3 @@ def _sanitize_value(value: Any, max_str_len: int = _MAX_TOOL_OUTPUT_CHARS) -> An
         return _sanitize_value(value.dict(), max_str_len)
     # Fallback: stringify
     return str(value)[:max_str_len]
-
-
-def _sanitize_trace(trace: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """清理 tool_trace：确保每条记录都是 JSON 可序列化的，且输出截断。"""
-    sanitized = []
-    for item in trace:
-        if not isinstance(item, dict):
-            sanitized.append({"raw": str(item)[:_MAX_TOOL_OUTPUT_CHARS]})
-            continue
-        sanitized.append(
-            {
-                "step_index": item.get("step_index", 0),
-                "timestamp": item.get("timestamp", ""),
-                "tool": str(item.get("tool", "unknown")),
-                "input": _sanitize_value(item.get("input", {})),
-                "output": _sanitize_value(item.get("output")),
-            }
-        )
-    return sanitized

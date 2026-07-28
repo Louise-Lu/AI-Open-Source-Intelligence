@@ -82,6 +82,7 @@ documentation
 - latest: 最新
 - recent: 最近几个月
 - historical: 历史
+- future: 未来、展望、预测
 - any: 不限
 
 ## depth
@@ -324,6 +325,8 @@ class ResearchIntentRouter:
             return "recent"
         if any(kw in text for kw in ["历史", "过去", "演进", "发展史"]):
             return "historical"
+        if any(kw in text for kw in ["未来", "将来", "展望", "预测", "下一步", "前景"]):
+            return "future"
         return "any"
 
     @staticmethod

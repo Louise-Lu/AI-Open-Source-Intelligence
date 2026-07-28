@@ -98,10 +98,11 @@ class ResearchIntent(BaseModel):
         "latest",
         "recent",
         "historical",
+        "future",
         "any",
     ] = Field(
         default="any",
-        description="时间范围: latest (最新), recent (最近几个月), historical (历史), any (不限)",
+        description="时间范围: latest (最新), recent (最近几个月), historical (历史), future (未来), any (不限)",
     )
     depth: Literal[
         "quick",

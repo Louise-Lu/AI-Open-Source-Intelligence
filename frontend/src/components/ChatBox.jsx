@@ -65,11 +65,8 @@ export default function ChatBox() {
               AI Intelligence Agent
             </div>
             <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-              AI Intelligence Agent
+              AI Open Source Intelligence Agent
             </h1>
-            <p className="mt-2 text-sm leading-7 text-slate-500">
-              Chat with the backend agent and render answers in a clean ChatGPT-style layout.
-            </p>
           </header>
 
           <div className="grid min-h-[32rem] grid-rows-[1fr_auto]">

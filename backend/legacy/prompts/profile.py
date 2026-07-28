@@ -57,7 +57,7 @@ PROFILE_PROMPT = """
 - 如果 Evidence 不足，请填写：
 "信息不足"
 
-
+使用中文。
 不要输出 markdown。
 只输出 JSON。
 

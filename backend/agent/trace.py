@@ -52,34 +52,55 @@ def get_discovered_resources() -> dict[str, list[Any]]:
     discovered: dict[str, list[Any]] = {
         "github": [],
         "huggingface": [],
-        "reddit": [],
+        "community": [],
         "web": [],
         "youtube": [],
-        "x": [],
     }
     for item in get_trace():
         tool_name = item.get("tool")
         output = item.get("output")
+        if isinstance(output, dict) and output.get("source") == "research_policy":
+            continue
+
         if tool_name == "github_search":
-            for repo in output or []:
-                full_name = repo.get("full_name") if isinstance(repo, dict) else repo
-                if full_name:
-                    discovered["github"].append(full_name)
+            for repo in _as_list(output):
+                identifier = repo.get("identifier") if isinstance(repo, dict) else repo
+                if identifier:
+                    discovered["github"].append(identifier)
         elif tool_name == "huggingface_search":
-            for model in output or []:
-                model_id = model.get("id") if isinstance(model, dict) else None
+            for model in _as_list(output):
+                model_id = model.get("identifier") if isinstance(model, dict) else None
                 if model_id:
                     discovered["huggingface"].append(model_id)
-        elif tool_name == "reddit_search":
-            discovered["reddit"].append(output)
+        elif tool_name == "community_search":
+            for item in _as_list(output):
+                identifier = item.get("identifier") if isinstance(item, dict) else item
+                if identifier:
+                    discovered["community"].append(identifier)
+        elif tool_name == "youtube_search":
+            for item in _as_list(output):
+                identifier = item.get("identifier") if isinstance(item, dict) else item
+                if identifier:
+                    discovered["youtube"].append(identifier)
         elif tool_name == "web_search":
-            discovered["web"].append(output)
+            for item in _as_list(output):
+                identifier = item.get("identifier") if isinstance(item, dict) else item
+                if identifier:
+                    discovered["web"].append(identifier)
 
     return {
         key: list(dict.fromkeys(value))
         for key, value in discovered.items()
         if value
     }
+
+
+def _as_list(value: Any) -> list[Any]:
+    if isinstance(value, list):
+        return value
+    if value is None:
+        return []
+    return [value]
 
 
 def get_evidence_store() -> list[IntelligenceEvidence]:
@@ -90,16 +111,46 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
         return []
 
     github_raw: dict[str, Any] = {}
+    huggingface_raw: dict[str, Any] | None = None
     reddit_raw: dict[str, Any] | None = None
 
     for item in trace:
         tool_name = item.get("tool")
         output = item.get("output")
 
-        if tool_name == "github_search":
+        if tool_name in {
+            "github_search",
+            "huggingface_search",
+            "community_search",
+            "youtube_search",
+            "web_search",
+        }:
             continue
-        if tool_name == "huggingface_search":
+
+        if isinstance(output, dict) and output.get("source") == "github":
+            evidence = output.get("evidence")
+            if isinstance(evidence, dict):
+                github_raw.update(evidence)
             continue
+
+        if isinstance(output, dict) and output.get("source") == "huggingface":
+            evidence = output.get("evidence")
+            if isinstance(evidence, dict):
+                model = evidence.get("model")
+                if isinstance(model, dict):
+                    huggingface_raw = model
+            continue
+
+        if isinstance(output, dict) and output.get("source") == "community":
+            evidence = output.get("evidence")
+            if isinstance(evidence, dict):
+                reddit_raw = {
+                    "posts": [str(evidence.get("content") or evidence.get("identifier") or "")],
+                    "sentiment": None,
+                    "mentions": 1,
+                }
+            continue
+
         if tool_name == "get_repository_info":
             github_raw["repository"] = output
         elif tool_name == "readme":
@@ -116,14 +167,7 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
             github_raw["planning"] = output
         elif tool_name == "get_discussion_signals":
             github_raw["discussions"] = output
-        elif tool_name == "reddit_search":
-            reddit_raw = {
-                "posts": [str(output)],
-                "sentiment": None,
-                "mentions": 0,
-            }
-
-    has_evidence = bool(github_raw or reddit_raw)
+    has_evidence = bool(github_raw or huggingface_raw or reddit_raw)
     if not has_evidence:
         return []
 
@@ -138,6 +182,7 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
         planning=github_raw.get("planning"),
         discussions=github_raw.get("discussions"),
         ecosystem=github_raw.get("ecosystem"),
+        huggingface=huggingface_raw,
         reddit=reddit_raw,
     )
     return [evidence]

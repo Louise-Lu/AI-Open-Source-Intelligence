@@ -2,7 +2,7 @@
 
 ## Overview
 
-GitHub Intelligence Agent 采用 ReAct（Reason + Act）模式。
+AI Intelligence Agent 采用 ReAct（Reason + Act）模式。
 
 用 LangGraph 把 Agent 的循环（Reason → Act → Observe）实现。
 
@@ -30,7 +30,7 @@ Planning
 
 ↓
 
-Tool Selection 调用 GitHub API
+Tool Selection 
 
 ↓
 
@@ -54,6 +54,156 @@ Generate Intelligence Report
 
 ---
 
+```text
+Prompt + policy_hint
+    ↓
+LLM 产生 thought
+    ↓
+LLM 决定下一步调用哪个 tool
+    ↓
+before_tool_call() 做硬约束检查
+    ↓
+执行 tool
+    ↓
+after_tool_call() 更新 state
+    ↓
+tool 返回结果给 LLM 观察
+    ↓
+LLM 根据观察结果 + 新的 policy_hint 决定下一步
+```
+
+这里可以分成两层：
+
+## LLM 负责决策
+
+LLM 根据这些信息做“软决策”：
+
+```text
+Research Goal
+Prompt 原则
+Current Research Policy / policy_hint
+上一步 tool 返回结果
+自己的 thought
+```
+
+所以它会判断：
+
+```text
+现在是该继续 Discovery？
+还是已经发现资源，应该进入 Evidence？
+还是证据已经够了，可以停止？
+```
+
+比如：
+
+```text
+min_evidence_sources = 3
+```
+
+而当前只有：
+
+```python
+evidence_sources = ["community"]
+```
+
+那 `policy_hint` 会告诉它：
+
+```text
+当前已有 1 个证据来源，目标是至少 3 个。
+继续探索下一个优先数据源，补充交叉验证。
+```
+
+于是 LLM 理论上就会去选：
+
+```python
+web_search(...)
+```
+
+然后再：
+
+```python
+webpage_reader(...)
+```
+
+## Python state 负责约束和记录
+
+`state` 不是直接替 LLM 决策，而是负责记录和限制。
+
+它记录这些东西：
+
+```python
+{
+    "objective": "trend_analysis",
+    "policy": ObjectivePolicy(...),
+    "last_discovery_source": "community",
+    "same_discovery_count": 1,
+    "discovery_counts": {
+        "community": 1
+    },
+    "discovered_resources": {
+        "community": ["reddit:pending:AI Agent"]
+    },
+    "evidence_sources": ["community"]
+}
+```
+
+它主要有两个作用。
+
+第一，生成下一轮给 LLM 看的 `policy_hint`：
+
+```text
+Current Progress
+- Community: 已探索（1 次）
+- Web: 未探索
+- GitHub: 未探索
+
+Evidence
+- 已获得 Community 证据。
+```
+
+第二，在工具调用前做硬限制：
+
+```python
+before_tool_call(...)
+```
+
+例如如果 LLM 又想继续：
+
+```python
+community_search(...)
+```
+
+但之前已经发现了 Community 资源，Python 会拦截：
+
+```text
+已经发现资源，下一步应该读取证据，而不是继续搜索同一来源。
+```
+
+或者如果它连续搜索同一个来源太多次，也会拦截：
+
+```text
+Community 已连续探索 2 次，建议切换到其它来源。
+```
+
+## 一句话总结
+
+你的理解可以总结成：
+
+```text
+LLM 根据 prompt + policy_hint + observation 自主选择下一步工具；
+Python state 负责记录进度，并在工具调用前做必要的硬约束；
+工具执行后，state 更新，再生成新的 policy_hint，影响下一轮 LLM thought。
+```
+
+也就是说：
+
+```text
+policy_hint = 给 LLM 的导航提示
+state = Runtime 的真实进度记录
+before_tool_call = 防止 LLM 走偏的刹车
+after_tool_call = 每次工具执行后的进度更新
+```
+<!-- 
 ## Core Components
 
 ### Intent Understanding
@@ -650,4 +800,4 @@ Final Answer
 | 最近趋势  | releases + commits           |
 | 技术分析  | README + repo                |
 | 竞品比较  | 多个repo                       |
-| 商业价值  | repo + issues + contributors |
+| 商业价值  | repo + issues + contributors | -->

@@ -10,7 +10,30 @@ function formatValue(value) {
   return JSON.stringify(value, null, 2);
 }
 
+function formatAction(action) {
+  if (!action) {
+    return '';
+  }
+
+  const tool = action.tool || 'unknown_tool';
+  const input = action.input;
+
+  if (!input || Object.keys(input).length === 0) {
+    return `${tool}()`;
+  }
+
+  const args = Object.values(input)
+    .map((value) => JSON.stringify(value))
+    .join(', ');
+
+  return `${tool}(${args})`;
+}
+
 function TraceBlock({ label, value }) {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
   return (
     <div className="space-y-1">
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
@@ -22,31 +45,26 @@ function TraceBlock({ label, value }) {
 }
 
 export default function ToolTrace({ trace }) {
-  if (!trace || (Array.isArray(trace) && trace.length === 0)) {
-    return null;
-  }
+  const steps = Array.isArray(trace) ? trace : trace?.steps;
 
-  if (!Array.isArray(trace)) {
-    return (
-      <div className="space-y-4 rounded-3xl border border-amber-200 bg-amber-50/60 p-4">
-        <TraceBlock label="Trace" value={trace} />
-      </div>
-    );
+  if (!Array.isArray(steps) || steps.length === 0) {
+    return null;
   }
 
   return (
     <div className="space-y-4 rounded-3xl border border-amber-200 bg-amber-50/60 p-4">
-      {trace.map((item, index) => (
+      {steps.map((step, index) => (
         <div
-          key={`${item?.tool || 'tool'}-${index}`}
+          key={`${step?.action?.tool || 'step'}-${index}`}
           className="space-y-4 rounded-2xl border border-amber-200 bg-white p-4 shadow-sm"
         >
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">
-            🔧 Tool: {item?.tool || 'Unknown'}
-          </div>
-
-          <TraceBlock label="Input" value={item?.input} />
-          <TraceBlock label="Output" value={item?.output} />
+          <TraceBlock label="Thought" value={step?.thought} />
+          <TraceBlock label="Action" value={formatAction(step?.action)} />
+          <TraceBlock label="Observation" value={step?.observation} />
+          <TraceBlock label="Reflection" value={step?.reflection} />
+          {!step?.action && (
+            <p className="text-sm font-semibold text-amber-800">Finish.</p>
+          )}
         </div>
       ))}
     </div>

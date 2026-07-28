@@ -1,54 +1,39 @@
 # 整体架构
 ```
-                 User
+User Query
 
-                  |
-                  v
+↓
 
-             TaskRouter  意图判断
-            (task+reports) 
+IntentRouter
+（理解研究目标）
 
-                  |
-                  v
+↓
 
-          EntityResolver 主体解析检索sources 
+EntityResolver
+（解析实体，仅标准化名称，不绑定任何数据源）
 
-                  |
-                  v
+↓
 
-          EvidencePlanner 根据 task + reports -> tools
+ResearchGoalPlanner
+（生成 research goal、research questions、success criteria）
 
-                  |
-                  v
+↓
 
-          Tool Executor   执行 tools -> evidence
-                  |
-       --------------------
-       |                  |
-    Github             HuggingFace
-       |                  |
+ReAct ResearchAgent
+（自主决定：
+探索什么数据源
+调用什么 Tool
+什么时候停止）
 
-       --------------------
+↓
 
-                  |
-                  v
+Analyzer
+（提取结构化 Insight）
 
-       IntelligenceEvidence
+↓
 
-                  |
-       ------------------
-       |        |       |
-    Profile  Health  Roadmap
-
-                  |
-                  v
-
-             Composer
-
-                  |
-                  v
-
-              Chat UI
+Composer
+（输出最终 Research Brief）
 ```
 
 # Workflow 分支（Dashboard）
