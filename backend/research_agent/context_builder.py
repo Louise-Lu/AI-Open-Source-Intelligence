@@ -1,11 +1,11 @@
-# planner.py — Research Goal Planner
+# context_builder.py — Research Context Builder
 #
-# 职责: 根据 ResearchIntent + Entity 生成 Goal 驱动的 ResearchGoal
+# 职责: 根据 ResearchIntent + Entity 构建 ResearchContext
 # 输入: ResearchIntent + list[ResolvedEntity]
-# 输出: ResearchGoal { objective, user_goal, entities, context, depth,
-#                      success_criteria, constraints }
+# 输出: ResearchContext { objective, user_goal, entities, focus, time_range, depth,
+#                       research_brief, success_criteria, constraints }
 #
-# Planner 不负责：
+# ResearchContextBuilder 不负责：
 # - 工具规划
 # - 研究问题拆分
 # - 数据源选择
@@ -14,23 +14,21 @@
 from __future__ import annotations
 
 import json
-import logging
 
 from llms.deepseek import deepseek_model
-from research_agent.schemas.research import ResearchGoal, ResearchIntent
+from research_agent.schemas.research import ResearchContext, ResearchIntent
 from shared_schemas.entity import ResolvedEntity
 
-logger = logging.getLogger(__name__)
 
 
-PLANNER_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究规划器。
+CONTEXT_BUILDER_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究上下文构建器。
 
 ## 核心职责
-根据用户的研究意图和已解析实体，生成一个 Goal 驱动的研究目标。生成中文。
+根据用户的研究意图和已解析实体，构建一个 ResearchContext。生成中文。
 
-你只定义"要完成什么"，不定义"怎么完成"。
+你只回答"用户真正想研究什么"，不定义"怎么研究"。
 不要生成研究问题、不要生成执行步骤、不要选择数据源、不要选择工具。
-工具调用顺序、数据源选择和探索深度由后续 ReAct Agent 自主决定。
+是否需要 GitHub / Community / RSS / YouTube / HuggingFace、工具调用顺序、Discovery 次数和是否结束研究，都由后续 ReAct Agent 自主决定。
 
 ## 输出字段说明
 
@@ -41,9 +39,23 @@ PLANNER_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究规划
 一句自然语言，描述用户想通过这次研究达成什么。
 例如："评估 CrewAI 是否适合作为多智能体编排框架"
 
-### context
-一句背景信息，帮助 Agent 理解用户的研究处境。
-例如："用户正在选型 AI Agent 框架，关注社区活跃度和维护风险"
+### focus
+直接透传意图中的 focus，不要重新解析或修改。
+例如：["community", "sentiment"]
+
+### time_range
+直接透传意图中的 time_range，不要重新解析或修改。
+例如：recent / latest / historical / future / any
+
+### research_brief
+给 Agent 的研究说明，解释研究重点、需要关注的具体维度以及注意事项。
+不要只写一句背景，要写清楚 Agent 在这次研究中应该重点关注什么。
+例如：
+"请重点关注：
+1. Twitter 和 Reddit 社区讨论。
+2. 最近版本是否影响社区评价。
+3. 总结积极观点、负面观点及主要争议。
+不要只总结 GitHub README。"
 
 ### depth
 直接使用意图中的 depth。
@@ -63,7 +75,9 @@ PLANNER_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究规划
   "objective": "evaluation",
   "user_goal": "评估 CrewAI 是否适合作为多智能体编排框架",
   "entities": ["CrewAI"],
-  "context": "用户正在选型 AI Agent 框架，关注社区活跃度和维护风险",
+  "focus": ["community", "sentiment"],
+  "time_range": "recent",
+  "research_brief": "请重点关注：\n1. 社区活跃度和维护健康度。\n2. 技术架构和核心定位。\n3. 主要风险和适用场景。\n不要只总结 GitHub README。",
   "depth": "standard",
   "success_criteria": [
     "已识别项目的核心定位和技术架构",
@@ -79,61 +93,49 @@ PLANNER_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究规划
 
 ---
 
-现在，请根据以下研究意图和实体信息生成研究目标，只输出 JSON。
+现在，请根据以下研究意图和实体信息构建 ResearchContext，只输出 JSON。
 """
 
 
-class ResearchAgentPlanner:
-    """根据 ResearchIntent + Entity 生成 Goal 驱动的 ResearchGoal。
+class ResearchContextBuilder:
+    """根据 ResearchIntent + Entity 构建 ResearchContext。
 
-    Planner 只负责定义研究目标和完成标准，不负责决定工具调用顺序。
+    ResearchContextBuilder 只负责定义用户真正想研究什么，不负责决定工具调用顺序、数据源或执行步骤。
     """
 
     def __init__(self):
-        self.llm = deepseek_model.with_structured_output(ResearchGoal)
+        self.llm = deepseek_model.with_structured_output(ResearchContext)
 
-    def plan(
+    def build(
         self,
         intent: ResearchIntent,
         entities: list[ResolvedEntity],
-    ) -> ResearchGoal:
-        """生成研究目标。
+    ) -> ResearchContext | None:
+        """构建研究上下文。
 
-        如果 entities 为空，直接返回 need_user_input 状态。
+        如果 entities 为空，返回 None，由调用方处理 need_user_input。
         """
-        # Entity Guard: 没有解析到实体时不生成计划
+        # Entity Guard: 没有解析到实体时不构建研究上下文
         if not entities:
-            return ResearchGoal(
-                objective=intent.objective,
-                user_goal="",
-                entities=[],
-                context="",
-                depth=intent.depth,
-                success_criteria=[],
-                constraints=[],
-                status="need_user_input",
-                message="未识别到需要研究的对象，请提供项目名称或 GitHub Repository。",
-            )
+            return None
 
         if intent.depth == "quick":
-            return self._quick_plan(intent, entities)
+            return self._quick_build(intent, entities)
 
         try:
-            goal = self._llm_plan(intent, entities)
-        
-        except Exception as exc:
-            logger.warning("ResearchAgentPlanner LLM error, using fallback: %s", exc)
-            goal = self._quick_plan(intent, entities)
+            research_context = self._llm_build(intent, entities)
+        except Exception:
+            research_context = self._quick_build(intent, entities)
 
-        return goal
+        return research_context
 
-    # ── LLM Planning ──────────────────────────────────────────
+    # ── LLM Context Building ───────────────────────────────────
 
-    def _llm_plan(
+    def _llm_build(
         self,
         intent: ResearchIntent,
         entities: list[ResolvedEntity],
-    ) -> ResearchGoal:
+    ) -> ResearchContext:
         entity_info = [
             {
                 "name": e.name,
@@ -144,7 +146,7 @@ class ResearchAgentPlanner:
             for e in entities
         ]
 
-        prompt = f"""{PLANNER_SYSTEM_PROMPT}
+        prompt = f"""{CONTEXT_BUILDER_SYSTEM_PROMPT}
 
 ## 研究意图
 - 目标类型: {intent.objective}
@@ -159,21 +161,21 @@ class ResearchAgentPlanner:
 """
         return self.llm.invoke(prompt)
 
-    # ── Quick Goal (Fallback) ──────────────────────────────────
+    # ── Quick Context (Fallback) ────────────────────────────────
 
-    def _quick_plan(
+    def _quick_build(
         self,
         intent: ResearchIntent,
         entities: list[ResolvedEntity],
-    ) -> ResearchGoal:
-        """快速模式：根据 objective 类型生成精简研究目标。"""
+    ) -> ResearchContext:
+        """快速模式：根据 objective 类型生成精简研究上下文。"""
         entity_names = [e.name for e in entities] or intent.entities
         entity_label = "、".join(entity_names or ["目标对象"])
 
         strategies = {
             "trend_analysis": {
                 "user_goal": f"分析 {entity_label} 最近的发展趋势",
-                "context": f"用户希望了解 {entity_label} 近期的技术演进和社区动态",
+                "research_brief": f"请重点关注：\n1. {entity_label} 近期的技术演进和社区动态。\n2. Twitter 和 Reddit 上的社区讨论。\n3. 积极观点和负面观点。\n不要只总结 GitHub README。",
                 "success_criteria": [
                     "已识别近期主要技术方向",
                     "已找到代表性项目或事件",
@@ -183,7 +185,7 @@ class ResearchAgentPlanner:
             },
             "evaluation": {
                 "user_goal": f"评估 {entity_label} 的整体状况",
-                "context": f"用户希望了解 {entity_label} 的技术能力、社区健康度和风险",
+                "research_brief": f"请重点关注：\n1. {entity_label} 的技术能力、社区健康度和风险。\n2. Twitter 和 Reddit 社区讨论。\n3. 最近版本是否影响社区评价。\n4. 总结积极观点、负面观点及主要争议。\n不要只总结 GitHub README。",
                 "success_criteria": [
                     "已识别项目的核心定位和技术架构",
                     "已评估社区活跃度和维护健康度",
@@ -192,7 +194,7 @@ class ResearchAgentPlanner:
             },
             "comparison": {
                 "user_goal": f"对比分析 {entity_label} 的差异和取舍",
-                "context": f"用户正在比较 {entity_label}，需要理解各自的优势和劣势",
+                "research_brief": f"请重点关注：\n1. {entity_label} 各自的优势和劣势。\n2. 社区讨论中的评价和争议。\n3. 多源交叉验证，不要只依赖 GitHub。",
                 "success_criteria": [
                     "已明确各实体的核心定位和差异",
                     "已从活跃度、生态、风险等维度对比",
@@ -201,7 +203,7 @@ class ResearchAgentPlanner:
             },
             "technology_research": {
                 "user_goal": f"深入研究 {entity_label} 的技术原理和架构",
-                "context": f"用户希望理解 {entity_label} 的技术实现和典型用法",
+                "research_brief": f"请重点关注：\n1. {entity_label} 的技术实现原理和架构设计。\n2. 社区中的典型用法和实践案例。\n3. 技术限制和注意事项。\n不要只总结官方文档。",
                 "success_criteria": [
                     "已理解核心技术原理和架构设计",
                     "已找到典型用法和实践案例",
@@ -210,7 +212,7 @@ class ResearchAgentPlanner:
             },
             "market_research": {
                 "user_goal": f"研究 {entity_label} 所在方向的市场机会",
-                "context": f"用户希望了解 {entity_label} 的市场格局和机会",
+                "research_brief": f"请重点关注：\n1. {entity_label} 的市场格局和竞争态势。\n2. Twitter 和 Reddit 上的行业讨论和趋势。\n3. 机会和风险评估。\n不要只总结 GitHub。",
                 "success_criteria": [
                     "已了解市场需求和竞争格局",
                     "已识别主要参与者和定位",
@@ -219,7 +221,7 @@ class ResearchAgentPlanner:
             },
             "information_lookup": {
                 "user_goal": f"了解 {entity_label} 是什么",
-                "context": f"用户希望快速了解 {entity_label} 的基本信息",
+                "research_brief": f"请重点关注：\n1. {entity_label} 的核心定位和基本信息。\n2. 主要能力和使用场景。\n不要只总结 GitHub README。",
                 "success_criteria": [
                     "已明确对象的定义和核心定位",
                     "已了解主要能力和使用场景",
@@ -227,7 +229,7 @@ class ResearchAgentPlanner:
             },
             "decision_support": {
                 "user_goal": f"为 {entity_label} 的选型提供决策支持",
-                "context": f"用户正在做技术选型，需要基于证据做决策",
+                "research_brief": f"请重点关注：\n1. {entity_label} 的技术能力和适配度。\n2. Twitter 和 Reddit 社区评价和争议。\n3. 主要风险和取舍。\n不要只总结 GitHub README。",
                 "success_criteria": [
                     "已评估技术能力和适配度",
                     "已识别主要风险和取舍",
@@ -240,11 +242,13 @@ class ResearchAgentPlanner:
             intent.objective, strategies["information_lookup"]
         )
 
-        return ResearchGoal(
+        return ResearchContext(
             objective=intent.objective,
             user_goal=strategy["user_goal"],
             entities=entity_names,
-            context=strategy["context"],
+            focus=intent.focus,
+            time_range=intent.time_range,
+            research_brief=strategy["research_brief"],
             depth=intent.depth,
             success_criteria=strategy["success_criteria"],
             constraints=[

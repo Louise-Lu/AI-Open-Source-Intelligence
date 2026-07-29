@@ -1,7 +1,4 @@
-# Research schemas — AI Intelligence Research Agent
-#
-# 从 Workflow 升级为 Agent
-# 核心理念：不输出固定 report 类型，Router 只理解用户研究目标
+# Research schemas 
 #
 # ResearchIntent:
 #   objective: information_lookup | evaluation | comparison | trend_analysis
@@ -18,11 +15,6 @@ from enum import Enum
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
-
-
-# ═══════════════════════════════════════════════════════════════
-# Research Intent — Router 的输出，不绑定任何 report 类型
-# ═══════════════════════════════════════════════════════════════
 
 
 class ResearchObjective(str, Enum):
@@ -45,13 +37,7 @@ class ResearchObjective(str, Enum):
 
 class ResearchIntent(BaseModel):
     """深度理解用户的研究意图。
-
-    与旧版的区别：
-    - 不包含 information_needs（那是 Planner 的工作，不是 Router 的）
-    - 不包含 sub_questions（那是 Planner 的工作，不是 Router 的）
-    - 不包含 audience（由 Planner 根据 objective 推导）
-    - objective 是枚举，不是自由文本 goal
-    - 纯粹表达「用户想做什么 + 在什么上下文 + 关注什么时间 + 多深」
+    - 纯粹表达「用户想做什么 + 什么信息维度 + 关注什么时间 + 多深」
     """
 
     objective: Literal[
@@ -75,20 +61,18 @@ class ResearchIntent(BaseModel):
     focus: list[
         Literal[
             "community",
-            "release",
+            "developer",
+            "official",
             "technology",
             "ecosystem",
-            "activity",
-            "performance",
-            "architecture",
             "adoption",
             "sentiment",
-            "risk",
-            "opportunity",
-            "market",
-            "pricing",
+            "trend",
             "benchmark",
-            "documentation",
+            "market",
+            "opportunity",
+            "risk",
+            "recent_updates",
         ]
     ] = Field(
         default_factory=list,
@@ -118,49 +102,56 @@ class ResearchIntent(BaseModel):
     )
 
 
-class ResearchGoal(BaseModel):
-    """Planner 输出 — Goal 驱动的研究目标。
-
-    与旧版的核心区别：
-    - 删除 research_questions：不再把 Goal 拆成固定问题，Agent 自主探索
-    - 删除 suggested_sources：Agent 自主决定使用哪些数据源
-    - 新增 user_goal / context / success_criteria / constraints：
-      告诉 Agent "要完成什么"而非"按什么步骤做"
+class ResearchContext(BaseModel):
+    """
+    提供给 ReAct Agent 的研究上下文。
+    描述"用户真正想解决的问题"，而不是告诉 Agent 怎么做。
     """
 
+    # ===== 来自 Intent =====
+
     objective: str = Field(
-        description="研究目标类型，来自 IntentRouter，例如 evaluation / comparison / trend_analysis"
+        description="研究目标，例如 evaluation、trend_analysis"
     )
-    user_goal: str = Field(
-        description="一句自然语言描述用户的研究目标，例如 '分析 AI Agent 最近的发展趋势'"
-    )
+
     entities: list[str] = Field(
         default_factory=list,
-        description="研究涉及的实体名称列表",
+        description="标准化后的研究对象"
     )
-    context: str = Field(
-        default="",
-        description="一句背景信息，例如 '用户希望了解近期 AI Agent 技术的发展方向'",
+
+    focus: list[str] = Field(
+        default_factory=list,
+        description="用户关注的信息维度，例如 community、market、technology"
     )
-    depth: Literal["quick", "standard", "deep"] = Field(
+
+    time_range: str = Field(
+        default="any",
+        description="时间范围，例如 recent、past_year、any"
+    )
+
+    depth: str = Field(
         default="standard",
-        description="研究深度: quick (快速概览), standard (标准分析), deep (深度研究)",
+        description="研究深度：quick / standard / deep"
     )
+
+    # ===== Context Builder 生成 =====
+
+    user_goal: str = Field(
+        description="一句话描述用户真正想解决的问题"
+    )
+
+    research_brief: str = Field(
+        description="给 Agent 的研究说明，解释研究重点和背景"
+    )
+
     success_criteria: list[str] = Field(
         default_factory=list,
-        description="完成标准列表，告诉 Agent 什么时候算完成，例如 ['识别近期主要技术方向', '找到代表性项目']",
+        description="什么情况下认为研究已经完成"
     )
+
     constraints: list[str] = Field(
         default_factory=list,
-        description="研究约束，例如 ['优先官方来源', '不要猜测', '多个来源交叉验证']",
-    )
-    status: str = Field(
-        default="ready",
-        description="目标状态: ready | need_user_input | insufficient_information",
-    )
-    message: str = Field(
-        default="",
-        description="当 status != ready 时，向用户展示的解释信息",
+        description="研究限制，例如不要编造数据、优先官方来源"
     )
 
 

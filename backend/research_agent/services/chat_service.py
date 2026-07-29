@@ -4,11 +4,11 @@
 #   User Query
 #     → IntentRouter
 #           ├── greeting/small_talk/help → Chat Response → END
-#           └── information_lookup/evaluation/comparison/... → Entity → Planner → Agent → Signals → Brief
+#           └── information_lookup/evaluation/comparison/... → Entity → Context Builder → Runtime → Agent → Signals → Brief
 #
 # Fail Fast 原则：
 # - 非研究意图 → 立即结束
-# - 无实体 → Planner 返回 need_user_input，Agent 不启动
+# - 无实体 → Context Builder 返回 need_user_input，Agent 不启动
 # - 无证据 → Analyzer 返回空，Composer 返回 insufficient_information
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ from research_agent.intent import ResearchIntentRouter
 from research_agent.entity_extractor import EntityExtractor
 from research_agent.entity_resolver import EntityResolver
 
-from research_agent.planner import ResearchAgentPlanner
+from research_agent.context_builder import ResearchContextBuilder
 
 from research_agent.signal_extractor import ResearchAgentAnalyzer
 from research_agent.composer import ResearchBriefComposer
@@ -93,7 +93,7 @@ class ChatService:
 
     混合架构 + Fail Fast Guard:
     - Router / Entity 层保留确定性理解与解析
-    - Planner 输出 ResearchGoal，而不是步骤计划
+    - Research Context Builder 输出 ResearchContext，而不是步骤计划
     - Intelligence Agent 用 ReAct 循环自主选择工具
     - Analyzer / Composer 保留结构化输出层
 
@@ -106,7 +106,7 @@ class ChatService:
         self.router = ResearchIntentRouter()
         self.entity_extractor = EntityExtractor()
         self.entity_resolver = EntityResolver()
-        self.planner = ResearchAgentPlanner()
+        self.context_builder = ResearchContextBuilder()
         self.agent = intelligence_agent
         self.max_iterations = 12
         self.analyzer = ResearchAgentAnalyzer()
@@ -124,10 +124,7 @@ class ChatService:
         print(
             "[聊天服务] 1. 意图识别完成: "
             f"objective={intent.objective}, "
-            f"entities={intent.entities}, "
-            f"focus={intent.focus}, "
-            f"time_range={intent.time_range}, "
-            f"depth={intent.depth}"
+            f"entities={intent.entities}"
         )
 
         if intent.objective in _CHAT_ONLY_OBJECTIVES:
@@ -141,30 +138,28 @@ class ChatService:
             f"名称={[e.name for e in resolved_entities]}"
         )
 
-        goal = self.planner.plan(intent, resolved_entities)
-        print(
-            "[聊天服务] 3. 研究目标规划完成: "
-            f"status={goal.status}, "
-            f"objective={goal.objective}, "
-            f"user_goal={goal.user_goal[:120]}, "
-            f"depth={goal.depth}, "
-            f"完成标准数量={len(goal.success_criteria)}"
-        )
+        research_context = self.context_builder.build(intent, resolved_entities)
+        if research_context is None:
+            print("[聊天服务] 未识别到研究对象，返回 need_user_input")
+            return self._build_need_user_response(intent=intent)
 
-        if goal.status == "need_user_input":
-            print("[聊天服务] 研究目标需要用户补充信息，提前返回")
-            return self._build_need_user_response(
-                intent=intent,
-            )
+        print(
+            "[聊天服务] 3. 上下文构建完成: "
+            f"objective={research_context.objective}, "
+            f"user_goal={research_context.user_goal[:120]}, "
+            f"depth={research_context.depth}, "
+            f"brief={research_context.research_brief}"
+        )
 
         agent_error = None
         agent_result = None
         t_agent = time.perf_counter()
         try:
             # 初始化 policy_state
-            start_research_policy(goal.objective)
+            start_research_policy(research_context.objective)
+            
             # 构建 prompt + policy_hint
-            agent_prompt = build_intelligence_agent_prompt(goal, resolved_entities)
+            agent_prompt = build_intelligence_agent_prompt(research_context, resolved_entities)
             agent_result = self.agent.invoke(
                 {
                     "messages": [
@@ -189,10 +184,25 @@ class ChatService:
         populate_trace_from_agent_result(agent_result)
         sync_research_policy_from_trace(get_trace())
 
+
         evidences = get_evidence_store()
+
+        source_names = []
+        for evidence in evidences:
+            if evidence.github:
+                source_names.append("github")
+            if evidence.web:
+                source_names.append("web")
+            if evidence.reddit:
+                source_names.append("community")
+            if evidence.huggingface:
+                source_names.append("huggingface")
+
         print(
             "[聊天服务] 5. 证据收集完成: "
-            f"证据数量={len(evidences)}, "
+            f"证据对象数量={len(evidences)}, "
+            f"证据来源={source_names}, "
+            f"来源数量={len(set(source_names))}, "
             f"trace数量={len(get_trace())}"
         )
 
@@ -205,7 +215,7 @@ class ChatService:
                 agent_error=agent_error,
             )
 
-        signals = self.analyzer.analyze(evidences, goal)
+        signals = self.analyzer.analyze(evidences, research_context)
         print(
             "[聊天服务] 6. 信号提取完成: "
             f"是否有信号={signals.has_any_signal}, "

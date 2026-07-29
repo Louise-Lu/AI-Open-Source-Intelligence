@@ -1,6 +1,5 @@
-# intent.py — Research Goal Understanding
+# intent.py — 理解用户意图
 #
-# 职责: 理解用户真正的研究目标
 # 输入: 用户原始 query
 # 输出: ResearchIntent { objective, entities, focus, time_range, depth, raw_query }
 #
@@ -52,30 +51,32 @@ INTENT_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究目标�
 | help | 使用帮助 | "你能做什么"、"怎么用"、"help" |
 
 ## focus
-focus 不代表任务。focus 表示用户真正关心的信息维度，允许多个。
+focus 不代表任务。focus 表示用户真正关心的信息研究维度，允许多个。
 
 只能从以下值中选择：
 community
-release
+developer
+official
 technology
 ecosystem
-activity
-performance
-architecture
 adoption
 sentiment
-risk
-opportunity
-market
-pricing
+trend
 benchmark
-documentation
+market
+opportunity
+risk
+recent_updates
 
 示例：
-- "LangChain 最近社区怎么看" → ["community", "sentiment"]
-- "LangGraph 最近更新" → ["release"]
-- "AI Agent 最近有什么趋势" → ["technology", "community"]
-- "Qwen 和 DeepSeek 对比" → ["performance", "benchmark"]
+- "OpenAI 最近发布了什么？" → ["official","recent_updates"]
+- "AI Agent 最近有什么趋势" → ["trend","market","technology","community","adoption"]
+- "推荐 Agent Framework" → [
+    "benchmark",
+    "ecosystem",
+    "adoption",
+    "risk"
+]
 
 ## time_range
 只能使用以下值：
@@ -125,7 +126,13 @@ LangChain 最近社区怎么看？
 {
   "objective": "trend_analysis",
   "entities": ["AI Agent Memory"],
-  "focus": ["technology", "community"],
+  "focus": [
+    "trend",
+    "market",
+    "community",
+    "adoption",
+    "technology"
+],
   "time_range": "recent",
   "depth": "deep",
   "raw_query": "最近 AI Agent Memory 有什么趋势？"
@@ -138,7 +145,13 @@ LangChain 最近社区怎么看？
 {
   "objective": "decision_support",
   "entities": ["AI Agent Framework"],
-  "focus": ["technology", "benchmark"],
+  "focus": [
+   "technology",
+    "benchmark",
+    "ecosystem",
+    "adoption",
+    "risk"
+],
   "time_range": "any",
   "depth": "deep",
   "raw_query": "推荐一个 AI Agent Framework"
@@ -277,41 +290,38 @@ class ResearchIntentRouter:
         focus: list[str] = []
         rules: list[tuple[str, list[str]]] = [
             ("社区", ["community"]),
+            ("开发者", ["developer"]),
             ("口碑", ["sentiment"]),
             ("怎么看", ["sentiment"]),
             ("情绪", ["sentiment"]),
-            ("更新", ["release"]),
-            ("版本", ["release"]),
-            ("release", ["release"]),
+            ("更新", ["official", "recent_updates"]),
+            ("版本", ["official", "recent_updates"]),
+            ("release", ["official", "recent_updates"]),
+            ("官方", ["official"]),
             ("技术", ["technology"]),
             ("原理", ["technology"]),
-            ("架构", ["architecture"]),
-            ("实现", ["architecture"]),
+            ("架构", ["technology"]),
+            ("实现", ["technology"]),
             ("生态", ["ecosystem"]),
-            ("活跃", ["activity"]),
-            ("维护", ["activity"]),
-            ("性能", ["performance"]),
-            ("benchmark", ["benchmark"]),
-            ("基准", ["benchmark"]),
             ("采用", ["adoption"]),
             ("用户", ["adoption"]),
+            ("趋势", ["trend"]),
             ("风险", ["risk"]),
             ("机会", ["opportunity"]),
             ("市场", ["market"]),
-            ("价格", ["pricing"]),
-            ("pricing", ["pricing"]),
-            ("文档", ["documentation"]),
+            ("benchmark", ["benchmark"]),
+            ("基准", ["benchmark"]),
         ]
         for keyword, values in rules:
             if keyword in text:
                 focus.extend(values)
 
         if any(kw in text for kw in ["趋势", "最近"]):
-            focus.extend(["technology", "community"])
+            focus.extend(["trend", "community"])
         if any(kw in text for kw in ["对比", "比较", "vs"]):
-            focus.extend(["performance", "benchmark"])
+            focus.extend(["benchmark", "technology"])
         if any(kw in text for kw in ["推荐", "选型"]):
-            focus.extend(["technology", "benchmark"])
+            focus.extend(["technology", "benchmark", "risk"])
         if not focus:
             focus.append("technology")
 
