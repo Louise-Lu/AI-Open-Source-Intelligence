@@ -40,6 +40,19 @@ def clear_trace() -> None:
     tool_trace.set([])
 
 
+def unwrap_tool_output(output: Any) -> Any:
+    """兼容带 policy_hint 的 Tool Observation。
+
+    Tool 返回给 LLM 时会包装成：
+    {"result": 原始工具结果, "policy_hint": 最新策略提示}
+
+    但 trace/evidence 解析只关心原始工具结果，所以这里统一拆出来。
+    """
+    if isinstance(output, dict) and "result" in output and "policy_hint" in output:
+        return output.get("result")
+    return output
+
+
 def get_discovered_resources() -> dict[str, list[Any]]:
     """从 trace 中提取 Agent 自主发现的数据源资源。
       "例如:
@@ -58,7 +71,7 @@ def get_discovered_resources() -> dict[str, list[Any]]:
     }
     for item in get_trace():
         tool_name = item.get("tool")
-        output = item.get("output")
+        output = unwrap_tool_output(item.get("output"))
         if isinstance(output, dict) and output.get("source") == "research_policy":
             continue
 
@@ -116,7 +129,7 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
 
     for item in trace:
         tool_name = item.get("tool")
-        output = item.get("output")
+        output = unwrap_tool_output(item.get("output"))
 
         if tool_name in {
             "github_search",

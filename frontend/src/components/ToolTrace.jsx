@@ -45,7 +45,7 @@ function TraceBlock({ label, value }) {
 }
 
 export default function ToolTrace({ trace }) {
-  const steps = Array.isArray(trace) ? trace : trace?.steps;
+  const steps = Array.isArray(trace) ? trace : trace?.react_steps || trace?.steps;
 
   if (!Array.isArray(steps) || steps.length === 0) {
     return null;

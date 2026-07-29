@@ -18,42 +18,6 @@ Agent 不采用固定 Workflow，而是根据用户目标自主规划分析过�
 
 ## Architecture
 
-User
-
-↓
-
-Intent Understanding
-
-↓
-
-Planning
-
-↓
-
-Tool Selection 
-
-↓
-
-Observation
-
-↓
-
-Reasoning
-
-↓
-
-Enough Information？
-
-├── No → Continue Tool Calling
-
-└── Yes
-
-↓
-
-Generate Intelligence Report
-
----
-
 ```text
 Prompt + policy_hint
     ↓
@@ -63,11 +27,17 @@ LLM 决定下一步调用哪个 tool
     ↓
 before_tool_call() 做硬约束检查
     ↓
-执行 tool
+Tool 执行
     ↓
-after_tool_call() 更新 state
+after_tool_call() 更新 policy state
     ↓
-tool 返回结果给 LLM 观察
+build_policy_hint() 生成最新 hint
+    ↓
+返回结果给 LLM 观察：
+{
+    result: 工具结果,
+    policy_hint: 最新策略提示
+}
     ↓
 LLM 根据观察结果 + 新的 policy_hint 决定下一步
 ```

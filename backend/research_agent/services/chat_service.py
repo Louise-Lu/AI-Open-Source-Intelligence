@@ -23,7 +23,6 @@ from agent.research_policy import (
     needs_trend_single_source_warning,
     start_research_policy,
     sync_research_policy_from_trace,
-    trend_single_source_warning,
 )
 from agent.trace import clear_trace, get_discovered_resources, get_evidence_store, get_trace, populate_trace_from_agent_result
 
@@ -38,7 +37,6 @@ from research_agent.composer import ResearchBriefComposer
 
 
 from research_agent.schemas.research import (
-    ResearchGoal,
     ResearchIntent,
     ResearchObjective,
 )
@@ -81,15 +79,13 @@ def _build_chat_response(intent: ResearchIntent) -> dict:
     else:
         answer = "你好！有什么可以帮你的吗？"
 
-    return {
-        "answer": answer,
-        "trace": {
-            "intent": intent.model_dump(),
-            "discovered_sources": {},
-            "steps": [],
-        },
-        "error": None,
+    ui_trace = {
+        "intent": intent.model_dump(),
+        "discovered_sources": {},
+        "steps": [],
+        "react_steps": [],
     }
+    return {"answer": answer, "trace": ui_trace, "error": None}
 
 
 class ChatService:
@@ -165,9 +161,9 @@ class ChatService:
         agent_result = None
         t_agent = time.perf_counter()
         try:
-            # 初始化 _policy_state
+            # 初始化 policy_state
             start_research_policy(goal.objective)
-            
+            # 构建 prompt + policy_hint
             agent_prompt = build_intelligence_agent_prompt(goal, resolved_entities)
             agent_result = self.agent.invoke(
                 {
@@ -221,7 +217,7 @@ class ChatService:
 
         brief = self.composer.compose(message, evidences, signals)
         if needs_trend_single_source_warning():
-            warning = trend_single_source_warning()
+            warning = "目前仅获得 GitHub 证据，社区观点不足。"
             if warning not in brief.key_findings:
                 brief.key_findings.append(warning)
             if warning not in brief.analysis:
@@ -303,12 +299,13 @@ class ChatService:
             "- Mastra\n"
             "- owner/repo"
         )
-        trace = {
+        ui_trace = {
             "intent": intent.model_dump(),
             "discovered_sources": {},
             "steps": [],
+            "react_steps": [],
         }
-        return {"answer": answer, "trace": trace, "error": None}
+        return {"answer": answer, "trace": ui_trace, "error": None}
 
     @staticmethod
     def _build_insufficient_evidence_response(
@@ -325,12 +322,13 @@ class ChatService:
             "- 研究对象没有公开数据\n\n"
             "请尝试提供其他项目名称或 GitHub 仓库地址。"
         )
-        trace = {
+        ui_trace = {
             "intent": intent.model_dump(),
             "discovered_sources": _sanitize_value(get_discovered_resources()),
-            "steps": _extract_agent_steps(agent_result),
+            "steps": _extract_react_steps(agent_result),
         }
-        return {"answer": answer, "trace": trace, "error": agent_error}
+        ui_trace["react_steps"] = ui_trace["steps"]
+        return {"answer": answer, "trace": ui_trace, "error": agent_error}
 
     @staticmethod
     def _build_response(
@@ -356,11 +354,12 @@ class ChatService:
                 f"- {source}" for source in brief.sources
             )
 
-        trace = {
+        ui_trace = {
             "intent": intent.model_dump(),
             "discovered_sources": _sanitize_value(get_discovered_resources()),
-            "steps": _extract_agent_steps(agent_result),
+            "steps": _extract_react_steps(agent_result),
         }
+        ui_trace["react_steps"] = ui_trace["steps"]
 
         if agent_error:
             answer = (
@@ -373,7 +372,7 @@ class ChatService:
         if len(answer) > MAX_ANSWER_LENGTH:
             answer = answer[:MAX_ANSWER_LENGTH] + "\n\n...(报告过长已截断)"
 
-        return {"answer": answer, "trace": trace, "error": agent_error}
+        return {"answer": answer, "trace": ui_trace, "error": agent_error}
 
 
 # 单个工具输出最大字符数（防止 README 等大文本撑爆响应体）
@@ -383,7 +382,7 @@ _MAX_OBSERVATION_CHARS = 300
 
 
 def _truncate_text(value: Any, max_chars: int) -> str:
-    """将任意值转换为字符串并截断，供前端 trace.steps 展示。"""
+    """将任意值转换为字符串并截断，供前端 UI trace 展示。"""
     if value is None:
         return ""
     if isinstance(value, str):
@@ -409,11 +408,34 @@ def _parse_tool_content(content: Any) -> Any:
         return content
 
 
+def _format_observation_for_ui(content: Any) -> str:
+    """格式化前端 Observation。
+
+    Tool 返回给 LLM 的 observation 现在包含：
+    - result: 工具原始结果
+    - policy_hint: 最新 Research Policy
+
+    前端只展示 observation 字段，所以这里提前整理成更容易读的文本。
+    """
+    parsed = _parse_tool_content(content)
+    if isinstance(parsed, dict) and "result" in parsed and "policy_hint" in parsed:
+        result_text = _truncate_text(parsed.get("result"), _MAX_OBSERVATION_CHARS)
+        policy_text = _truncate_text(parsed.get("policy_hint"), 800)
+        return (
+            "Tool Result:\n"
+            f"{result_text}\n\n"
+            "Latest Policy Hint:\n"
+            f"{policy_text}"
+        )
+
+    return _truncate_text(parsed, _MAX_OBSERVATION_CHARS)
+
+
 def _get_message_type(message: Any) -> str:
     return str(getattr(message, "type", "") or "")
 
 
-def _extract_agent_steps(agent_result: dict | None) -> list[dict[str, Any]]:
+def _extract_react_steps(agent_result: dict | None) -> list[dict[str, Any]]:
     """从 LangGraph agent_result 中提取前端可渲染的 ReAct 步骤。"""
     if not isinstance(agent_result, dict):
         return []
@@ -472,10 +494,7 @@ def _extract_agent_steps(agent_result: dict | None) -> list[dict[str, Any]]:
             tool_call_id = getattr(msg, "tool_call_id", "") or ""
             tool_name = getattr(msg, "name", "") or ""
             content = getattr(msg, "content", "")
-            observation = _truncate_text(
-                _parse_tool_content(content),
-                _MAX_OBSERVATION_CHARS,
-            )
+            observation = _format_observation_for_ui(content)
 
             step = step_by_tool_call_id.get(tool_call_id)
             if step is None:
