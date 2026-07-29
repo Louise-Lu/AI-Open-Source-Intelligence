@@ -1,6 +1,6 @@
 # ReAct Agent — Goal 驱动的自主研究
 #
-# Agent 接收 ResearchGoal，自主决定工具调用和数据源
+# Agent 接收 ResearchContext，自主决定工具调用和数据源
 
 from __future__ import annotations
 
@@ -20,10 +20,10 @@ INTELLIGENCE_AGENT_PROMPT = """
 你的职责不是回答问题，而是完成一次真实的研究任务。
 
 ========================
-Research Goal
+Research Context
 ========================
 
-{research_goal}
+{research_context}
 
 ========================
 Known Entities
@@ -44,7 +44,19 @@ Current Research Policy 会实时告诉你：
 - 已获得的证据来源
 - 是否建议停止继续搜索
 
-请根据 Current Research Policy 自主决定下一步工具调用。
+请根据 Research Context 里的 execution_plan 和 Current Research Policy 决定下一步工具调用。
+
+【重要】每一轮只能调用 1 个工具。绝对不要在同一轮发起多个 tool calls。
+
+如果 Current Research Policy 的 Status 是 Ready to Finish，必须停止继续调用工具，直接输出最终结论。
+如果工具返回 tool_policy_block，说明该工具或来源已达到上限。请根据 suggestion 切换到其他允许的来源或工具，不要反复尝试被 block 的工具。
+只有当所有允许来源都已用完或 Status 为 Ready to Finish 时，才停止搜索并输出结论。
+
+execution_plan 是硬执行边界。
+如果 execution_plan 限制了 source_scope 或 avoid_sources，必须遵守，不要调用范围外工具。
+如果 execution_plan.required_sources 已满足，必须停止继续搜索并输出结论。
+不要把 execution_plan.avoid_sources 中的来源写成“本次缺失”或“研究不足”；它们是本次任务主动排除的范围。
+不要建议后续补充 avoid_sources 中的来源，除非用户明确要求更完整或更深度的研究。
 
 ========================
 Available Tools
@@ -60,7 +72,8 @@ Available Tools
 
 Discovery Tool 仅用于发现资源。
 
-不要连续调用同一种 Discovery Tool。
+如果 Discovery 返回空结果，可以换一个更简短的关键词重试同一种 Discovery Tool。
+例如 community_search("CrewAI review sentiment 2024 2025") 无结果时，可以试 community_search("CrewAI")。
 
 找到合适资源后，应立即进入 Evidence 阅读。
 
@@ -81,6 +94,8 @@ Discovery Tool 仅用于发现资源。
 
 - youtube_transcript
 
+- podcast_transcript
+
 Evidence Tool 用于收集研究证据。
 
 ========================
@@ -89,7 +104,7 @@ Research Principles
 
 1.
 
-围绕 Research Goal 收集证据。
+围绕 Research Context 收集证据。
 
 不要为了调用工具而调用工具。
 
@@ -112,6 +127,7 @@ Discovery 的职责只是找到资源。
 不同来源的证据可以互相验证。
 
 如果多个来源已经能够回答当前研究问题，就停止继续搜索。
+不要为了“再确认一下”继续搜索。
 
 5.
 
@@ -154,17 +170,21 @@ Research Findings
 
 
 def build_intelligence_agent_prompt(
-    research_goal: Any,
+    research_context: Any,
     resolved_entities: list[Any],
 ) -> str:
-    goal_dict = research_goal.model_dump() if hasattr(research_goal, "model_dump") else research_goal
+    context_dict = (
+        research_context.model_dump()
+        if hasattr(research_context, "model_dump")
+        else dict(research_context or {})
+    )
     entity_dict = [
         entity.model_dump() if hasattr(entity, "model_dump") else entity
         for entity in resolved_entities
     ]
 
     prompt = INTELLIGENCE_AGENT_PROMPT.format(
-        research_goal=json.dumps(goal_dict, ensure_ascii=False, indent=2),
+        research_context=json.dumps(context_dict, ensure_ascii=False, indent=2),
         resolved_entities=json.dumps(entity_dict, ensure_ascii=False, indent=2),
         policy_hint=build_policy_hint(),
     )
@@ -175,7 +195,7 @@ intelligence_agent = create_react_agent(
     model=deepseek_model,
     tools=TOOLS,
     prompt=INTELLIGENCE_AGENT_PROMPT.format(
-        research_goal="{}",
+        research_context="{}",
         resolved_entities="[]",
         policy_hint=build_policy_hint(),
     ),

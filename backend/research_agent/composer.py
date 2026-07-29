@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 
 from llms.deepseek import deepseek_model
 from evidence.models import IntelligenceEvidence
@@ -123,6 +124,15 @@ class ResearchBriefComposer:
             logger.warning("ResearchBriefComposer LLM error: %s", exc)
             return self._fallback_brief(query, evidences, signals, str(exc))
 
+    def compose_fast(
+        self,
+        query: str,
+        evidences: list[IntelligenceEvidence],
+        signals: ExtractedSignals | None = None,
+    ) -> ResearchBrief:
+        """快速生成简报：不调用 LLM，直接基于 evidence 拼出可用答案。"""
+        return self._fallback_brief(query, evidences, signals, "")
+
     # ── Serialization ──────────────────────────────────────────
 
     @staticmethod
@@ -170,10 +180,45 @@ class ResearchBriefComposer:
                 sources.append(f"GitHub repository: {repo_name}")
 
             if github and github.readme:
-                readme_preview = github.readme[:300].replace("\n", " ").strip()
+                readme_preview = _clean_snippet(github.readme, 300)
                 if readme_preview:
                     analysis_parts.append(f"README 摘要片段：{readme_preview}...")
                     sources.append("GitHub README")
+
+            if github and github.commit_activity:
+                key_findings.append(
+                    f"近期维护活跃度：近 30 天约 {github.commit_activity.commits_last_30_days} 次提交，"
+                    f"近 90 天约 {github.commit_activity.commits_last_90_days} 次提交。"
+                )
+                sources.append("GitHub commit activity")
+
+            reddit = evidence.reddit if evidence else None
+            if reddit and reddit.posts:
+                reddit_summaries = [_reddit_summary(post) for post in reddit.posts[:3]]
+                reddit_summaries = [item for item in reddit_summaries if item]
+                if reddit_summaries:
+                    key_findings.append(f"Reddit 相关讨论：{reddit_summaries[0]}")
+                else:
+                    key_findings.append(
+                        f"社区讨论方面，当前抓取到 {reddit.mentions or len(reddit.posts)} 条 Reddit 相关讨论。"
+                    )
+                for post in reddit.posts[:3]:
+                    preview = _reddit_summary(post) or _clean_snippet(post, 300)
+                    if preview:
+                        analysis_parts.append(f"Reddit 讨论片段：{preview}...")
+                sources.append("Reddit community discussions")
+
+            web = evidence.web if evidence else None
+            if web and web.pages:
+                key_findings.append(f"Web 资料方面，当前读取到 {len(web.pages)} 个公开页面。")
+                for page in web.pages[:2]:
+                    url = _clean_url(page.get("url") or "")
+                    content = _clean_web_snippet(page.get("content") or page.get("summary") or "", 400)
+                    if content:
+                        source_label = f"（{url}）" if url else ""
+                        analysis_parts.append(f"Web 页面片段{source_label}：{content}...")
+                    if url:
+                        sources.append(f"Web page: {url}")
 
         if signals:
             if signals.technology and signals.technology.summary:
@@ -190,11 +235,75 @@ class ResearchBriefComposer:
         if reason:
             analysis_parts.append(f"结构化撰写模型未返回有效结果，已使用 fallback 简报。内部原因：{reason}")
 
+        summary = f"关于「{query[:50]}」的研究已基于现有证据生成快速简报。"
+        if key_findings:
+            summary = key_findings[0]
+
         return ResearchBrief(
-            summary=f"关于「{query[:50]}」的研究已基于现有证据生成 fallback 简报。",
+            summary=summary,
             key_findings=key_findings[:6],
             analysis="\n\n".join(analysis_parts),
             signals=signals,
             sources=list(dict.fromkeys(sources)),
             recommendations=recommendations,
         )
+
+
+def _clean_url(value: str) -> str:
+    """清理 URL 外层 Markdown 符号。"""
+    return str(value or "").strip().strip("`").strip()
+
+
+def _clean_snippet(value: str, limit: int) -> str:
+    """清理网页/社区正文片段，避免图片、导航和 blob 链接污染 fast brief。"""
+    text = str(value or "")
+    text = re.sub(r"!\[[^\]]*\]\([^)]+\)", " ", text)
+    text = re.sub(r"\[[^\]]*\]\((?:javascript:|blob:)[^)]+\)", " ", text)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = re.sub(r"`?https?://[^\s`<>)]+`?", " ", text)
+    text = re.sub(r"blob:http://[^\s)]+", " ", text)
+    text = re.sub(r"javascript:;", " ", text)
+    text = re.sub(r"[`*_#>]+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:limit].strip()
+
+
+def _clean_web_snippet(value: str, limit: int) -> str:
+    """清理 Jina Markdown 的网页片段，只保留正文性内容。"""
+    text = str(value or "")
+    text = re.sub(r"^Title:\s*", "", text, flags=re.I)
+    text = re.sub(r"\bURL Source:\s*.*?(?=(Published Time:|Markdown Content:|$))", " ", text, flags=re.I | re.S)
+    text = re.sub(r"\bPublished Time:\s*.*?(?=(Markdown Content:|$))", " ", text, flags=re.I | re.S)
+    text = re.sub(r"\bMarkdown Content:\s*", " ", text, flags=re.I)
+    text = re.sub(r"\[[^\]]{1,20}\]\(\s*\)", " ", text)
+    text = re.sub(r"(?:\s*/\s*){2,}", " ", text)
+    return _clean_snippet(text, limit)
+
+
+def _reddit_summary(value: str) -> str:
+    """从 opencli Reddit YAML 文本中提取可读摘要。"""
+    text = str(value or "")
+    blocks = re.split(r"\n(?=- id: )", text.strip())
+    summaries: list[str] = []
+    for block in blocks[:3]:
+        title = _yaml_value(block, "title")
+        subreddit = _yaml_value(block, "subreddit")
+        comments = _yaml_value(block, "comments")
+        score = _yaml_value(block, "score")
+        if not title:
+            continue
+        meta = []
+        if subreddit:
+            meta.append(subreddit)
+        if score:
+            meta.append(f"{score} 分")
+        if comments:
+            meta.append(f"{comments} 评论")
+        suffix = f"（{'，'.join(meta)}）" if meta else ""
+        summaries.append(f"{title}{suffix}")
+    return "；".join(summaries)
+
+
+def _yaml_value(block: str, key: str) -> str:
+    match = re.search(rf"^\s*{re.escape(key)}:\s*(.*)$", block, re.MULTILINE)
+    return match.group(1).strip(" '\"") if match else ""

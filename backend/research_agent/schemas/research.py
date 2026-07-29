@@ -102,6 +102,51 @@ class ResearchIntent(BaseModel):
     )
 
 
+class ExecutionPlan(BaseModel):
+    """执行控制计划：约束工具来源、预算和停止条件，避免 ReAct Agent 发散。"""
+
+    mode: Literal["quick", "standard", "deep"] = Field(
+        default="standard",
+        description="执行深度，决定工具预算大小",
+    )
+    source_scope: list[str] = Field(
+        default_factory=list,
+        description="允许使用的数据源，例如 community/web/github",
+    )
+    required_sources: list[str] = Field(
+        default_factory=list,
+        description="达到停止条件所需的证据来源",
+    )
+    avoid_sources: list[str] = Field(
+        default_factory=list,
+        description="本任务应避免使用的数据源",
+    )
+    allowed_tools: list[str] = Field(
+        default_factory=list,
+        description="本次研究允许调用的工具名白名单；为空表示按 source_scope 推导",
+    )
+    blocked_tools: list[str] = Field(
+        default_factory=list,
+        description="本次研究禁止调用的工具名黑名单",
+    )
+    max_tool_calls: int = Field(
+        default=8,
+        description="本次研究最多允许的工具调用次数",
+    )
+    max_discovery_per_source: int = Field(
+        default=1,
+        description="每个来源最多允许的 Discovery 调用次数",
+    )
+    max_reader_per_source: int = Field(
+        default=1,
+        description="每个来源最多允许的 Evidence Reader 调用次数",
+    )
+    stop_when: str = Field(
+        default="required_sources_satisfied",
+        description="停止规则，例如 required_sources_satisfied",
+    )
+
+
 class ResearchContext(BaseModel):
     """
     提供给 ReAct Agent 的研究上下文。
@@ -140,18 +185,9 @@ class ResearchContext(BaseModel):
         description="一句话描述用户真正想解决的问题"
     )
 
-    research_brief: str = Field(
-        description="给 Agent 的研究说明，解释研究重点和背景"
-    )
-
-    success_criteria: list[str] = Field(
-        default_factory=list,
-        description="什么情况下认为研究已经完成"
-    )
-
-    constraints: list[str] = Field(
-        default_factory=list,
-        description="研究限制，例如不要编造数据、优先官方来源"
+    execution_plan: ExecutionPlan = Field(
+        default_factory=ExecutionPlan,
+        description="执行控制计划，用于约束 Agent 工具调用边界",
     )
 
 

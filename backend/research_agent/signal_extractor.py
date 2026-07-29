@@ -2,8 +2,7 @@
 #
 # 职责: 从多源 IntelligenceEvidence 中提取结构化信号
 # 输入: list[IntelligenceEvidence] + ResearchContext
-#       ResearchContext { objective, user_goal, entities, focus, time_range, depth,
-#                       research_brief, success_criteria, constraints }
+#       ResearchContext { objective, user_goal, entities, focus, time_range, depth, execution_plan }
 # 输出: ExtractedSignals { technology, community, ecosystem, risks }
 #
 # 与旧 SignalExtractor 的区别:
@@ -14,6 +13,7 @@
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from llms.deepseek import deepseek_model
 from evidence.models import IntelligenceEvidence
@@ -68,18 +68,30 @@ class ResearchAgentAnalyzer:
         needed_dimensions = self._needed_dimensions(research_context)
 
         signals = ExtractedSignals()
+        extractors = {
+            "technology": self._extract_tech,
+            "community": self._extract_community,
+            "ecosystem": self._extract_ecosystem,
+            "risk": self._extract_risks,
+        }
 
-        if "technology" in needed_dimensions:
-            signals.technology = self._extract_tech(merged_json, context_text)
-
-        if "community" in needed_dimensions:
-            signals.community = self._extract_community(merged_json, context_text)
-
-        if "ecosystem" in needed_dimensions:
-            signals.ecosystem = self._extract_ecosystem(merged_json, context_text)
-
-        if "risk" in needed_dimensions:
-            signals.risks = self._extract_risks(merged_json, context_text)
+        with ThreadPoolExecutor(max_workers=min(len(needed_dimensions), 4)) as executor:
+            future_map = {
+                executor.submit(extractors[dimension], merged_json, context_text): dimension
+                for dimension in needed_dimensions
+                if dimension in extractors
+            }
+            for future in as_completed(future_map):
+                dimension = future_map[future]
+                value = future.result()
+                if dimension == "technology":
+                    signals.technology = value
+                elif dimension == "community":
+                    signals.community = value
+                elif dimension == "ecosystem":
+                    signals.ecosystem = value
+                elif dimension == "risk":
+                    signals.risks = value
 
         return signals
 
@@ -136,14 +148,12 @@ class ResearchAgentAnalyzer:
         if research_context is None:
             return "无"
         if isinstance(research_context, ResearchContext):
-            criteria = "\n".join(f"- {c}" for c in research_context.success_criteria)
-            constraints = "\n".join(f"- {c}" for c in research_context.constraints)
             return (
                 f"研究目标: {research_context.user_goal}\n"
-                f"研究说明: {research_context.research_brief or '无'}\n"
-                f"完成标准:\n{criteria or '- 无'}\n"
-                f"约束:\n{constraints or '- 无'}\n"
-                f"深度: {research_context.depth}"
+                f"关注维度: {', '.join(research_context.focus or []) or '未指定'}\n"
+                f"时间范围: {research_context.time_range}\n"
+                f"深度: {research_context.depth}\n"
+                f"执行计划: {research_context.execution_plan.model_dump() if hasattr(research_context.execution_plan, 'model_dump') else research_context.execution_plan}"
             )
         return "无"
 
@@ -156,7 +166,23 @@ class ResearchAgentAnalyzer:
         if not isinstance(research_context, ResearchContext):
             return {"technology"}
 
-        # Context 驱动的分析：这里只决定 Analyzer 提取哪些维度，不参与 Tool Selection
+        # Context 驱动的分析：这里只决定 Analyzer 提取哪些维度，不参与 Tool Selection。
+        # 如果用户明确只关心社区/情绪，就不要再额外提取技术维度，减少一次 LLM 调用。
+        focus = set(research_context.focus or [])
+        if focus:
+            dimensions = set()
+            if focus & {"technology", "benchmark"}:
+                dimensions.add("technology")
+            if focus & {"community", "developer", "sentiment", "adoption", "recent_updates", "trend"}:
+                dimensions.add("community")
+            if focus & {"ecosystem", "market", "opportunity"}:
+                dimensions.add("ecosystem")
+            if focus & {"risk"}:
+                dimensions.add("risk")
+            if dimensions:
+                return dimensions
+
+        # 没有明确 focus 时，按 objective 推导默认维度。
         dimensions = set()
         obj = research_context.objective
 

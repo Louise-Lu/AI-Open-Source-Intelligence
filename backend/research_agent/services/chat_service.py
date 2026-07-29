@@ -11,6 +11,15 @@
 # - 无实体 → Context Builder 返回 need_user_input，Agent 不启动
 # - 无证据 → Analyzer 返回空，Composer 返回 insufficient_information
 
+# 用户问题
+#   -> IntentRouter 理解意图
+#   -> EntityExtractor 抽实体
+#   -> EntityResolver 标准化实体
+#   -> ContextBuilder 生成 ResearchContext + ExecutionPlan
+#   -> ResearchPolicy 初始化运行时策略
+#   -> ToolGateway 统一拦截工具调用
+#   -> ReAct Agent 在允许范围内搜索/读取/停止
+
 from __future__ import annotations
 
 import json
@@ -37,6 +46,7 @@ from research_agent.composer import ResearchBriefComposer
 
 
 from research_agent.schemas.research import (
+    ExtractedSignals,
     ResearchIntent,
     ResearchObjective,
 )
@@ -88,6 +98,14 @@ def _build_chat_response(intent: ResearchIntent) -> dict:
     return {"answer": answer, "trace": ui_trace, "error": None}
 
 
+def _recursion_limit_for_context(research_context: Any, minimum: int = 12) -> int:
+    """根据 execution_plan 工具预算推导 LangGraph recursion_limit。"""
+    execution_plan = getattr(research_context, "execution_plan", None)
+    max_tool_calls = int(getattr(execution_plan, "max_tool_calls", 6) or 6)
+    # 每个工具调用约 2 个图步骤，额外预留 system/user/final/reflection 空间。
+    return max(minimum, max_tool_calls * 2 + 6)
+
+
 class ChatService:
     """AI Intelligence Research Agent 主服务。
 
@@ -108,7 +126,16 @@ class ChatService:
         self.entity_resolver = EntityResolver()
         self.context_builder = ResearchContextBuilder()
         self.agent = intelligence_agent
-        self.max_iterations = 12
+        # LangGraph recursion_limit 不是业务工具预算。
+        # 一个 tool call 通常会消耗 AIMessage + ToolMessage 两个图步骤，还需要最终回答步骤。
+        # 真实工具预算由 ResearchPolicy / execution_plan.max_tool_calls 控制。
+        self.min_recursion_limit = 12
+        # 快速模式：跳过 Analyzer 的多次结构化 LLM，只用 evidence 交给 Composer 生成答案。
+        # 如果后续需要更完整的结构化信号，把这里改成 True。
+        self.use_structured_analyzer = False
+        # 快速模式：跳过 Composer LLM，直接基于 evidence 生成简报。
+        # 如果需要更自然的长文分析，把这里改成 True。
+        self.use_llm_composer = False
         self.analyzer = ResearchAgentAnalyzer()
         self.composer = ResearchBriefComposer()
 
@@ -124,7 +151,8 @@ class ChatService:
         print(
             "[聊天服务] 1. 意图识别完成: "
             f"objective={intent.objective}, "
-            f"entities={intent.entities}"
+            f"entities={intent.entities},"
+            f"depth={intent.depth}"
         )
 
         if intent.objective in _CHAT_ONLY_OBJECTIVES:
@@ -148,18 +176,20 @@ class ChatService:
             f"objective={research_context.objective}, "
             f"user_goal={research_context.user_goal[:120]}, "
             f"depth={research_context.depth}, "
-            f"brief={research_context.research_brief}"
+            f"execution_plan={research_context.execution_plan}"
         )
-
+    
         agent_error = None
         agent_result = None
         t_agent = time.perf_counter()
         try:
             # 初始化 policy_state
-            start_research_policy(research_context.objective)
+            start_research_policy(research_context)
             
             # 构建 prompt + policy_hint
             agent_prompt = build_intelligence_agent_prompt(research_context, resolved_entities)
+            recursion_limit = _recursion_limit_for_context(research_context, self.min_recursion_limit)
+            print(f"[聊天服务] Agent recursion_limit={recursion_limit}")
             agent_result = self.agent.invoke(
                 {
                     "messages": [
@@ -167,7 +197,7 @@ class ChatService:
                         ("user", message),
                     ]
                 },
-                config={"recursion_limit": 12},
+                config={"recursion_limit": recursion_limit},
             )
         except Exception as exc:  # noqa: BLE001
             agent_error = f"{type(exc).__name__}: {exc}"
@@ -215,9 +245,17 @@ class ChatService:
                 agent_error=agent_error,
             )
 
-        signals = self.analyzer.analyze(evidences, research_context)
+        t_analyzer = time.perf_counter()
+        if self.use_structured_analyzer:
+            signals = self.analyzer.analyze(evidences, research_context)
+            analyzer_mode = "structured"
+        else:
+            signals = ExtractedSignals()
+            analyzer_mode = "skipped"
         print(
             "[聊天服务] 6. 信号提取完成: "
+            f"模式={analyzer_mode}, "
+            f"耗时={time.perf_counter() - t_analyzer:.2f}s, "
             f"是否有信号={signals.has_any_signal}, "
             f"技术={signals.technology is not None}, "
             f"社区={signals.community is not None}, "
@@ -225,7 +263,18 @@ class ChatService:
             f"风险={signals.risks is not None}"
         )
 
-        brief = self.composer.compose(message, evidences, signals)
+        t_composer = time.perf_counter()
+        if self.use_llm_composer:
+            brief = self.composer.compose(message, evidences, signals)
+            composer_mode = "llm"
+        else:
+            brief = self.composer.compose_fast(message, evidences, signals)
+            composer_mode = "fast"
+        print(
+            "[聊天服务] Composer 生成完成: "
+            f"模式={composer_mode}, "
+            f"耗时={time.perf_counter() - t_composer:.2f}s"
+        )
         if needs_trend_single_source_warning():
             warning = "目前仅获得 GitHub 证据，社区观点不足。"
             if warning not in brief.key_findings:
@@ -246,6 +295,11 @@ class ChatService:
             agent_error=agent_error,
             brief=brief,
         )
+        if not self.use_llm_composer:
+            agent_answer = _extract_final_agent_answer(agent_result)
+            if agent_answer:
+                response["answer"] = agent_answer
+                print("[聊天服务] 使用 Agent 最终回答，跳过 fast composer 文本作为最终输出")
         print(
             "[聊天服务] 处理完成: "
             f"总耗时={time.perf_counter() - t0:.2f}s, "
@@ -276,12 +330,6 @@ class ChatService:
                 name = entity.get("name", "")
                 if name:
                     all_entity_names.add(name)
-
-        # else:
-        #     # 意图里已经有实体了，entity_dict 直接构造，不走 LLM
-        #     entity_dict = {
-        #         "entities": [{"name": name} for name in all_entity_names]
-        #     }
 
         # 3. 解析实体
         resolved = []
@@ -443,6 +491,22 @@ def _format_observation_for_ui(content: Any) -> str:
 
 def _get_message_type(message: Any) -> str:
     return str(getattr(message, "type", "") or "")
+
+
+def _extract_final_agent_answer(agent_result: Any) -> str:
+    """提取 ReAct Agent 已生成的最终回答，避免 fast composer 覆盖自然语言结论。"""
+    if not isinstance(agent_result, dict):
+        return ""
+    messages = agent_result.get("messages", []) or []
+    for msg in reversed(messages):
+        if _get_message_type(msg) != "ai":
+            continue
+        if getattr(msg, "tool_calls", []) or []:
+            continue
+        content = str(getattr(msg, "content", "") or "").strip()
+        if len(content) >= 80:
+            return content
+    return ""
 
 
 def _extract_react_steps(agent_result: dict | None) -> list[dict[str, Any]]:

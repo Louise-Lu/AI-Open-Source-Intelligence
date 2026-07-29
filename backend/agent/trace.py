@@ -126,6 +126,7 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
     github_raw: dict[str, Any] = {}
     huggingface_raw: dict[str, Any] | None = None
     reddit_raw: dict[str, Any] | None = None
+    web_raw: list[dict[str, Any]] = []
 
     for item in trace:
         tool_name = item.get("tool")
@@ -164,6 +165,18 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
                 }
             continue
 
+        if isinstance(output, dict) and output.get("source") == "web":
+            evidence = output.get("evidence")
+            if isinstance(evidence, dict):
+                web_raw.append(
+                    {
+                        "type": str(output.get("type") or "webpage"),
+                        "summary": str(output.get("summary") or ""),
+                        "evidence": evidence,
+                    }
+                )
+            continue
+
         if tool_name == "get_repository_info":
             github_raw["repository"] = output
         elif tool_name == "readme":
@@ -180,7 +193,7 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
             github_raw["planning"] = output
         elif tool_name == "get_discussion_signals":
             github_raw["discussions"] = output
-    has_evidence = bool(github_raw or huggingface_raw or reddit_raw)
+    has_evidence = bool(github_raw or huggingface_raw or reddit_raw or web_raw)
     if not has_evidence:
         return []
 
@@ -197,6 +210,7 @@ def get_evidence_store() -> list[IntelligenceEvidence]:
         ecosystem=github_raw.get("ecosystem"),
         huggingface=huggingface_raw,
         reddit=reddit_raw,
+        web=web_raw,
     )
     return [evidence]
 

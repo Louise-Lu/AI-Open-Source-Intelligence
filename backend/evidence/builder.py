@@ -9,6 +9,7 @@ from .models import (
     GitHubEvidence,
     RedditEvidence,
     HuggingFaceEvidence,
+    WebEvidence,
     RepositoryInfo,
     ReleaseInfo,
     IssueInfo,
@@ -50,29 +51,63 @@ class EvidenceBuilder:
 
         huggingface: dict[str, Any] | None = None,
         reddit: dict[str, Any] | list[str] | None = None,   # 保留 reddit
+        web: list[dict[str, Any]] | None = None,
 
     ) -> IntelligenceEvidence:
 
-        github = GitHubEvidence(
-            repository=self._build_repository(repository),
-            readme=readme,
-            releases=self._build_releases(releases),
-            issues=self._build_issues(issues),
-            pull_requests=self._build_pull_requests(pull_requests),
+        github = None
+        if any([repository, readme, releases, issues, pull_requests, commit_activity, planning, discussions, ecosystem]):
+            github = GitHubEvidence(
+                repository=self._build_repository(repository),
+                readme=readme,
+                releases=self._build_releases(releases),
+                issues=self._build_issues(issues),
+                pull_requests=self._build_pull_requests(pull_requests),
 
-            commit_activity=self._build_commit_activity(commit_activity),
-            planning=self._build_planning(planning),
-            discussions=self._build_discussions(discussions),
-            ecosystem=self._build_ecosystem(ecosystem),
-        )
+                commit_activity=self._build_commit_activity(commit_activity),
+                planning=self._build_planning(planning),
+                discussions=self._build_discussions(discussions),
+                ecosystem=self._build_ecosystem(ecosystem),
+            )
         huggingface_evidence = self._build_huggingface_evidence(huggingface)
         reddit_evidence = self._build_reddit(reddit)
+        web_evidence = self._build_web(web)
 
         return IntelligenceEvidence(
             github=github,
             huggingface=huggingface_evidence,
             reddit=reddit_evidence,
+            web=web_evidence,
         )
+
+    def _build_web(self, pages: list[dict[str, Any]] | None) -> WebEvidence | None:
+        """构建 Web / 官方文档证据。"""
+        if not pages:
+            return None
+
+        normalized = []
+        for page in pages:
+            evidence = page.get("evidence", page) if isinstance(page, dict) else {}
+            if not isinstance(evidence, dict):
+                continue
+            url = str(evidence.get("url") or page.get("url") or "")
+            content = str(evidence.get("content") or page.get("content") or "")
+            summary = str(page.get("summary") or "")
+            evidence_type = str(page.get("type") or page.get("evidence_type") or "webpage")
+            if url or content:
+                normalized.append(
+                    {
+                        "url": url,
+                        "content": content,
+                        "summary": summary,
+                        "type": evidence_type,
+                    }
+                )
+
+        if not normalized:
+            return None
+
+        return WebEvidence(pages=normalized)
 
     def _build_huggingface_evidence(
         self,

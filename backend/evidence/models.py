@@ -144,6 +144,14 @@ class HuggingFaceEvidence(BaseModel):
     last_modified: str | None = None
 
 
+class WebEvidence(BaseModel):
+    """
+    Web / 官方文档证据。
+    """
+
+    pages: list[dict[str, str]] = Field(default_factory=list)
+
+
 
 # =========================
 # Unified Evidence
@@ -164,3 +172,6 @@ class IntelligenceEvidence(BaseModel):
 
 
     huggingface: HuggingFaceEvidence | None = None
+
+
+    web: WebEvidence | None = None
