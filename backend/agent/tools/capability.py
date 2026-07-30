@@ -7,14 +7,12 @@ from langchain_core.tools import tool
 
 from agent.tools._shared import github, huggingface, with_policy_logging, record, capability_result
 from agent.tools._raw import (
-    search_twitter_raw,
-    search_reddit_raw,
     read_reddit_post_raw,
     read_webpage_raw,
+    read_bilibili_video_raw,
     youtube_transcript_raw,
     read_rss_raw,
     transcribe_podcast_raw,
-    search_v2ex_raw,
 )
 
 
@@ -160,25 +158,27 @@ def community_reader(identifier: str, platform: str = "community") -> dict[str, 
     evidence_type = "community_discussion"
 
     if identifier.startswith("twitter:"):
-        query = identifier.removeprefix("twitter:")
+        # Twitter 没有"读特定推文"的能力，搜索结果已在 community_search 中返回
+        # 直接从 discovery 的 reason 字段获取，无需重复搜索
+        content = "Twitter 搜索结果已在 community_search 阶段返回，请使用 discovery 结果中的内容。"
         platform = "twitter"
-        content = search_twitter_raw(query, limit=5)
-        summary = f"读取 Twitter/X 搜索结果: {query}"
+        summary = f"Twitter 无需单独读取: {identifier}"
     elif identifier.startswith("reddit:"):
         post_id = identifier.removeprefix("reddit:")
         platform = "reddit"
         content = read_reddit_post_raw(post_id, limit=10)
-        summary = f"读取 Reddit 帖子及评论: {post_id}"
+        summary = f"读取 Reddit 帖子: {post_id}"
     elif identifier.startswith("bilibili:"):
         value = identifier.removeprefix("bilibili:")
         platform = "bilibili"
-        url = value if value.startswith("http") else f"https://www.bilibili.com/video/{value}"
-        content = read_webpage_raw(url)
-        summary = f"读取 B站资源: {value}"
+        # 从 identifier 提取 bvid，走 B站 API 而非 Jina Reader
+        bvid = value.replace("https://www.bilibili.com/video/", "")
+        content = read_bilibili_video_raw(bvid)
+        summary = f"读取 B站视频信息及评论: {bvid}"
     elif identifier.startswith("v2ex:"):
         value = identifier.removeprefix("v2ex:")
         platform = "v2ex"
-        content = read_webpage_raw(value) if value.startswith("http") else json.dumps(search_v2ex_raw(value), ensure_ascii=False)
+        content = read_webpage_raw(value) if value.startswith("http") else "V2EX 搜索已停用"
         summary = f"读取 V2EX 资源: {value}"
     else:
         content = f"暂不支持的社区资源 identifier: {identifier}"
@@ -200,7 +200,7 @@ def community_reader(identifier: str, platform: str = "community") -> dict[str, 
 @tool
 @with_policy_logging("webpage_reader")
 def webpage_reader(url: str) -> dict[str, Any]:
-    """读取网页正文。"""
+    """读取网页正文。并文本清理噪声"""
     url = url.strip().strip("`")
     content = read_webpage_raw(url)
     result = capability_result(

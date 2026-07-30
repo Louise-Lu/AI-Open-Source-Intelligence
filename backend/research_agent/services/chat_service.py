@@ -201,7 +201,7 @@ class ChatService:
             # 初始化 policy_state
             start_research_policy(plan)
             
-            # 构建 prompt + policy_hint
+            # 构建 prompt（含静态 policy）
             agent_prompt = build_intelligence_agent_prompt(plan, resolved_entities)
             recursion_limit = _recursion_limit_for_plan(plan, self.min_recursion_limit)
             print(f"[聊天服务] Agent recursion_limit={recursion_limit}")
@@ -486,7 +486,7 @@ def _format_observation_for_ui(content: Any) -> str:
 
     Tool 返回给 LLM 的 observation 现在包含：
     - result: 工具原始结果
-    - policy_hint: 最新 Research Policy
+    - policy_hint: 动态研究进度（Research Progress）
 
     前端只展示 observation 字段，所以这里提前整理成更容易读的文本。
     """

@@ -180,30 +180,21 @@ def clear_research_policy() -> None:
 
 
 # ─────────────────────────────────────────────────────────
-# policy_hint — 给 LLM 看的自然语言提示
+# policy_hint — 给 LLM 看的自然语言提示（静态策略 + 动态进度）
 # ─────────────────────────────────────────────────────────
 
-def build_policy_hint() -> str:
-    """生成给 LLM 看的 Current Research Policy 提示。"""
+def build_static_policy_hint() -> str:
+    """生成静态 Research Policy 提示（研究期间不变，注入 system prompt 一次）。"""
     state = _policy_state.get() or {}
 
     policy: dict[str, Any] = state.get("policy", DEFAULT_POLICY)
     objective = str(state.get("objective", "unknown"))
-    discovery_counts: dict[str, int] = state.get("discovery_counts", {}) or {}
-    evidence_sources: list[str] = state.get("evidence_sources", []) or []
-    evidence_items: int = int(state.get("evidence_items", 0))
-    tool_calls = int(state.get("tool_calls", 0))
     max_total_tool_calls = int(policy.get("max_total_tool_calls", 8))
     required_evidence = policy.get("required_evidence", []) or []
     min_evidence_items = int(policy.get("min_evidence_items", 2))
     max_evidence_items = int(policy.get("max_evidence_items", 10))
     stop_conditions = policy.get("stop_conditions", {}) or {}
     min_sources = int(stop_conditions.get("min_sources", 1))
-    status = (
-        "Ready to Finish - stop calling tools and write final answer"
-        if state and _is_ready_to_finish(state)
-        else "Continue Research"
-    )
 
     preferred_sources_text = "\n".join(
         f"  - {_label(s)}" for s in policy.get("preferred_sources", [])
@@ -219,26 +210,52 @@ def build_policy_hint() -> str:
         f"  Max Reader Per Source: {policy.get('max_reader_per_source', 2)}\n"
         f"  Max Tool Calls: {max_total_tool_calls}"
     )
-    collected = (
-        f"Sources: {', '.join(_label(s) for s in sorted(set(evidence_sources))) or 'None'}\n"
-        f"  Evidence Items: {evidence_items}\n"
-        f"  Tool Calls: {tool_calls}/{max_total_tool_calls}"
-    )
     stop_condition_text = (
         f"  Min Sources: {min_sources}\n"
         f"  Min Evidence Items: {min_evidence_items}"
     )
 
     return (
-        "Current Research Policy\n\n"
+        "Research Policy (Static)\n\n"
         f"Objective: {objective}\n\n"
         f"Preferred Sources:\n{preferred_sources_text}\n\n"
         f"Evidence Needed:\n  {evidence_needed}\n\n"
         f"Budget:\n  {budget}\n\n"
+        f"Stop Conditions:\n{stop_condition_text}"
+    )
+
+
+def build_dynamic_progress() -> str:
+    """生成动态研究进度（每次 tool 调用后变化，注入 observation）。"""
+    state = _policy_state.get() or {}
+
+    policy: dict[str, Any] = state.get("policy", DEFAULT_POLICY)
+    evidence_sources: list[str] = state.get("evidence_sources", []) or []
+    evidence_items: int = int(state.get("evidence_items", 0))
+    tool_calls = int(state.get("tool_calls", 0))
+    max_total_tool_calls = int(policy.get("max_total_tool_calls", 8))
+    status = (
+        "Ready to Finish - stop calling tools and write final answer"
+        if state and _is_ready_to_finish(state)
+        else "Continue Research"
+    )
+
+    collected = (
+        f"Sources: {', '.join(_label(s) for s in sorted(set(evidence_sources))) or 'None'}\n"
+        f"  Evidence Items: {evidence_items}\n"
+        f"  Tool Calls: {tool_calls}/{max_total_tool_calls}"
+    )
+
+    return (
+        "Research Progress\n\n"
         f"Collected Evidence:\n  {collected}\n\n"
-        f"Stop Conditions:\n{stop_condition_text}\n\n"
         f"Status: {status}"
     )
+
+
+def build_policy_hint() -> str:
+    """生成完整 Policy 提示（静态 + 动态），用于控制台日志。"""
+    return build_static_policy_hint() + "\n\n" + build_dynamic_progress()
 
 
 # ─────────────────────────────────────────────────────────

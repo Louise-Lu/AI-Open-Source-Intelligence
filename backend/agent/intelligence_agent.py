@@ -9,7 +9,7 @@ from typing import Any
 
 from langgraph.prebuilt import create_react_agent
 
-from agent.research_policy import build_policy_hint
+from agent.research_policy import build_static_policy_hint
 from agent.tools import TOOLS
 from llms.deepseek import deepseek_model
 
@@ -32,26 +32,28 @@ Known Entities
 {resolved_entities}
 
 ========================
-Current Research Policy
+Research Policy
 ========================
 
-{policy_hint}
+{static_policy}
 
-Current Research Policy 会实时告诉你：
+以上是本次研究的固定策略，在研究过程中不会变化。
 
-- 推荐的数据源顺序
-- 当前已经探索的数据源
-- 已获得的证据来源
-- 是否建议停止继续搜索
+每次工具调用的 observation 中会附带 Research Progress，包含：
 
-请根据 Current Research Policy 决定下一步工具调用。
+- 当前已探索的数据源
+- 已获得的证据来源和数量
+- 工具调用进度
+- Status（Continue Research 或 Ready to Finish）
+
+请根据 Research Policy 和 Research Progress 决定下一步工具调用。
 
 【重要】每一轮只能调用 1 个工具。绝对不要在同一轮发起多个 tool calls。
 
 每一轮你应该根据当前已收集的证据，判断还缺什么信息，然后在 source_scope 范围内选择最合适的工具。
 例如：已经拿到 GitHub 基本信息后，可以跳去 web_search 补充社区讨论。
 
-如果 Current Research Policy 的 Status 是 Ready to Finish，必须停止继续调用工具，直接输出最终结论。
+如果 observation 中 Research Progress 的 Status 是 Ready to Finish，必须停止继续调用工具，直接输出最终结论。
 如果工具返回 tool_policy_block，说明该工具或来源已达到上限。请根据 suggestion 切换到其他来源或工具，不要反复尝试被 block 的工具。
 只有当所有来源都已用完或 Status 为 Ready to Finish 时，才停止搜索并输出结论。
 
@@ -138,7 +140,7 @@ Research Principles
 
 2.
 
-优先根据 Current Research Policy 推荐的数据源开展研究。
+优先根据 Research Policy 推荐的数据源开展研究。
 
 如果当前数据源证据不足，可以主动切换其他来源。
 
@@ -214,7 +216,7 @@ def build_intelligence_agent_prompt(
     prompt = INTELLIGENCE_AGENT_PROMPT.format(
         execution_plan=json.dumps(plan_dict, ensure_ascii=False, indent=2),
         resolved_entities=json.dumps(entity_dict, ensure_ascii=False, indent=2),
-        policy_hint=build_policy_hint(),
+        static_policy=build_static_policy_hint(),
     )
     return prompt
 
@@ -225,6 +227,6 @@ intelligence_agent = create_react_agent(
     prompt=INTELLIGENCE_AGENT_PROMPT.format(
         execution_plan="{}",
         resolved_entities="[]",
-        policy_hint=build_policy_hint(),
+        static_policy=build_static_policy_hint(),
     ),
 )

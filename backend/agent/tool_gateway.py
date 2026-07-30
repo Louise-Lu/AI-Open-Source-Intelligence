@@ -5,7 +5,7 @@ from functools import wraps
 from inspect import signature
 from typing import Any, Callable
 
-from agent.research_policy import after_tool_call, before_tool_call, build_policy_hint
+from agent.research_policy import after_tool_call, before_tool_call, build_policy_hint, build_dynamic_progress
 from agent.trace import add_trace
 
 
@@ -33,7 +33,7 @@ class ToolGateway:
 
         return {
             "result": tool_output,
-            "policy_hint": build_policy_hint(),
+            "policy_hint": build_dynamic_progress(),
         }
 
     def error(self, tool_name: str, tool_input: dict[str, Any], exc: Exception) -> dict[str, Any]:

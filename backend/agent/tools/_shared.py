@@ -118,7 +118,7 @@ def record(
     update_policy: bool = True,
     blocked: bool = False,
 ):
-    """tool 调用之后：更新 policy_state、更新 trace、返回带 policy_hint 的 observation。"""
+    """tool 调用之后：更新 policy_state、更新 trace、返回带动态进度的 observation。"""
     return tool_gateway.record(
         tool_name,
         tool_input,

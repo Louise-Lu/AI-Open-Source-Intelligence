@@ -1,15 +1,21 @@
 # 原始数据源调用：Twitter/Reddit/Bilibili/V2EX/Web/YouTube/RSS/播客
 
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import requests
 
 from agent.tools._shared import (
     agent_reach_env,
+    github,
+    huggingface,
     load_agent_reach_config,
     run_agent_reach_cmd,
     truncate_text,
@@ -17,27 +23,110 @@ from agent.tools._shared import (
     _PODCAST_SCRIPT,
 )
 
+
+# ── GitHub ──
+
+def search_github_raw(query: str) -> list[dict[str, Any]]:
+    """调用 GitHub Search API，返回原始 item 列表（按 stars 排序，最多 10 个）。"""
+    response = github.client.get(
+        "/search/repositories",
+        params={"q": query, "sort": "stars", "order": "desc", "per_page": 10},
+    )
+    return response.json().get("items", []) or []
+
+
+# ── HuggingFace ──
+
+def search_huggingface_raw(query: str) -> list[dict[str, Any]]:
+    """调用 HuggingFace Models API，返回原始 model 列表（按 downloads 排序，最多 5 个）。"""
+    response = huggingface.session.get(
+        f"{huggingface.BASE_URL}/api/models",
+        params={"search": query, "limit": 5, "sort": "downloads", "direction": -1},
+        timeout=20,
+    )
+    response.raise_for_status()
+    return response.json() or []
+
+
 # ── Twitter/X ──
+# twitter-cli 当前不可用（HTTP 404），暂用 Tavily site:x.com 兜底。
+# 待 twitter-cli 修复后可恢复两级 fallback 策略。
+
+_twitter_search_cache: dict[str, str] = {}
+
 
 def search_twitter_raw(query: str, limit: int = 10) -> str:
-    """调用 twitter-cli 搜索 Twitter/X。"""
-    cfg = load_agent_reach_config()  # 读取 ~/.agent-reach/config.yaml
+    """搜索 Twitter/X：通过 Tavily 搜索 site:x.com 获取推文内容。"""
+    cache_key = f"{query}:{limit}"
+    if cache_key in _twitter_search_cache:
+        return _twitter_search_cache[cache_key]
 
-    # 读取 Twitter 凭据并设置环境变量
-    env = {}
-    if cfg.get("twitter_auth_token"):
-        env["TWITTER_AUTH_TOKEN"] = cfg["twitter_auth_token"]
-    if cfg.get("twitter_ct0"):
-        env["TWITTER_CT0"] = cfg["twitter_ct0"]
+    result = _search_twitter_via_web(query, limit)
+    if not result:
+        result = "搜索失败: Twitter/X web 搜索无结果（Tavily 未配置或无匹配）"
+    _twitter_search_cache[cache_key] = result
+    return result
 
-    ok, stdout, stderr = run_agent_reach_cmd(
-        ["twitter", "search", query, "-n", str(limit), "--json"],
-        timeout=12,
-        env=env,
-    )
-    if ok or stdout.strip():
-        return truncate_text(stdout, 8000)
-    return f"搜索失败: {stderr}"
+def _search_twitter_via_web(query: str, limit: int) -> str:
+    """通过 Tavily 搜索 site:x.com 获取 Twitter 讨论内容。"""
+    tavily_key = os.environ.get("TAVILY_API_KEY", "")
+    if not tavily_key:
+        print("[twitter] TAVILY_API_KEY 未配置，无法搜索 Twitter")
+        return ""
+
+    try:
+        search_query = f"site:x.com {query}"
+        resp = requests.post(
+            "https://api.tavily.com/search",
+            json={
+                "api_key": tavily_key,
+                "query": search_query,
+                "max_results": limit,
+                "include_answer": False,
+                "search_depth": "basic",
+            },
+            timeout=12,
+        )
+        if resp.status_code != 200:
+            print(f"[twitter] Tavily HTTP {resp.status_code}")
+            return ""
+
+        results = resp.json().get("results", [])
+        if not results:
+            return ""
+
+        parts = [f"Twitter/X 搜索结果: {query}", f"来源: Tavily site:x.com, 共 {len(results)} 条", ""]
+        for r in results:
+            title = r.get("title", "")
+            url = r.get("url", "")
+            content = r.get("content", "")
+            parts.append(f"标题: {title}")
+            parts.append(f"链接: {url}")
+            if content:
+                parts.append(f"摘要: {truncate_text(content, 500)}")
+            parts.append("")
+
+        return truncate_text("\n".join(parts), 8000)
+    except Exception as exc:
+        print(f"[twitter] web 搜索异常: {exc}")
+        return ""
+
+
+# ── twitter-cli（已停用，待修复后恢复） ──
+# def _search_twitter_via_cli(query: str, limit: int) -> str:
+#     cfg = load_agent_reach_config()
+#     env = {}
+#     if cfg.get("twitter_auth_token"):
+#         env["TWITTER_AUTH_TOKEN"] = cfg["twitter_auth_token"]
+#     if cfg.get("twitter_ct0"):
+#         env["TWITTER_CT0"] = cfg["twitter_ct0"]
+#     ok, stdout, stderr = run_agent_reach_cmd(
+#         ["twitter", "search", query, "-n", str(limit), "--json"],
+#         timeout=12, env=env,
+#     )
+#     if ok or stdout.strip():
+#         return truncate_text(stdout, 8000)
+#     return f"搜索失败: {stderr}"
 
 
 # ── Reddit ──
@@ -48,7 +137,7 @@ def search_reddit_raw(query: str, limit: int = 10) -> str:
     for search_query in _reddit_query_candidates(query)[:3]:
         ok, stdout, stderr = run_agent_reach_cmd(
             ["opencli", "reddit", "search", search_query, "-f", "yaml"],
-            timeout=25,
+            timeout=15,
         )
         # opencli 成功但无结果（Reddit 对中文关键词支持弱）→ 继续尝试英文候选词
         if ok:
@@ -66,48 +155,25 @@ def search_reddit_raw(query: str, limit: int = 10) -> str:
 
 
 def _reddit_query_candidates(query: str) -> list[str]:
-    """Reddit 搜索候选词：primary term 优先（精准、召回率高），长查询兜底。
-
-    Reddit 搜索对多词查询做 OR 匹配，"CrewAI review sentiment 2024 2025"
-    会命中所有含 review/2025 的帖子（电影评论等），全部被过滤器丢弃。
-    所以把最精准的 primary term 放第一位，命中即返回，不浪费时间。
-    """
+    """Reddit 搜索候选词：primary term 优先，原始查询兜底。"""
     primary = _primary_reddit_term(query)
     candidates: list[str] = []
-
-    # 1. primary term 最精准，优先尝试
     if primary:
         candidates.append(primary)
-
-    # 2. 原始查询作为兜底（用户可能输入了特殊修饰词）
     original = query.strip()
-    if original:
+    if original and original != primary:
         candidates.append(original)
-
-    # 3. ascii 拼接词（去掉年份等非字母 token）
-    ascii_terms = re.findall(r"[A-Za-z][A-Za-z0-9_.-]*", query)
-    if ascii_terms:
-        ascii_query = " ".join(ascii_terms)
-        candidates.append(ascii_query)
-
-    # 4. primary + 上下文词扩展
-    if primary and len(ascii_terms) > 1:
-        candidates.extend(
-            [
-                f"{primary} AI",
-                f"{primary} agent",
-                f"{primary} review",
-            ]
-        )
-
-    return list(dict.fromkeys(item for item in candidates if item))
+    return candidates
 
 
 def _filter_reddit_yaml_output(output: str, query: str, limit: int) -> str:
-    """过滤 Reddit 搜索结果：只硬匹配核心实体词，避免把 sentiment/year 当成必需词。"""
+    """过滤 Reddit 搜索结果：只保留核心实体词匹配的帖子。"""
     primary = _primary_reddit_term(query)
     if not primary:
         return output
+
+    ambiguous = len(primary) <= 4 or primary in {"coze"}
+    ai_keywords = {"ai", "agent", "agents", "chatbot", "bot", "llm", "workflow", "api"}
 
     blocks = re.split(r"\n(?=- id: )", output.strip())
     matched_blocks: list[str] = []
@@ -118,10 +184,10 @@ def _filter_reddit_yaml_output(output: str, query: str, limit: int) -> str:
         haystack = f"{title} {subreddit} {selftext}".lower()
         if not re.search(rf"\b{re.escape(primary)}\b", haystack):
             continue
-        # Coze 这类短词容易误命中 cozy/狐狸/家居图片帖，需要 AI 上下文；CrewAI 这类专有词不强制。
-        if _is_ambiguous_reddit_term(primary) and not _has_reddit_ai_context(haystack):
+        if ambiguous and not any(kw in haystack for kw in ai_keywords):
             continue
-        if _looks_like_image_only_reddit_post(block) and _is_ambiguous_reddit_term(primary):
+        post_hint = _extract_yaml_scalar(block, "post_hint").lower()
+        if ambiguous and post_hint == "image" and not selftext.strip():
             continue
         matched_blocks.append(block.strip())
 
@@ -160,26 +226,71 @@ def parse_reddit_posts(yaml_output: str) -> list[dict[str, Any]]:
 
 
 def read_reddit_post_raw(post_id: str, limit: int = 10) -> str:
-    """通过 opencli reddit read 读取单个 Reddit 帖子及其评论。"""
-    # 支持传入完整 URL 或纯 post-id
+    """读取 Reddit 帖子：先走 RSS 快速通道（~1.5s），内容不足再走 opencli（~6s）。"""
     clean_id = post_id.strip().strip("`")
     if clean_id.startswith("http"):
-        # 从 URL 提取 post-id: https://www.reddit.com/r/xxx/comments/1txlb3n/...
         match = re.search(r"/comments/([a-z0-9]+)", clean_id)
         if match:
             clean_id = match.group(1)
         else:
             clean_id = clean_id.rstrip("/").split("/")[-1]
 
+    # 快速通道：RSS（帖子正文，无评论）
+    rss_content = _read_reddit_rss(clean_id)
+    if rss_content and len(rss_content) >= 200:
+        return rss_content
+
+    # 兜底：opencli（帖子 + 完整评论树）
     ok, stdout, stderr = run_agent_reach_cmd(
         ["opencli", "reddit", "read", clean_id, "-f", "yaml", "--limit", str(limit), "--depth", "2"],
-        timeout=25,
+        timeout=15,
     )
     if ok and stdout.strip():
         return truncate_text(stdout, 8000)
     if "tool-not-found" in (stderr or ""):
         return "读取失败: opencli 未安装"
+    # 两个通道都失败时，优先返回 RSS 的部分内容而非 opencli 错误
+    if rss_content:
+        return rss_content
     return f"读取失败: {stderr or '未知错误'}"
+
+
+def _read_reddit_rss(post_id: str) -> str:
+    """通过 Reddit RSS 快速读取帖子正文（内部函数）。"""
+    try:
+        resp = requests.get(
+            f"https://www.reddit.com/comments/{post_id}/.rss",
+            headers={"User-Agent": "agent-reach/1.0 (research bot)"},
+            timeout=8,
+        )
+        if resp.status_code != 200:
+            return ""
+
+        import xml.etree.ElementTree as ET
+        root = ET.fromstring(resp.text)
+        ns = {"atom": "http://www.w3.org/2005/Atom"}
+
+        entries = root.findall("atom:entry", ns)
+        if not entries:
+            return ""
+
+        parts = []
+        for entry in entries[:5]:
+            title = entry.findtext("atom:title", "", ns)
+            content = entry.findtext("atom:content", "", ns)
+            author = entry.findtext("atom:author/atom:name", "", ns)
+            content = re.sub(r"<[^>]+>", "", content).strip()
+            if title:
+                parts.append(f"标题: {title}")
+            if author:
+                parts.append(f"作者: {author}")
+            if content:
+                parts.append(truncate_text(content, 2000))
+            parts.append("")
+
+        return "\n".join(parts).strip()
+    except Exception:
+        return ""
 
 
 def _primary_reddit_term(query: str) -> str:
@@ -215,18 +326,6 @@ def _primary_reddit_term(query: str) -> str:
     return ""
 
 
-def _is_ambiguous_reddit_term(term: str) -> bool:
-    """短词更容易误召回普通词或图片帖。"""
-    return len(term) <= 4 or term in {"coze"}
-
-
-def _looks_like_image_only_reddit_post(block: str) -> bool:
-    """识别 Reddit 图片帖，避免作为产品社区讨论证据。"""
-    post_hint = _extract_yaml_scalar(block, "post_hint").lower()
-    selftext = _extract_yaml_scalar(block, "selftext").strip()
-    return post_hint == "image" and not selftext
-
-
 def _extract_yaml_scalar(block: str, key: str) -> str:
     """从 opencli 的 YAML 文本中提取简单标量字段，支持 block scalar (>- / > / |- / |)。"""
     match = re.search(rf"^\s*{re.escape(key)}:\s*(.*)$", block, re.MULTILINE)
@@ -254,42 +353,12 @@ def _extract_yaml_scalar(block: str, key: str) -> str:
     return value.strip(" '\"")
 
 
-def _has_reddit_ai_context(text: str) -> bool:
-    """避免短词命中狐狸/家居/图片帖，只保留 AI 产品相关讨论。"""
-    context_terms = {
-        "ai",
-        "agent",
-        "agents",
-        "chatbot",
-        "bot",
-        "llm",
-        "workflow",
-        "automation",
-        "bytedance",
-        "coze.com",
-        "no-code",
-        "nocode",
-        "review",
-        "tool",
-        "api",
-    }
-    return any(term in text for term in context_terms)
-
-
 # ── Bilibili ──
 
 def search_bilibili_raw(query: str, limit: int = 5) -> list[dict[str, Any]]:
-    """搜索 B站视频；bili-cli 不可用时用公开 API 兜底。"""
-    ok, stdout, _ = run_agent_reach_cmd(
-        ["bili", "search", query, "--type", "video", "-n", str(limit)],
-        timeout=8,
-    )
-    if ok and stdout.strip():
-        return [{"title": line, "raw": line} for line in stdout.splitlines()[:limit]]
-
+    """通过 B站公开搜索 API 搜索视频。"""
     ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
     try:
-        requests.get("https://www.bilibili.com/", headers={"User-Agent": ua}, timeout=5)
         response = requests.get(
             "https://api.bilibili.com/x/web-interface/search/all/v2",
             params={"keyword": query, "page": 1},
@@ -317,42 +386,143 @@ def search_bilibili_raw(query: str, limit: int = 5) -> list[dict[str, Any]]:
             )
     return results[:limit]
 
+def read_bilibili_video_raw(bvid: str) -> str:
+    """通过 B站公开 API 获取视频信息 + 热门评论，替代 Jina Reader 抓整页。"""
+    ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    headers = {"User-Agent": ua, "Referer": "https://www.bilibili.com/"}
 
-# ── V2EX ──
-
-def search_v2ex_raw(query: str, limit: int = 10) -> list[dict[str, Any]]:
-    """获取 V2EX 热门主题；V2EX 搜索 API 已不可用，所以按标题做本地过滤。"""
+    # 1) 视频元信息（拿到 aid 用于评论接口）
     try:
-        response = requests.get(
-            "https://www.v2ex.com/api/topics/hot.json",
-            headers={"User-Agent": "agent-reach/1.0"},
-            timeout=6,
+        info_resp = requests.get(
+            "https://api.bilibili.com/x/web-interface/view",
+            params={"bvid": bvid},
+            headers=headers,
+            timeout=5,
         )
-        payload = response.json()
+        info = info_resp.json().get("data", {})
     except Exception as exc:
-        return [{"title": "V2EX 获取失败", "error": str(exc)}]
+        return f"B站视频信息获取失败: {exc}"
 
-    items = [
-        item
-        for item in payload or []
-        if query.lower() in (item.get("title") or "").lower()
-    ]
-    if not items:
-        return []
+    title = info.get("title", "未知标题")
+    desc = info.get("desc", "")
+    owner = info.get("owner", {}).get("name", "未知UP主")
+    view = info.get("stat", {}).get("view", 0)
+    reply_count = info.get("stat", {}).get("reply", 0)
+    aid = info.get("aid")
 
-    return [
-        {
-            "title": item.get("title"),
-            "url": item.get("url"),
-            "replies": item.get("replies"),
-            "node": item.get("node", {}).get("title"),
-            "member": item.get("member", {}).get("username"),
-        }
-        for item in items[:limit]
+    parts = [
+        f"标题: {title}",
+        f"UP主: {owner}",
+        f"播放: {view} | 评论数: {reply_count}",
     ]
+    if desc:
+        parts.append(f"简介: {desc}")
+
+    # 2) 热门评论（需要 aid）
+    if aid:
+        try:
+            cmt_resp = requests.get(
+                "https://api.bilibili.com/x/v2/reply",
+                params={"type": 1, "oid": aid, "sort": 1, "ps": 10},
+                headers=headers,
+                timeout=5,
+            )
+            replies = cmt_resp.json().get("data", {}).get("replies") or []
+            if replies:
+                parts.append("\n── 热门评论 ──")
+                for r in replies[:10]:
+                    name = r.get("member", {}).get("uname", "")
+                    msg = r.get("content", {}).get("message", "")
+                    likes = r.get("like", 0)
+                    parts.append(f"[{name}] (👍{likes}): {msg}")
+            else:
+                parts.append("\n暂无评论")
+        except Exception:
+            parts.append("\n评论获取失败")
+
+    return "\n".join(parts)
+
+
+# ── V2EX（已停用，搜索 API 不可用，热门列表过滤命中率极低） ──
+# def search_v2ex_raw(query: str, limit: int = 10) -> list[dict[str, Any]]:
+#     try:
+#         response = requests.get(
+#             "https://www.v2ex.com/api/topics/hot.json",
+#             headers={"User-Agent": "agent-reach/1.0"},
+#             timeout=6,
+#         )
+#         payload = response.json()
+#     except Exception as exc:
+#         return [{"title": "V2EX 获取失败", "error": str(exc)}]
+#     items = [item for item in payload or [] if query.lower() in (item.get("title") or "").lower()]
+#     if not items:
+#         return []
+#     return [{"title": item.get("title"), "url": item.get("url"), "replies": item.get("replies"),
+#              "node": item.get("node", {}).get("title"), "member": item.get("member", {}).get("username")}
+#             for item in items[:limit]]
 
 
 # ── Web ──
+def search_web_raw(query: str, mode: str = "standard") -> list[str]:
+    """混合 Web 搜索：根据 mode 选择搜索引擎，自动 fallback，
+    返回 URL 列表。
+
+    策略：
+    - deep 模式：优先 Exa（语义搜索），fallback Tavily
+    - quick/standard 模式：优先 Tavily（速度快），fallback Exa
+    """
+    exa_key = os.environ.get("EXA_API_KEY", "")
+    tavily_key = os.environ.get("TAVILY_API_KEY", "")
+
+    if mode == "deep":
+        providers = [("exa", exa_key), ("tavily", tavily_key)]
+    else:
+        providers = [("tavily", tavily_key), ("exa", exa_key)]
+
+    for name, api_key in providers:
+        if not api_key:
+            continue
+        try:
+            urls: list[str] = []
+            if name == "tavily":
+                resp = requests.post(
+                    "https://api.tavily.com/search",
+                    json={
+                        "api_key": api_key,
+                        "query": query,
+                        "max_results": 3,
+                        "include_answer": False,
+                        "search_depth": "basic",
+                    },
+                    timeout=12,
+                )
+                if resp.status_code == 200:
+                    urls = [r["url"] for r in resp.json().get("results", []) if r.get("url")]
+                else:
+                    print(f"[web_search] Tavily HTTP {resp.status_code}")
+            elif name == "exa":
+                resp = requests.post(
+                    "https://api.exa.ai/search",
+                    json={"query": query, "numResults": 3, "type": "auto"},
+                    headers={"x-api-key": api_key, "Content-Type": "application/json"},
+                    timeout=15,
+                )
+                if resp.status_code == 200:
+                    urls = [r["url"] for r in resp.json().get("results", []) if r.get("url")]
+                else:
+                    print(f"[web_search] Exa HTTP {resp.status_code}")
+
+            if urls:
+                print(f"[web_search] 使用 {name} 搜索成功: query={query}, 找到 {len(urls)} 个 URL")
+                return urls
+            print(f"[web_search] {name} 返回空结果，尝试下一个: query={query}")
+        except Exception as e:
+            print(f"[web_search] {name} 搜索异常: {e}")
+            continue
+
+    print(f"[web_search] 所有搜索引擎均失败或无 key: query={query}")
+    return []
+
 
 def read_webpage_raw(url: str) -> str:
     """通过 Jina Reader 读取网页正文。"""
@@ -362,7 +532,6 @@ def read_webpage_raw(url: str) -> str:
         return truncate_text(_clean_jina_reader_text(response.text), 8000)
     except Exception as exc:
         return f"读取失败: {exc}"
-
 
 def _clean_jina_reader_text(text: str) -> str:
     """清理 Jina Reader 仍可能保留的图片、导航和无意义链接噪声。"""
@@ -376,16 +545,6 @@ def _clean_jina_reader_text(text: str) -> str:
     value = re.sub(r"\n{3,}", "\n\n", value)
     return value.strip()
 
-
-def search_web_raw(query: str) -> str:
-    """通过 mcporter + Exa 搜索 Web。"""
-    ok, stdout, stderr = run_agent_reach_cmd(
-        ["mcporter", "call", f'exa.web_search_exa(query: "{query}", numResults: 3)'],
-        timeout=12,
-    )
-    if ok:
-        return truncate_text(stdout, 8000)
-    return f"搜索失败: {stderr}"
 
 
 # ── YouTube ──
@@ -429,30 +588,40 @@ def youtube_transcript_raw(video_url: str) -> str:
 
 
 def search_youtube_raw(query: str, limit: int = 5) -> list[dict[str, Any]]:
-    """用 yt-dlp 搜索 YouTube 视频。"""
-    ok, stdout, stderr = run_agent_reach_cmd(
-        ["yt-dlp", "--dump-json", f"ytsearch{limit}:{query}"],
-        timeout=60,
-    )
-    if not ok:
-        return [{"title": "YouTube 搜索失败", "error": stderr}]
+    """搜索 YouTube 视频：走 Tavily site:youtube.com（~2s），yt-dlp 太慢已停用。"""
+    tavily_key = os.environ.get("TAVILY_API_KEY", "")
+    if not tavily_key:
+        return [{"title": "YouTube 搜索失败", "error": "TAVILY_API_KEY 未配置"}]
 
-    results = []
-    for line in stdout.splitlines():
-        try:
-            item = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        video_id = item.get("id")
-        results.append(
-            {
-                "title": item.get("title"),
-                "url": item.get("webpage_url") or (f"https://www.youtube.com/watch?v={video_id}" if video_id else ""),
-                "duration": item.get("duration"),
-                "uploader": item.get("uploader"),
-            }
+    try:
+        resp = requests.post(
+            "https://api.tavily.com/search",
+            json={
+                "api_key": tavily_key,
+                "query": f"site:youtube.com {query}",
+                "max_results": limit,
+                "include_answer": False,
+                "search_depth": "basic",
+            },
+            timeout=12,
         )
-    return results[:limit]
+        if resp.status_code != 200:
+            return [{"title": "YouTube 搜索失败", "error": f"Tavily HTTP {resp.status_code}"}]
+
+        results = []
+        for r in resp.json().get("results", []):
+            url = r.get("url", "")
+            if "youtube.com" not in url and "youtu.be" not in url:
+                continue
+            results.append({
+                "title": r.get("title", ""),
+                "url": url,
+                "duration": None,
+                "uploader": None,
+            })
+        return results[:limit] if results else [{"title": "YouTube 搜索无结果", "error": f"query={query}"}]
+    except Exception as exc:
+        return [{"title": "YouTube 搜索失败", "error": str(exc)}]
 
 
 # ── RSS ──
