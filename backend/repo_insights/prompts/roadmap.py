@@ -24,7 +24,7 @@ ROADMAP_PROMPT = """
 
 重要规则：
 1. 必须输出纯 JSON，不要包含 markdown 标记
-2. 所有字段都必须存在，无法判断时填 "信息不足" 或空数组 []
+2. 所有字段都必须存在。字符串字段（current_stage、prediction_reasoning）无法判断时填 "信息不足"；数组字段（recent_direction、future_3_months、future_6_12_months、opportunities、risks）无法判断时填 ["信息不足"]，注意必须是数组而非字符串
 3. 字段值均为字符串或字符串数组，不允许出现数字、布尔值等其他类型
 4. 用中文回答
 5. 如果三层证据均不足以支撑具体功能预测，则 future_3_months 可填入基于近期 PR 主题推断的维护方向，

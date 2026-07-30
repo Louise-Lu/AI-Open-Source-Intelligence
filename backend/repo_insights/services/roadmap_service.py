@@ -1,7 +1,7 @@
 from evidence import IntelligenceEvidence
 from llms.deepseek import deepseek_structured_model
-from legacy.prompts.roadmap import ROADMAP_PROMPT
-from legacy.schemas.roadmap import RoadmapReport
+from repo_insights.prompts.roadmap import ROADMAP_PROMPT
+from repo_insights.schemas.roadmap import RoadmapReport
 
 
 class RepositoryRoadmapService:

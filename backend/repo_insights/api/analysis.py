@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 # 1. owner/repo -> entity 
 # 2. 生成 analysis报告
-from legacy.services.entity_adapter import EntityAdapter
-from legacy.services.report_pipeline import ReportPipeline
+from repo_insights.services.entity_adapter import EntityAdapter
+from repo_insights.services.report_pipeline import ReportPipeline
 
 router = APIRouter(tags=["Analysis"])
 adapter = EntityAdapter()

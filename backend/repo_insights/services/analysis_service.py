@@ -1,6 +1,6 @@
 # from evidence import IntelligenceEvidence
 from llms.deepseek import deepseek_model
-from legacy.prompts.analysis import ANALYSIS_PROMPT
+from repo_insights.prompts.analysis import ANALYSIS_PROMPT
 
 
 class RepositoryAnalysisService:

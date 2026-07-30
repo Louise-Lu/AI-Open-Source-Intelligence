@@ -1,6 +1,6 @@
 from llms.deepseek import deepseek_model
-from legacy.prompts.release_diff import RELEASE_DIFF_PROMPT
-from legacy.schemas.release_diff import ReleaseDiffEvidence
+from repo_insights.prompts.release_diff import RELEASE_DIFF_PROMPT
+from repo_insights.schemas.release_diff import ReleaseDiffEvidence
 
 
 class ReleaseDiffService:

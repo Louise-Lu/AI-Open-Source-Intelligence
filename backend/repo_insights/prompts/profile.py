@@ -52,10 +52,10 @@ PROFILE_PROMPT = """
 
 注意：
 
-- 所有字段必须返回
-- 不允许省略字段
-- 如果 Evidence 不足，请填写：
-"信息不足"
+- 所有字段必须返回，不允许省略字段
+- 字符串字段（project_type、summary）证据不足时填 "信息不足"
+- 数组字段（target_users、core_features、technical_stack、strengths、weaknesses）证据不足时填 ["信息不足"]，必须是数组格式
+- enterprise_readiness 必须是对象，不能是字符串
 
 使用中文。
 不要输出 markdown。

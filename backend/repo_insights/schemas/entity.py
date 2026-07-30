@@ -4,7 +4,7 @@ from __future__ import annotations
 
 
 class RepositoryRef:
-    """GitHub 仓库引用 — legacy pipeline 专用。"""
+    """GitHub 仓库引用 — repo_insights 专用。"""
 
     __slots__ = ("name", "aliases")
 

@@ -1,7 +1,7 @@
 from evidence import IntelligenceEvidence
 from llms.deepseek import deepseek_model
-from legacy.prompts.comparison import COMPARISON_PROMPT
-from legacy.schemas.comparison import RepositoryComparisonReport
+from repo_insights.prompts.comparison import COMPARISON_PROMPT
+from repo_insights.schemas.comparison import RepositoryComparisonReport
 
 
 class RepositoryComparisonService:

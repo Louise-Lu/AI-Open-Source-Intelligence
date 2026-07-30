@@ -1,16 +1,20 @@
 from __future__ import annotations
 
+import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from types import SimpleNamespace
 
-from legacy.schemas.entity import RepositoryRef
+from repo_insights.schemas.entity import RepositoryRef
 from evidence.builder import EvidenceBuilder
 from sources.github.client import GitHubAPI
 
-# 简单内存缓存：key = owner/repo, value = (timestamp, evidence)
-_cache: dict[str, tuple[float, object]] = {}
+# Future 缓存：key = owner/repo, value = (timestamp, Future)
+# 第一个请求立即占位 Future，后续并发请求共享同一个 Future，避免重复收集
+_cache: dict[str, tuple[float, Future]] = {}
 _CACHE_TTL = 300  # 5 分钟
+_cache_lock = threading.Lock()
+_executor = ThreadPoolExecutor(max_workers=6)
 
 
 class RepositoryEvidenceService:
@@ -35,18 +39,39 @@ class RepositoryEvidenceService:
         owner, repo = self._split_github_identifier(github_source.identifier)
         cache_key = f"{owner}/{repo}"
 
-        # 检查缓存
-        cached = _cache.get(cache_key)
-        if cached and (time.time() - cached[0]) < _CACHE_TTL:
-            print(f"[证据收集] 命中缓存: {cache_key}")
-            return cached[1]
+        # 快速路径：缓存命中且未过期，直接返回结果
+        with _cache_lock:
+            cached = _cache.get(cache_key)
+            if cached and (time.time() - cached[0]) < _CACHE_TTL:
+                future = cached[1]
+                if future.done():
+                    print(f"[证据收集] 命中缓存: {cache_key}")
+                    return future.result()
 
+                # 收集仍在进行中，等待结果（不重复发起）
+                print(f"[证据收集] 等待进行中的收集: {cache_key}")
+                return future.result()
+
+            # 缓存未命中或已过期，创建 Future 占位
+            future = Future()
+            _cache[cache_key] = (time.time(), future)
+
+        # 在锁外执行实际收集，避免阻塞其他请求
+        try:
+            evidence = self._do_collect(owner, repo, cache_key)
+            future.set_result(evidence)
+            return evidence
+        except Exception as exc:
+            future.set_exception(exc)
+            # 收集失败，清除缓存占位，允许下次重试
+            with _cache_lock:
+                _cache.pop(cache_key, None)
+            raise
+
+    def _do_collect(self, owner: str, repo: str, cache_key: str):
+        """实际执行 9 维并发证据收集。"""
         print(f"[证据收集] 开始并发获取: {cache_key}")
         t0 = time.perf_counter()
-
-        # 9 个调用互相独立，并发执行
-        def _call(fn, *args, **kwargs):
-            return fn(*args, **kwargs)
 
         tasks = [
             ("repository", self.github.get_repository, (owner, repo), {}),
@@ -61,18 +86,17 @@ class RepositoryEvidenceService:
         ]
 
         results = {}
-        with ThreadPoolExecutor(max_workers=6) as pool:
-            futures = {
-                name: pool.submit(_call, fn, *args, **kwargs)
-                for name, fn, args, kwargs in tasks
-            }
+        futures = {
+            name: _executor.submit(fn, *args, **kwargs)
+            for name, fn, args, kwargs in tasks
+        }
 
-            for name, future in futures.items():
-                try:
-                    results[name] = future.result()
-                except Exception as exc:
-                    print(f"[证据收集] {name} 失败: {exc}")
-                    results[name] = None
+        for name, fut in futures.items():
+            try:
+                results[name] = fut.result()
+            except Exception as exc:
+                print(f"[证据收集] {name} 失败: {exc}")
+                results[name] = None
 
         elapsed = time.perf_counter() - t0
         print(f"[证据收集] 并发完成: {cache_key}, 耗时={elapsed:.2f}s")
@@ -88,9 +112,6 @@ class RepositoryEvidenceService:
             discussions=results.get("discussions"),
             ecosystem=results.get("ecosystem"),
         )
-
-        # 写入缓存
-        _cache[cache_key] = (time.time(), evidence)
         return evidence
 
     @staticmethod

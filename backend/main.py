@@ -2,12 +2,13 @@ from fastapi import FastAPI, Request
 
 from fastapi.openapi.docs import get_swagger_ui_html
 
-from legacy.api.analysis import router as analysis_router
-from legacy.api.compare import router as compare_router
-from legacy.api.profile import router as profile_router
-from legacy.api.release_diff import router as release_diff_router
-from legacy.api.routes import router as base_router
-from legacy.api.roadmap import router as roadmap_router
+from repo_insights.api.analysis import router as analysis_router
+from repo_insights.api.compare import router as compare_router
+from repo_insights.api.insights import router as insights_router
+from repo_insights.api.profile import router as profile_router
+from repo_insights.api.release_diff import router as release_diff_router
+from repo_insights.api.routes import router as base_router
+from repo_insights.api.roadmap import router as roadmap_router
 from research_agent.api.chat import router as chat_router
 
 from fastapi.responses import JSONResponse
@@ -39,6 +40,7 @@ async def custom_swagger_ui():
 )
 
 app.include_router(base_router)
+app.include_router(insights_router)
 app.include_router(analysis_router)
 app.include_router(profile_router)
 app.include_router(compare_router)

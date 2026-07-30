@@ -2,8 +2,8 @@ import logging
 
 from evidence import IntelligenceEvidence
 from llms.deepseek import deepseek_structured_model
-from legacy.prompts.profile import PROFILE_PROMPT
-from legacy.schemas.profile import RepositoryProfile
+from repo_insights.prompts.profile import PROFILE_PROMPT
+from repo_insights.schemas.profile import RepositoryProfile
 
 logger = logging.getLogger(__name__)
 

@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from legacy.schemas.entity import RepositoryRef
-from legacy.schemas.release_diff import ReleaseDiffEvidence
-from legacy.services.analysis_service import RepositoryAnalysisService
-from legacy.services.comparison_service import RepositoryComparisonService
-from legacy.evidence.repo_evidence import RepositoryEvidenceService
-from legacy.services.profile_service import RepositoryProfileService
-from legacy.services.roadmap_service import RepositoryRoadmapService
-from legacy.services.release_diff_service import ReleaseDiffService
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from repo_insights.schemas.entity import RepositoryRef
+from repo_insights.schemas.release_diff import ReleaseDiffEvidence
+from repo_insights.services.analysis_service import RepositoryAnalysisService
+from repo_insights.services.comparison_service import RepositoryComparisonService
+from repo_insights.evidence.repo_evidence import RepositoryEvidenceService
+from repo_insights.services.profile_service import RepositoryProfileService
+from repo_insights.services.roadmap_service import RepositoryRoadmapService
+from repo_insights.services.release_diff_service import ReleaseDiffService
 from sources.github.client import GitHubAPI
 
 
@@ -33,6 +35,32 @@ class ReportPipeline:
         if report_type in {"analysis", "project_health"}:
             return self.analysis.analyze(evidence)
         raise ValueError(f"Unsupported report_type: {report_type}")
+
+    def generate_all(self, entity: RepositoryRef) -> dict:
+        """收集一次证据，并发跑 profile + roadmap + analysis，返回组合结果。"""
+        evidence = self.build_evidence(entity)
+
+        tasks = {
+            "profile": lambda: self.profile.generate(evidence),
+            "roadmap": lambda: self.roadmap.predict(evidence),
+            "analysis": lambda: self.analysis.analyze(evidence),
+        }
+
+        results: dict = {}
+        errors: dict = {}
+
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            futures = {name: pool.submit(fn) for name, fn in tasks.items()}
+            for name, future in futures.items():
+                try:
+                    results[name] = future.result()
+                except Exception as exc:
+                    print(f"[ReportPipeline] {name} 生成失败: {exc}")
+                    errors[name] = str(exc)
+
+        if errors:
+            results["_errors"] = errors
+        return results
 
     def generate_comparison(self, left: RepositoryRef, right: RepositoryRef):
         left_evidence = self.build_evidence(left)

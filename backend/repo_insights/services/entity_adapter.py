@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from legacy.schemas.entity import RepositoryRef
+from repo_insights.schemas.entity import RepositoryRef
 
 
 class EntityAdapter:
