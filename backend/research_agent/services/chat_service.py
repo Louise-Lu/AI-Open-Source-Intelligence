@@ -15,7 +15,7 @@
 #   -> IntentRouter 理解意图
 #   -> EntityExtractor 抽实体
 #   -> EntityResolver 标准化实体
-#   -> ContextBuilder 生成 ResearchContext + ExecutionPlan
+#   -> ExecutionPlanBuilder 生成 ExecutionPlan
 #   -> ResearchPolicy 初始化运行时策略
 #   -> ToolGateway 统一拦截工具调用
 #   -> ReAct Agent 在允许范围内搜索/读取/停止
@@ -39,7 +39,7 @@ from research_agent.intent import ResearchIntentRouter
 from research_agent.entity_extractor import EntityExtractor
 from research_agent.entity_resolver import EntityResolver
 
-from research_agent.context_builder import ResearchContextBuilder
+from research_agent.context_builder import ExecutionPlanBuilder
 
 from research_agent.signal_extractor import ResearchAgentAnalyzer
 from research_agent.composer import ResearchBriefComposer
@@ -51,7 +51,7 @@ from research_agent.schemas.research import (
     ResearchObjective,
 )
 
-from shared_schemas.entity import ResolvedEntity
+from research_agent.schemas.entity import ResolvedEntity
 
 
 # 非研究类意图集合（不走 Research Pipeline）
@@ -98,10 +98,9 @@ def _build_chat_response(intent: ResearchIntent) -> dict:
     return {"answer": answer, "trace": ui_trace, "error": None}
 
 
-def _recursion_limit_for_context(research_context: Any, minimum: int = 12) -> int:
-    """根据 execution_plan 工具预算推导 LangGraph recursion_limit。"""
-    execution_plan = getattr(research_context, "execution_plan", None)
-    max_tool_calls = int(getattr(execution_plan, "max_tool_calls", 6) or 6)
+def _recursion_limit_for_plan(plan: Any, minimum: int = 12) -> int:
+    """根据 ExecutionPlan 工具预算推导 LangGraph recursion_limit。"""
+    max_tool_calls = int(getattr(plan, "max_tool_calls", 6) or 6)
     # 每个工具调用约 2 个图步骤，额外预留 system/user/final/reflection 空间。
     return max(minimum, max_tool_calls * 2 + 6)
 
@@ -111,7 +110,7 @@ class ChatService:
 
     混合架构 + Fail Fast Guard:
     - Router / Entity 层保留确定性理解与解析
-    - Research Context Builder 输出 ResearchContext，而不是步骤计划
+    - ExecutionPlanBuilder 输出 ExecutionPlan（统一研究上下文 + 执行控制）
     - Intelligence Agent 用 ReAct 循环自主选择工具
     - Analyzer / Composer 保留结构化输出层
 
@@ -124,11 +123,11 @@ class ChatService:
         self.router = ResearchIntentRouter()
         self.entity_extractor = EntityExtractor()
         self.entity_resolver = EntityResolver()
-        self.context_builder = ResearchContextBuilder()
+        self.plan_builder = ExecutionPlanBuilder()
         self.agent = intelligence_agent
         # LangGraph recursion_limit 不是业务工具预算。
         # 一个 tool call 通常会消耗 AIMessage + ToolMessage 两个图步骤，还需要最终回答步骤。
-        # 真实工具预算由 ResearchPolicy / execution_plan.max_tool_calls 控制。
+        # 真实工具预算由 ResearchPolicy / plan.max_tool_calls 控制。
         self.min_recursion_limit = 12
         # 快速模式：跳过 Analyzer 的多次结构化 LLM，只用 evidence 交给 Composer 生成答案。
         # 如果后续需要更完整的结构化信号，把这里改成 True。
@@ -162,21 +161,37 @@ class ChatService:
         resolved_entities = self._extract_and_resolve(message, intent)
         print(
             "[聊天服务] 2. 实体解析完成: "
-            f"数量={len(resolved_entities)}, "
-            f"名称={[e.name for e in resolved_entities]}"
+            f"数量={len(resolved_entities)}"
         )
+        for e in resolved_entities:
+            print(
+                f"  → name={e.name}, scope={e.entity_scope}, origin={e.entity_origin}"
+            )
 
-        research_context = self.context_builder.build(intent, resolved_entities)
-        if research_context is None:
+        plan = self.plan_builder.build(intent, resolved_entities)
+        if plan is None:
             print("[聊天服务] 未识别到研究对象，返回 need_user_input")
             return self._build_need_user_response(intent=intent)
 
         print(
-            "[聊天服务] 3. 上下文构建完成: "
-            f"objective={research_context.objective}, "
-            f"user_goal={research_context.user_goal[:120]}, "
-            f"depth={research_context.depth}, "
-            f"execution_plan={research_context.execution_plan}"
+            "[聊天服务] 3. 执行计划构建完成\n"
+            f"  【研究目标】objective={plan.objective}\n"
+            f"  【研究对象】entities={plan.entities}\n"
+            f"  【关注维度】focus={plan.focus}\n"
+            f"  【时间范围】time_range={plan.time_range}\n"
+            f"  【任务描述】user_goal={plan.user_goal}\n"
+            f"  【执行模式】mode={plan.mode}\n"
+            f"  【允许数据源】source_scope={plan.source_scope}\n"
+            f"  【排除数据源】avoid_sources={plan.avoid_sources}\n"
+            f"  【社区平台】community_platforms={plan.community_platforms}\n"
+            f"  【必需证据】required_evidence={plan.required_evidence}\n"
+            f"  【最大工具调用】max_tool_calls={plan.max_tool_calls}\n"
+            f"  【每源最大发现】max_discovery_per_source={plan.max_discovery_per_source}\n"
+            f"  【每源空重试】max_empty_retry_per_source={plan.max_empty_retry_per_source}\n"
+            f"  【每源最大读取】max_reader_per_source={plan.max_reader_per_source}\n"
+            f"  【最大证据数】max_evidence_items={plan.max_evidence_items}\n"
+            f"  【最小证据数】min_evidence_items={plan.min_evidence_items}\n"
+            f"  【停止条件】stop_conditions={plan.stop_conditions}"
         )
     
         agent_error = None
@@ -184,11 +199,11 @@ class ChatService:
         t_agent = time.perf_counter()
         try:
             # 初始化 policy_state
-            start_research_policy(research_context)
+            start_research_policy(plan)
             
             # 构建 prompt + policy_hint
-            agent_prompt = build_intelligence_agent_prompt(research_context, resolved_entities)
-            recursion_limit = _recursion_limit_for_context(research_context, self.min_recursion_limit)
+            agent_prompt = build_intelligence_agent_prompt(plan, resolved_entities)
+            recursion_limit = _recursion_limit_for_plan(plan, self.min_recursion_limit)
             print(f"[聊天服务] Agent recursion_limit={recursion_limit}")
             agent_result = self.agent.invoke(
                 {
@@ -247,7 +262,7 @@ class ChatService:
 
         t_analyzer = time.perf_counter()
         if self.use_structured_analyzer:
-            signals = self.analyzer.analyze(evidences, research_context)
+            signals = self.analyzer.analyze(evidences, plan)
             analyzer_mode = "structured"
         else:
             signals = ExtractedSignals()
@@ -591,6 +606,8 @@ def _extract_react_steps(agent_result: dict | None) -> list[dict[str, Any]]:
                     step_by_tool_call_id[tool_call_id] = step
 
             step["observation"] = observation
+            # 保留原始工具输出供评估使用
+            step["raw_output"] = _parse_tool_content(content)
 
     return steps
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 
-from llms.deepseek import deepseek_model
-from shared_schemas.entity import EntityExtraction
+from llms.deepseek import deepseek_structured_model
+from research_agent.schemas.entity import EntityExtraction
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ EXTRACTOR_PROMPT = """从用户问题中提取技术相关实体。
 
 class EntityExtractor:
     def __init__(self):
-        self.llm = deepseek_model.with_structured_output(EntityExtraction)
+        self.llm = deepseek_structured_model.with_structured_output(EntityExtraction)
 
     def extract(self, query: str) -> dict:
         prompt = f"""
