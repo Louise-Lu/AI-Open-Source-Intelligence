@@ -1,0 +1,1902 @@
+[
+  {
+    "id": 1,
+    "query": "What is LangGraph?",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 2
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "what is LangGraph",
+        "core features",
+        "use cases"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 6
+    }
+  },
+  {
+    "id": 2,
+    "query": "How many stars does langchain-ai/langgraph have?",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 1
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "star count"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 4
+    }
+  },
+  {
+    "id": 3,
+    "query": "What programming language is LangGraph written in?",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 1
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "programming language"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 4
+    }
+  },
+  {
+    "id": 4,
+    "query": "What license does LangGraph use?",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 1
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "license type"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 4
+    }
+  },
+  {
+    "id": 5,
+    "query": "Summarize the LangGraph README.",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology",
+        "official"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 1
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "README content summary",
+        "key features",
+        "getting started"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 4
+    }
+  },
+  {
+    "id": 6,
+    "query": "What is FastAPI? Tell me about its architecture.",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 2
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "what is FastAPI",
+        "architecture overview",
+        "key features"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 6
+    }
+  },
+  {
+    "id": 7,
+    "query": "Tell me about Pydantic and its main use cases.",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 2
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "what is Pydantic",
+        "main use cases",
+        "core features"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 6
+    }
+  },
+  {
+    "id": 8,
+    "query": "What is the OpenHands project?",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 2
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "what is OpenHands",
+        "project goals",
+        "key capabilities"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 6
+    }
+  },
+  {
+    "id": 9,
+    "query": "What is Mastra framework?",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 2
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "what is Mastra",
+        "core purpose",
+        "tech stack"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 6
+    }
+  },
+  {
+    "id": 10,
+    "query": "What does CrewAI do and how does it work?",
+    "category": "information_lookup",
+    "expected_intent": {
+      "objective": "information_lookup",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 2
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "what is CrewAI",
+        "how it works",
+        "core concepts"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 6
+    }
+  },
+  {
+    "id": 11,
+    "query": "最近大家怎么看 LangChain？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "sentiment"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "community sentiment",
+        "recent discussion",
+        "major concerns"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 12,
+    "query": "CrewAI 最近社区评价怎么样？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "sentiment"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "community sentiment",
+        "user feedback",
+        "common complaints"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 13,
+    "query": "LangGraph 这个项目怎么样？值得用吗？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "technology",
+        "sentiment"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community",
+        "github"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "project quality",
+        "community opinion",
+        "pros and cons"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 14,
+    "query": "FastAPI 的社区活跃度如何？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "adoption"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "activity level",
+        "contributor activity",
+        "issue response time"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 8
+    }
+  },
+  {
+    "id": 15,
+    "query": "Pydantic V2 的改动好不好？社区反馈如何？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "sentiment",
+        "technology"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "V2 changes",
+        "community reaction",
+        "migration experience"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 16,
+    "query": "OpenHands 项目现在发展得怎么样？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "trend",
+        "adoption"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "project progress",
+        "community growth",
+        "recent updates"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 17,
+    "query": "Mastra 框架的优缺点是什么？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "technology",
+        "community",
+        "sentiment"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "strengths",
+        "weaknesses",
+        "user opinions"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 18,
+    "query": "LangChain 最近有什么更新？发展怎么样？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "recent_updates",
+        "trend"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "recent updates",
+        "development direction",
+        "community reaction"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 19,
+    "query": "Dify 平台好用吗？用户评价怎么样？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "sentiment"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "user reviews",
+        "platform quality",
+        "common issues"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 20,
+    "query": "AutoGPT 现在还活跃吗？项目状态如何？",
+    "category": "evaluation",
+    "expected_intent": {
+      "objective": "evaluation",
+      "focus": [
+        "community",
+        "trend",
+        "recent_updates"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "project status",
+        "activity level",
+        "recent development"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 8
+    }
+  },
+  {
+    "id": 21,
+    "query": "最近 AI Agent 有什么趋势？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "technology",
+        "market"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community",
+        "web"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "current trends",
+        "emerging patterns",
+        "key directions"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 22,
+    "query": "LLM 应用开发框架最近有什么新动向？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "technology"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community",
+        "web"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "framework trends",
+        "new releases",
+        "community direction"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 23,
+    "query": "RAG 技术最近有什么发展趋势？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "technology"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web",
+        "github"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "RAG trends",
+        "new techniques",
+        "best practices evolution"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 24,
+    "query": "AI coding assistant 领域最近有什么变化？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "market",
+        "technology"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "market changes",
+        "new players",
+        "technology shifts"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 25,
+    "query": "MCP 协议的发展前景如何？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "ecosystem",
+        "adoption"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web",
+        "github"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "MCP adoption",
+        "ecosystem growth",
+        "future outlook"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 26,
+    "query": "开源 LLM 的发展趋势是什么？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "market",
+        "technology"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "open source LLM trends",
+        "key players",
+        "future direction"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 27,
+    "query": "Multi-agent 系统最近有什么新进展？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "technology"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "community",
+        "web"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "new frameworks",
+        "research progress",
+        "practical applications"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 28,
+    "query": "Vector database 市场现在怎么样了？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "market",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "market status",
+        "key players",
+        "technology trends"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 29,
+    "query": "AI workflow automation 有什么新方向？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "market"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "new directions",
+        "key tools",
+        "adoption trends"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 30,
+    "query": "LLM observability 领域的发展趋势？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "technology",
+        "market"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web",
+        "github"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "observability trends",
+        "key tools",
+        "best practices"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 31,
+    "query": "LangGraph 和 CrewAI 哪个更适合做 multi-agent 系统？",
+    "category": "comparison",
+    "expected_intent": {
+      "objective": "comparison",
+      "focus": [
+        "technology",
+        "community",
+        "ecosystem"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github",
+        "community"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "architecture differences",
+        "use case fit",
+        "community preference"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 14
+    }
+  },
+  {
+    "id": 32,
+    "query": "对比 LangChain 和 LlamaIndex 的优劣。",
+    "category": "comparison",
+    "expected_intent": {
+      "objective": "comparison",
+      "focus": [
+        "technology",
+        "ecosystem"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "strengths of each",
+        "weaknesses of each",
+        "best use cases"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 14
+    }
+  },
+  {
+    "id": 33,
+    "query": "FastAPI 和 Flask 相比怎么样？",
+    "category": "comparison",
+    "expected_intent": {
+      "objective": "comparison",
+      "focus": [
+        "technology",
+        "ecosystem"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "performance comparison",
+        "feature differences",
+        "ecosystem comparison"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 34,
+    "query": "OpenHands 和 Cursor 哪个更适合 AI 辅助编程？",
+    "category": "comparison",
+    "expected_intent": {
+      "objective": "comparison",
+      "focus": [
+        "technology",
+        "community",
+        "sentiment"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "feature comparison",
+        "user experience",
+        "community opinion"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 14
+    }
+  },
+  {
+    "id": 35,
+    "query": "Dify 和 Coze 做 AI 应用哪个好？",
+    "category": "comparison",
+    "expected_intent": {
+      "objective": "comparison",
+      "focus": [
+        "technology",
+        "community",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web",
+        "github"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "platform comparison",
+        "user reviews",
+        "feature differences"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 14
+    }
+  },
+  {
+    "id": 36,
+    "query": "LangGraph 的架构设计是怎样的？",
+    "category": "technology_research",
+    "expected_intent": {
+      "objective": "technology_research",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "architecture overview",
+        "core components",
+        "design patterns"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 8
+    }
+  },
+  {
+    "id": 37,
+    "query": "LangGraph 怎么部署到生产环境？",
+    "category": "technology_research",
+    "expected_intent": {
+      "objective": "technology_research",
+      "focus": [
+        "technology",
+        "official"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "deployment methods",
+        "production considerations",
+        "best practices"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 8
+    }
+  },
+  {
+    "id": 38,
+    "query": "CrewAI 的 agent 协作机制是怎么实现的？",
+    "category": "technology_research",
+    "expected_intent": {
+      "objective": "technology_research",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "collaboration mechanism",
+        "agent communication",
+        "workflow design"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 8
+    }
+  },
+  {
+    "id": 39,
+    "query": "RAG 的最佳实践有哪些？",
+    "category": "technology_research",
+    "expected_intent": {
+      "objective": "technology_research",
+      "focus": [
+        "technology",
+        "benchmark"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "web",
+        "community",
+        "github"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "best practices",
+        "common patterns",
+        "optimization tips"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 40,
+    "query": "如何搭建一个 AI Agent 系统？有哪些关键组件？",
+    "category": "technology_research",
+    "expected_intent": {
+      "objective": "technology_research",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web",
+        "community"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "key components",
+        "architecture patterns",
+        "implementation guide"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 41,
+    "query": "AI Agent 创业方向有没有机会？",
+    "category": "market_research",
+    "expected_intent": {
+      "objective": "market_research",
+      "focus": [
+        "market",
+        "opportunity",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "market opportunity",
+        "competitive landscape",
+        "potential niches"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 42,
+    "query": "LLM 应用开发工具的市场空间有多大？",
+    "category": "market_research",
+    "expected_intent": {
+      "objective": "market_research",
+      "focus": [
+        "market",
+        "opportunity"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "web",
+        "community"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "market size",
+        "growth potential",
+        "key segments"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 43,
+    "query": "现在做 AI coding assistant 还有市场机会吗？",
+    "category": "market_research",
+    "expected_intent": {
+      "objective": "market_research",
+      "focus": [
+        "market",
+        "opportunity",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "web",
+        "community"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "market status",
+        "competition level",
+        "differentiation opportunities"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 44,
+    "query": "开源 AI 基础设施的商业机会有哪些？",
+    "category": "market_research",
+    "expected_intent": {
+      "objective": "market_research",
+      "focus": [
+        "market",
+        "opportunity"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "web",
+        "community"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "business opportunities",
+        "monetization models",
+        "market gaps"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 45,
+    "query": "低代码 AI 平台的市场前景怎么样？",
+    "category": "market_research",
+    "expected_intent": {
+      "objective": "market_research",
+      "focus": [
+        "market",
+        "opportunity",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "web",
+        "community"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "market prospects",
+        "key players",
+        "growth drivers"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 46,
+    "query": "推荐一个适合初学者的 AI Agent 框架。",
+    "category": "decision_support",
+    "expected_intent": {
+      "objective": "decision_support",
+      "focus": [
+        "technology",
+        "community"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "recommendation with reasoning",
+        "comparison of options",
+        "learning curve assessment"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 47,
+    "query": "我应该用 LangGraph 还是直接写 Python 做 Agent？",
+    "category": "decision_support",
+    "expected_intent": {
+      "objective": "decision_support",
+      "focus": [
+        "technology",
+        "community"
+      ],
+      "time_range": "any"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "trade-offs analysis",
+        "recommendation with reasoning",
+        "use case guidance"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 48,
+    "query": "企业级 RAG 方案选什么技术栈好？",
+    "category": "decision_support",
+    "expected_intent": {
+      "objective": "decision_support",
+      "focus": [
+        "technology",
+        "ecosystem",
+        "risk"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "technology recommendations",
+        "enterprise considerations",
+        "trade-offs"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 14
+    }
+  },
+  {
+    "id": 49,
+    "query": "生产环境部署 LLM 应用，用什么框架比较好？",
+    "category": "decision_support",
+    "expected_intent": {
+      "objective": "decision_support",
+      "focus": [
+        "technology",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "framework recommendations",
+        "production readiness",
+        "comparison"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 50,
+    "query": "做 AI 产品应该选 Dify 还是自己开发？",
+    "category": "decision_support",
+    "expected_intent": {
+      "objective": "decision_support",
+      "focus": [
+        "technology",
+        "ecosystem",
+        "market"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web",
+        "github"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "build vs buy analysis",
+        "Dify capabilities",
+        "custom development trade-offs"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 12
+    }
+  },
+  {
+    "id": 51,
+    "query": "LangGraph 和 AutoGen 做 research agent 哪个好？",
+    "category": "comparison",
+    "expected_intent": {
+      "objective": "comparison",
+      "focus": [
+        "technology",
+        "community"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "github"
+      ],
+      "min_evidence_items": 4
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "architecture comparison",
+        "research agent suitability",
+        "community feedback"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 14
+    }
+  },
+  {
+    "id": 52,
+    "query": "AI Agent 的可观测性怎么做好？有什么工具推荐？",
+    "category": "technology_research",
+    "expected_intent": {
+      "objective": "technology_research",
+      "focus": [
+        "technology",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web",
+        "community"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "observability approaches",
+        "tool recommendations",
+        "best practices"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 53,
+    "query": "最近社区对 AI Agent 安全性有什么讨论？",
+    "category": "trend_analysis",
+    "expected_intent": {
+      "objective": "trend_analysis",
+      "focus": [
+        "trend",
+        "community",
+        "risk"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "community",
+        "web"
+      ],
+      "required_evidence": [
+        "community"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "safety discussions",
+        "community concerns",
+        "emerging solutions"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 54,
+    "query": "推荐一个适合生产环境的 LLM 监控方案。",
+    "category": "decision_support",
+    "expected_intent": {
+      "objective": "decision_support",
+      "focus": [
+        "technology",
+        "ecosystem"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "web",
+        "github",
+        "community"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "monitoring solutions",
+        "feature comparison",
+        "recommendation"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  },
+  {
+    "id": 55,
+    "query": "AI 应用中的 function calling 和 tool use 怎么实现最好？",
+    "category": "technology_research",
+    "expected_intent": {
+      "objective": "technology_research",
+      "focus": [
+        "technology"
+      ],
+      "time_range": "recent"
+    },
+    "expected_context": {
+      "preferred_sources": [
+        "github",
+        "web"
+      ],
+      "required_evidence": [
+        "web"
+      ],
+      "min_evidence_items": 3
+    },
+    "quality_expectations": {
+      "must_answer": [
+        "implementation approaches",
+        "best practices",
+        "tool design patterns"
+      ],
+      "avoid_claims_without_evidence": true
+    },
+    "constraints": {
+      "max_tool_calls": 10
+    }
+  }
+]

@@ -1,0 +1,1113 @@
+{
+  "summary": {
+    "total": 5,
+    "errors": 0,
+    "intent_accuracy": 1.0,
+    "intent_precision": 1.0,
+    "intent_recall": 1.0,
+    "intent_f1": 1.0,
+    "tool_precision": 0.0,
+    "tool_recall": 0.0,
+    "tool_f1": 0.0,
+    "tool_order": 0.0,
+    "evidence_quality": 19.2,
+    "evidence_completeness": 0.0,
+    "evidence_freshness": 40.0,
+    "evidence_coverage": 36.0,
+    "reasoning_quality": 58.2,
+    "reasoning_grounding": 25.0,
+    "reasoning_contradictions": 100.0,
+    "reasoning_completeness": 77.0,
+    "answer_quality": 79.4,
+    "answer_relevance": 78.0,
+    "answer_completeness": 74.0,
+    "answer_clarity": 87.4,
+    "answer_conciseness": 87.0,
+    "average_latency_seconds": 23.541000000000004
+  },
+  "results": [
+    {
+      "id": 1,
+      "question": "What is LangGraph?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.description",
+        "readme"
+      ],
+      "answer": "Status 已经是 **Ready to Finish**，Web 来源已满足，停止搜索，输出最终结论。\n\n---\n\n## Research Findings：LangGraph 是什么？\n\n### 一句话定义\n\n**LangGraph** 是由 LangChain Inc 开发的一个**底层编排框架和运行时**（low-level orchestration framework and runtime），专门用于构建、管理和部署**长生命周期、有状态的 AI 智能体（Agent）**。\n\n---\n\n### 核心定位\n\n| 维度 | 说明 |\n|------|------|\n| **层级** | 底层（low-level），完全专注于智能体**编排**，不抽象提示词或架构 |\n| **与 LangChain 的关系** | 由 LangChain Inc 开发，但**无需 LangChain 即可独立使用**；文档中常用 LangChain 组件集成模型和工具 |\n| **灵感来源** | 受 Google 的 **Pregel** 和 **Apache Beam** 启发，公开接口设计借鉴 **NetworkX** |\n| **采用者** | Klarna、Uber、J.P. Morgan 等大型企业 |\n\n---\n\n### 五大核心能力\n\n1. **持久化执行（Durable Execution）**：智能体可从故障中恢复并从中断处继续长期运行。\n2. **人机协作（Human-in-the-loop）**：可在任意时间点检查、修改智能体状态，引入人工监管。\n3. **综合内存（Comprehensive Memory）**：支持短期工作记忆（持续推理）+ 长期记忆（跨会话保持）。\n4. **LangSmith 调试**：可视化追踪执行路径、捕获状态转换、提供运行时指标。\n5. **生产级部署**：专门针对有状态、长生命周期工作流的可扩展基础设施。\n\n---\n\n### 与 LangChain Agents 的区别\n\nLangChain 的 Agents 提供的是**预构建的 LLM 和工具调用循环**，适合刚开始接触智能体的开发者。而 LangGraph 面向需要更细粒度控制底层编排逻辑的场景——如持久化、流式处理、人工介入等。\n\n---\n\n### 证据来源\n\n- **LangChain 官方文档 · LangGraph 概览**（[链接](https://docs.langchain.org.cn/oss/python/langgraph/overview)）：提供了完整的定位、核心优势、代码示例和设计背景。\n\n> 本次研究为快速查询模式（quick），已覆盖 Web 官方来源，满足研究目标。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "technology",
+            "official"
+          ],
+          "time_range": "any",
+          "depth": "quick",
+          "raw_query": "What is LangGraph?"
+        },
+        "discovered_sources": {
+          "web": [
+            "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+            "https://langgraph.com.cn/",
+            "https://www.langchain.com/langgraph"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph 是什么"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"title\": \"Web 搜索结果: https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"url\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"score\": 0.0, \"reason\": \"Title: LangGr...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "找到了官方文档和 LangChain 官网。让我先读取官方文档获取详细信息。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://docs.langchain.org.cn/oss/python/langgraph/overview"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"evidence\": {\"url\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"content\": \"Title: LangGraph 概览 - LangChain 文档\\n\\nURL Source: https://docs.langchain...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "Status 已经是 **Ready to Finish**，Web 来源已满足，停止搜索，输出最终结论。\n\n---\n\n## Research Findings：LangGraph 是什么？\n\n### 一句话定义\n\n**LangGraph** 是由 LangChain Inc 开发的一个**底层编排框架和运行时**（low-level orchestration fra...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph 是什么"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"title\": \"Web 搜索结果: https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"url\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"score\": 0.0, \"reason\": \"Title: LangGr...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "找到了官方文档和 LangChain 官网。让我先读取官方文档获取详细信息。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://docs.langchain.org.cn/oss/python/langgraph/overview"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"evidence\": {\"url\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"content\": \"Title: LangGraph 概览 - LangChain 文档\\n\\nURL Source: https://docs.langchain...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "Status 已经是 **Ready to Finish**，Web 来源已满足，停止搜索，输出最终结论。\n\n---\n\n## Research Findings：LangGraph 是什么？\n\n### 一句话定义\n\n**LangGraph** 是由 LangChain Inc 开发的一个**底层编排框架和运行时**（low-level orchestration fra...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": []
+      },
+      "latency_seconds": 31.092,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "order": 0.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [],
+            "predicted_unique": [],
+            "missed_tools": [
+              "github_project_profile",
+              "github_search"
+            ],
+            "extra_tools": [],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 22,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 45,
+            "missing_evidence": [
+              "repository.description",
+              "readme"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 1171,
+              "evidence_empty": true,
+              "unsupported_claims": [
+                "readme"
+              ],
+              "unsupported_count": 1,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.description",
+              "readme"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 58,
+          "details": {
+            "grounding": 25,
+            "contradictions": 100,
+            "completeness": 75,
+            "unsupported_claims": [
+              "no_evidence"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 92,
+          "details": {
+            "relevance": 95,
+            "completeness": 90,
+            "clarity": 92,
+            "conciseness": 88,
+            "feedback": "回答直接回应了\"什么是LangGraph\"的问题，从定义、定位、核心能力、与LangChain Agents的区别等多维度展开，信息丰富。结构清晰，使用表格和分点增强可读性。略有冗余（如开头\"Ready to Finish\"的流程性描述），但不影响整体质量。缺少社区口碑或实际使用反馈等多元来源证据。"
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "question": "How many stars does langchain-ai/langgraph have?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.stars"
+      ],
+      "answer": "没有获取到任何证据，因此无法继续研究。\n\n可能原因：\n- 目标仓库不存在或无法访问\n- 网络/API 限制\n- 研究对象没有公开数据\n\n请尝试提供其他项目名称或 GitHub 仓库地址。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "langchain-ai/langgraph"
+          ],
+          "focus": [
+            "community"
+          ],
+          "time_range": "latest",
+          "depth": "quick",
+          "raw_query": "How many stars does langchain-ai/langgraph have?"
+        },
+        "discovered_sources": {
+          "web": [
+            "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+            "https://docs.langchain.com/oss/python/langgraph/",
+            "https://repositoryradar.dev/repo/langchain-ai/langgraph"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "langchain-ai/langgraph stars count"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph?tab=readme-ov-file\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph?tab=readme-ov-file\", \"url\": \"https://github.com/langchain-ai/langgraph?tab=readme-ov-file\", \"score\": 0.0, \"reason\": \"Title: lan...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:1/6\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "根据 **Web 搜索结果**（来源：GitHub 仓库页面元数据），**langchain-ai/langgraph** 目前拥有 **38,412 颗星** ⭐。\n\n| 指标 | 数值 |\n|------|------|\n| Stars | 38,412 |\n| Forks | 6,467 |\n| Open Issues | 649 |\n| License | MI...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "langchain-ai/langgraph stars count"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph?tab=readme-ov-file\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph?tab=readme-ov-file\", \"url\": \"https://github.com/langchain-ai/langgraph?tab=readme-ov-file\", \"score\": 0.0, \"reason\": \"Title: lan...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:1/6\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "根据 **Web 搜索结果**（来源：GitHub 仓库页面元数据），**langchain-ai/langgraph** 目前拥有 **38,412 颗星** ⭐。\n\n| 指标 | 数值 |\n|------|------|\n| Stars | 38,412 |\n| Forks | 6,467 |\n| Open Issues | 649 |\n| License | MI...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": []
+      },
+      "latency_seconds": 18.856,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "order": 0.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [],
+            "predicted_unique": [],
+            "missed_tools": [
+              "github_project_profile",
+              "github_search"
+            ],
+            "extra_tools": [],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 20,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 40,
+            "missing_evidence": [
+              "repository.stars"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 93,
+              "evidence_empty": true,
+              "unsupported_claims": [],
+              "unsupported_count": 0,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.stars"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 54,
+          "details": {
+            "grounding": 25,
+            "contradictions": 100,
+            "completeness": 57,
+            "unsupported_claims": [
+              "no_evidence"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 19,
+          "details": {
+            "relevance": 0,
+            "completeness": 0,
+            "clarity": 60,
+            "conciseness": 70,
+            "feedback": "回答完全没有提供用户所问的 star 数量，也未尝试任何替代途径获取信息。虽然结构清晰、没有废话，但核心问题完全未得到回应，属于典型的\"无结果\"兜底回复，对用户毫无帮助。"
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "question": "What programming language is LangGraph written in?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.language"
+      ],
+      "answer": "## Research Findings\n\n**LangGraph 主要使用 Python 编写。**\n\n### 证据来源\n\n- **GitHub 仓库 `langchain-ai/langgraph`**：项目主页明确标注 `language: Python`，仓库拥有 38,425 颗星和 6,469 个 fork。README 中展示的安装方式为 `pip install -U langgraph`，并指向 PyPI（Python 包索引），进一步确认其 Python 技术栈。\n\n### 补充说明\n\nLangGraph 是 LangChain 团队开发的一个底层编排框架（low-level orchestration framework），用于构建具有状态感知能力的 AI Agent。除了 Python 版本外，LangGraph 还提供了 JavaScript/TypeScript 版本 [LangGraph.js](https://github.com/langchain-ai/langgraphjs)，以满足不同技术栈的开发需求。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "technology"
+          ],
+          "time_range": "any",
+          "depth": "quick",
+          "raw_query": "What programming language is LangGraph written in?"
+        },
+        "discovered_sources": {
+          "github": [
+            "langchain-ai/langgraph",
+            "google-gemini/gemini-fullstack-langgraph-quickstart"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"github\", \"identifier\": \"langchain-ai/langgraph\", \"title\": \"langchain-ai/langgraph\", \"url\": \"https://github.com/langchain-ai/langgraph\", \"score\": 38425.0, \"reason\": \"Build resilient agents.\"}, {\"source\": \"github\", \"identifier\": \"google-gemini/gemini-fullstack-langgraph-quic...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:1\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "",
+            "action": {
+              "tool": "github_project_profile",
+              "input": {
+                "owner": "langchain-ai",
+                "repo": "langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"github\", \"type\": \"project_profile\", \"summary\": \"langchain-ai/langgraph 是一个以 Python 为主的项目，当前 stars=38425。\", \"evidence\": {\"repository\": {\"full_name\": \"langchain-ai/langgraph\", \"description\": \"Build resilient agents.\", \"language\": \"Python\", \"stars\": 38425, \"forks\": 6469, \"topi...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:1\nWeb:0\nTool Calls:2/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "## Research Findings\n\n**LangGraph 主要使用 Python 编写。**\n\n### 证据来源\n\n- **GitHub 仓库 `langchain-ai/langgraph`**：项目主页明确标注 `language: Python`，仓库拥有 38,425 颗星和 6,469 个 fork。README 中展示的安装方式为 `pip ins...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"github\", \"identifier\": \"langchain-ai/langgraph\", \"title\": \"langchain-ai/langgraph\", \"url\": \"https://github.com/langchain-ai/langgraph\", \"score\": 38425.0, \"reason\": \"Build resilient agents.\"}, {\"source\": \"github\", \"identifier\": \"google-gemini/gemini-fullstack-langgraph-quic...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:1\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "",
+            "action": {
+              "tool": "github_project_profile",
+              "input": {
+                "owner": "langchain-ai",
+                "repo": "langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"github\", \"type\": \"project_profile\", \"summary\": \"langchain-ai/langgraph 是一个以 Python 为主的项目，当前 stars=38425。\", \"evidence\": {\"repository\": {\"full_name\": \"langchain-ai/langgraph\", \"description\": \"Build resilient agents.\", \"language\": \"Python\", \"stars\": 38425, \"forks\": 6469, \"topi...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:1\nWeb:0\nTool Calls:2/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "## Research Findings\n\n**LangGraph 主要使用 Python 编写。**\n\n### 证据来源\n\n- **GitHub 仓库 `langchain-ai/langgraph`**：项目主页明确标注 `language: Python`，仓库拥有 38,425 颗星和 6,469 个 fork。README 中展示的安装方式为 `pip ins...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": []
+      },
+      "latency_seconds": 19.184,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "order": 0.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [],
+            "predicted_unique": [],
+            "missed_tools": [
+              "github_project_profile",
+              "github_search"
+            ],
+            "extra_tools": [],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 16,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 25,
+            "missing_evidence": [
+              "repository.language"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 478,
+              "evidence_empty": true,
+              "unsupported_claims": [
+                "repository.forks",
+                "repository.language",
+                "readme"
+              ],
+              "unsupported_count": 3,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.language"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 60,
+          "details": {
+            "grounding": 25,
+            "contradictions": 100,
+            "completeness": 86,
+            "unsupported_claims": [
+              "no_evidence"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 96,
+          "details": {
+            "relevance": 100,
+            "completeness": 95,
+            "clarity": 95,
+            "conciseness": 90,
+            "feedback": "回答直接回应了用户问题，明确指出 LangGraph 主要使用 Python 编写，并提供了 GitHub 仓库证据。同时补充了 JS/TS 版本信息，超出预期但增加了完整性。结构清晰，分证据来源和补充说明两部分。略有冗余（如 star/fork 数对回答核心问题非必需），但整体质量很高。"
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "question": "What license does LangGraph use?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.license"
+      ],
+      "answer": "## Research Findings\n\n**LangGraph 使用的是 MIT License。**\n\n### 证据来源\n\n- **GitHub LICENSE 文件**（[langchain-ai/langgraph/LICENSE](https://github.com/langchain-ai/langgraph/blob/main/LICENSE)）：该文件明确标注为 **MIT License**，版权归属 LangChain, Inc.（2024 年）。MIT 许可证是一种非常宽松的开源许可证，允许任何人免费获取该软件及其文档，并可以不受限制地使用、复制、修改、合并、发布、分发、再许可和/或出售该软件的副本。\n\n### 结论\n\nLangGraph 采用 MIT 许可证，这意味着它对商业使用、修改和再分发都非常友好，几乎没有限制，是开源社区中最广泛使用的许可证之一。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "official"
+          ],
+          "time_range": "latest",
+          "depth": "quick",
+          "raw_query": "What license does LangGraph use?"
+        },
+        "discovered_sources": {
+          "web": [
+            "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+            "https://www.langchain.com/langgraph",
+            "https://github.com/langchain-ai/langgraph?tab=readme-ov-file"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph license"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"score\": 0.0, \"reason\": \"Title: MIT Li...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "搜索结果已经显示 LangGraph 使用的是 MIT License。让我直接读取 LICENSE 文件获取确凿证据。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"evidence\": {\"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"content\": \"Title: langgraph/LICENSE at main · langchain-ai/langgraph\\n\\nURL Source:...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "## Research Findings\n\n**LangGraph 使用的是 MIT License。**\n\n### 证据来源\n\n- **GitHub LICENSE 文件**（[langchain-ai/langgraph/LICENSE](https://github.com/langchain-ai/langgraph/blob/main/LICENSE)）：该文...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph license"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"score\": 0.0, \"reason\": \"Title: MIT Li...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "搜索结果已经显示 LangGraph 使用的是 MIT License。让我直接读取 LICENSE 文件获取确凿证据。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"evidence\": {\"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"content\": \"Title: langgraph/LICENSE at main · langchain-ai/langgraph\\n\\nURL Source:...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "## Research Findings\n\n**LangGraph 使用的是 MIT License。**\n\n### 证据来源\n\n- **GitHub LICENSE 文件**（[langchain-ai/langgraph/LICENSE](https://github.com/langchain-ai/langgraph/blob/main/LICENSE)）：该文...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": []
+      },
+      "latency_seconds": 20.551,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "order": 0.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [],
+            "predicted_unique": [],
+            "missed_tools": [
+              "github_project_profile",
+              "github_search"
+            ],
+            "extra_tools": [],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 22,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 45,
+            "missing_evidence": [
+              "repository.license"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 396,
+              "evidence_empty": true,
+              "unsupported_claims": [
+                "repository.license"
+              ],
+              "unsupported_count": 1,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.license"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 59,
+          "details": {
+            "grounding": 25,
+            "contradictions": 100,
+            "completeness": 82,
+            "unsupported_claims": [
+              "no_evidence"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 97,
+          "details": {
+            "relevance": 100,
+            "completeness": 95,
+            "clarity": 95,
+            "conciseness": 95,
+            "feedback": "回答直接命中问题核心，明确给出 MIT License 结论。提供了 GitHub LICENSE 文件作为权威证据来源，并简要说明了 MIT 许可证的含义和商业友好性。结构清晰，分为证据来源和结论两部分。唯一可改进之处是可补充 SPDX 标识符（MIT）以便工具链识别，但整体已非常完整。"
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "question": "Summarize the LangGraph README.",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "readme"
+      ],
+      "answer": "## Research Findings：LangGraph README 总结\n\n根据从 GitHub 仓库 `langchain-ai/langgraph` 获取的 README 内容（来源：GitHub Project Profile），总结如下：\n\n---\n\n### 一句话定位\n\nLangGraph 是一个**低层级编排框架（low-level orchestration framework）**，用于构建、管理和部署长时间运行、有状态的 AI Agent。它被 Klarna、Replit、Elastic 等公司所信赖。\n\n---\n\n### 五大核心能力\n\n1. **持久化执行（Durable Execution）**：Agent 可在故障后自动从断点恢复，适合长时间运行的任务。\n2. **人机协同（Human-in-the-Loop）**：允许在执行过程中随时检查和修改 Agent 状态，融入人工监督。\n3. **全面记忆（Comprehensive Memory）**：同时支持短期工作记忆（当前推理）和跨会话的长期持久记忆。\n4. **LangSmith 调试**：提供可视化工具，追踪执行路径、捕获状态转换、展示运行时指标。\n5. **生产级部署**：专为有状态、长时间运行的工作流设计的可扩展基础设施。\n\n---\n\n### 生态集成\n\nLangGraph 可独立使用，也可与 LangChain 生态无缝配合：\n\n- **Deep Agents**：基于 LangGraph 构建的更高级 Agent 包，支持规划、子 Agent 和文件系统。\n- **LangChain**：提供集成和可组合组件，简化 LLM 应用开发。\n- **LangSmith**：用于 Agent 评估、可观测性和调试。\n- **LangSmith Deployment**：专用部署平台，支持可视化原型设计（LangSmith Studio）。\n\n---\n\n### 技术要点\n\n- **语言**：Python（也有 JS/TS 版本 [LangGraph.js](https://github.com/langchain-ai/langgraphjs)）\n- **许可证**：MIT License\n- **安装**：`pip install -U langgraph`\n- **Stars**：38,425（截至查询时）\n- **灵感来源**：受 Google Pregel 和 Apache Beam 启发，接口设计借鉴 NetworkX\n- **独立性**：虽由 LangChain 团队构建，但**可以不依赖 LangChain 单独使用**\n\n---\n\n### 证据来源\n\n- **GitHub**：`langchain-ai/langgraph` 仓库的 README（通过 `github_project_profile` 获取），这是本次研究的唯一证据来源，提供了 LangGraph 的完整官方介绍。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "official",
+            "technology"
+          ],
+          "time_range": "latest",
+          "depth": "quick",
+          "raw_query": "Summarize the LangGraph README."
+        },
+        "discovered_sources": {
+          "web": [
+            "https://www.langchain.com/langgraph",
+            "https://github.com/langchain-ai/langgraph",
+            "https://docs.langchain.com/oss/python/langgraph/durable-execution)**"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://www.langchain.com/langgraph\", \"title\": \"Web 搜索结果: https://www.langchain.com/langgraph\", \"url\": \"https://www.langchain.com/langgraph\", \"score\": 0.0, \"reason\": \"Title: LangGraph: Agent Orchestration Framework for Reliable AI Agents\\nURL: https://...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "很好，找到了 LangGraph 的官网和 GitHub。用户要求总结 LangGraph 的 README，我先读取 GitHub 仓库的 README 内容。",
+            "action": {
+              "tool": "github_project_profile",
+              "input": {
+                "owner": "langchain-ai",
+                "repo": "langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"github\", \"type\": \"project_profile\", \"summary\": \"langchain-ai/langgraph 是一个以 Python 为主的项目，当前 stars=38425。\", \"evidence\": {\"repository\": {\"full_name\": \"langchain-ai/langgraph\", \"description\": \"Build resilient agents.\", \"language\": \"Python\", \"stars\": 38425, \"forks\": 6469, \"topi...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "## Research Findings：LangGraph README 总结\n\n根据从 GitHub 仓库 `langchain-ai/langgraph` 获取的 README 内容（来源：GitHub Project Profile），总结如下：\n\n---\n\n### 一句话定位\n\nLangGraph 是一个**低层级编排框架（low-level orchestr...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://www.langchain.com/langgraph\", \"title\": \"Web 搜索结果: https://www.langchain.com/langgraph\", \"url\": \"https://www.langchain.com/langgraph\", \"score\": 0.0, \"reason\": \"Title: LangGraph: Agent Orchestration Framework for Reliable AI Agents\\nURL: https://...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+          },
+          {
+            "index": 2,
+            "thought": "很好，找到了 LangGraph 的官网和 GitHub。用户要求总结 LangGraph 的 README，我先读取 GitHub 仓库的 README 内容。",
+            "action": {
+              "tool": "github_project_profile",
+              "input": {
+                "owner": "langchain-ai",
+                "repo": "langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"github\", \"type\": \"project_profile\", \"summary\": \"langchain-ai/langgraph 是一个以 Python 为主的项目，当前 stars=38425。\", \"evidence\": {\"repository\": {\"full_name\": \"langchain-ai/langgraph\", \"description\": \"Build resilient agents.\", \"language\": \"Python\", \"stars\": 38425, \"forks\": 6469, \"topi...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer"
+          },
+          {
+            "index": 3,
+            "thought": "## Research Findings：LangGraph README 总结\n\n根据从 GitHub 仓库 `langchain-ai/langgraph` 获取的 README 内容（来源：GitHub Project Profile），总结如下：\n\n---\n\n### 一句话定位\n\nLangGraph 是一个**低层级编排框架（low-level orchestr...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": []
+      },
+      "latency_seconds": 28.022,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "order": 0.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [],
+            "predicted_unique": [],
+            "missed_tools": [
+              "github_project_profile",
+              "github_search"
+            ],
+            "extra_tools": [],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 16,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 25,
+            "missing_evidence": [
+              "readme"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 1264,
+              "evidence_empty": true,
+              "unsupported_claims": [
+                "repository.stars",
+                "repository.license",
+                "readme"
+              ],
+              "unsupported_count": 3,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "readme"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 60,
+          "details": {
+            "grounding": 25,
+            "contradictions": 100,
+            "completeness": 85,
+            "unsupported_claims": [
+              "no_evidence"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 93,
+          "details": {
+            "relevance": 95,
+            "completeness": 90,
+            "clarity": 95,
+            "conciseness": 92,
+            "feedback": "回答直接回应了\"总结 LangGraph README\"的需求，结构清晰，按定位、核心能力、生态集成、技术要点分层呈现，易于阅读。信息覆盖了 README 的主要关键点（持久化、人机协同、记忆、调试、部署、生态、技术栈等），且注明了唯一证据来源。略有不足在于缺少对 README 中可能存在的快速开始示例或代码片段的提及，但整体完整度已很高。无冗余废话。"
+          }
+        }
+      }
+    }
+  ]
+}

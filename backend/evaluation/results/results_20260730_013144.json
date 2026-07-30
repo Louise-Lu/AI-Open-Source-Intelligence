@@ -1,0 +1,2150 @@
+{
+  "summary": {
+    "total": 5,
+    "errors": 0,
+    "intent_accuracy": 1.0,
+    "intent_precision": 1.0,
+    "intent_recall": 1.0,
+    "intent_f1": 1.0,
+    "tool_precision": 0.3333333333333333,
+    "tool_recall": 0.5,
+    "tool_f1": 0.4,
+    "tool_order": 0.8,
+    "evidence_quality": 29.8,
+    "evidence_completeness": 0.0,
+    "evidence_freshness": 40.0,
+    "evidence_coverage": 73.0,
+    "reasoning_quality": 81.4,
+    "reasoning_grounding": 73.2,
+    "reasoning_contradictions": 100.0,
+    "reasoning_completeness": 73.6,
+    "answer_quality": 76.0,
+    "answer_relevance": 76.0,
+    "answer_completeness": 69.0,
+    "answer_clarity": 83.6,
+    "answer_conciseness": 81.0,
+    "average_latency_seconds": 67.28659999999999
+  },
+  "results": [
+    {
+      "id": 1,
+      "question": "What is LangGraph?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.description",
+        "readme"
+      ],
+      "answer": "## Research Findings\n\n### LangGraph 是什么？\n\n根据 Web 搜索结果，**LangGraph** 是一个**低层级的编排框架和运行时（low-level orchestration framework and runtime）**，用于**构建、管理和部署长时间运行的、有状态的 AI Agent**。\n\n---\n\n### 核心特征\n\n| 维度 | 说明 |\n|------|------|\n| **定位** | 低层级（low-level），专注于 Agent 编排（agent orchestration） |\n| **用途** | 构建、管理、部署长时间运行的有状态 Agent |\n| **生态归属** | LangChain 生态的一部分 |\n| **采用方** | Klarna、Uber、J.P. Morgan 等公司 |\n\n---\n\n### 关键要点\n\n1. **Low-Level 定位**：LangGraph 并非高层抽象框架，而是一个底层编排工具，给开发者极大的控制力。文档明确建议在使用 LangGraph 之前应先熟悉 LangChain 等更高层的抽象。\n\n2. **有状态 Agent**：与无状态的一次性调用不同，LangGraph 支持长时间运行的、保持上下文的 Agent 应用。\n\n3. **行业认可**：已被 Klarna、Uber、J.P. Morgan 等知名公司采用，说明其在生产环境中具备可靠性。\n\n---\n\n### 证据来源\n\n- **Web Search**：来自 LangChain 官方中文文档概览页（`docs.langchain.org.cn/oss/python/langgraph/overview`）的搜索摘要，其中明确描述了 LangGraph 的定位和用途。\n\n---\n\n### 证据不足说明\n\n- 由于网络连接问题，未能成功读取 `langchain.com/langgraph` 官方产品页面的完整内容，也未能获取 GitHub 仓库（`langchain-ai/langgraph`）的详细证据。当前结论主要基于 Web 搜索摘要，如需更深入的技术细节（如图状态、节点编排、Checkpoint 机制等），建议在更稳定的网络环境下进一步查阅官方文档。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "technology",
+            "official"
+          ],
+          "time_range": "any",
+          "depth": "quick",
+          "raw_query": "What is LangGraph?"
+        },
+        "discovered_sources": {
+          "web": [
+            "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+            "https://langgraph.com.cn/",
+            "https://www.langchain.com/langgraph"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub 搜索暂时不可用（SSL 错误），我先转向 Web 搜索——这是执行计划要求的必需来源。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph 是什么"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"title\": \"Web 搜索结果: https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"url\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"score\": 0.0, \"reason\": \"Title: LangGr...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+                  "title": "Web 搜索结果: https://docs.langchain.org.cn/oss/python/langgraph/overview",
+                  "url": "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+                  "score": 0.0,
+                  "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://langgraph.com.cn/",
+                  "title": "Web 搜索结果: https://langgraph.com.cn/",
+                  "url": "https://langgraph.com.cn/",
+                  "score": 0.0,
+                  "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://www.langchain.com/langgraph",
+                  "title": "Web 搜索结果: https://www.langchain.com/langgraph",
+                  "url": "https://www.langchain.com/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "找到了 LangGraph 的官方页面和文档。让我先读取官方产品页面获取权威信息。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://www.langchain.com/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://www.langchain.com/langgraph\", \"evidence\": {\"url\": \"https://www.langchain.com/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://www.langchain.com/langgra...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://www.langchain.com/langgraph",
+                "evidence": {
+                  "url": "https://www.langchain.com/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://www.langchain.com/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "## Research Findings\n\n### LangGraph 是什么？\n\n根据 Web 搜索结果，**LangGraph** 是一个**低层级的编排框架和运行时（low-level orchestration framework and runtime）**，用于**构建、管理和部署长时间运行的、有状态的 AI Agent**。\n\n---\n\n### 核心特征\n...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub 搜索暂时不可用（SSL 错误），我先转向 Web 搜索——这是执行计划要求的必需来源。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph 是什么"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"title\": \"Web 搜索结果: https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"url\": \"https://docs.langchain.org.cn/oss/python/langgraph/overview\", \"score\": 0.0, \"reason\": \"Title: LangGr...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+                  "title": "Web 搜索结果: https://docs.langchain.org.cn/oss/python/langgraph/overview",
+                  "url": "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+                  "score": 0.0,
+                  "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://langgraph.com.cn/",
+                  "title": "Web 搜索结果: https://langgraph.com.cn/",
+                  "url": "https://langgraph.com.cn/",
+                  "score": 0.0,
+                  "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://www.langchain.com/langgraph",
+                  "title": "Web 搜索结果: https://www.langchain.com/langgraph",
+                  "url": "https://www.langchain.com/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "找到了 LangGraph 的官方页面和文档。让我先读取官方产品页面获取权威信息。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://www.langchain.com/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://www.langchain.com/langgraph\", \"evidence\": {\"url\": \"https://www.langchain.com/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://www.langchain.com/langgra...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://www.langchain.com/langgraph",
+                "evidence": {
+                  "url": "https://www.langchain.com/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://www.langchain.com/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "## Research Findings\n\n### LangGraph 是什么？\n\n根据 Web 搜索结果，**LangGraph** 是一个**低层级的编排框架和运行时（low-level orchestration framework and runtime）**，用于**构建、管理和部署长时间运行的、有状态的 AI Agent**。\n\n---\n\n### 核心特征\n...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": [
+          {
+            "source": "web",
+            "identifier": "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+            "title": "Web 搜索结果: https://docs.langchain.org.cn/oss/python/langgraph/overview",
+            "url": "https://docs.langchain.org.cn/oss/python/langgraph/overview",
+            "score": 0.0,
+            "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://langgraph.com.cn/",
+            "title": "Web 搜索结果: https://langgraph.com.cn/",
+            "url": "https://langgraph.com.cn/",
+            "score": 0.0,
+            "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://www.langchain.com/langgraph",
+            "title": "Web 搜索结果: https://www.langchain.com/langgraph",
+            "url": "https://www.langchain.com/langgraph",
+            "score": 0.0,
+            "reason": "Title: LangGraph 概览 - LangChain 文档 - LangChain 教程\nURL: https://docs.langchain.org.cn/oss/python/langgraph/overview\nPublished: N/A\nAuthor: N/A\nHighlights:\n# LangGraph overview\n...\nTrusted by companies shaping the future of agents-- including Klarna, Uber, J.P. Morgan, and more-- LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents.\n...\nLangGraph is very low-level, and focused entirely on agent orchestration. Before using ...(truncated)"
+          },
+          {
+            "url": "https://www.langchain.com/langgraph",
+            "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://www.langchain.com/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+          }
+        ]
+      },
+      "latency_seconds": 48.61,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "f1": 0.4,
+            "order": 1.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [
+              "github_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "predicted_unique": [
+              "github_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "missed_tools": [
+              "github_project_profile"
+            ],
+            "extra_tools": [
+              "web_search",
+              "webpage_reader"
+            ],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 32,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 80,
+            "missing_evidence": [
+              "repository.description",
+              "readme"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 982,
+              "evidence_empty": false,
+              "unsupported_claims": [
+                "readme"
+              ],
+              "unsupported_count": 1,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.description",
+              "readme"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 80,
+          "details": {
+            "grounding": 70,
+            "contradictions": 100,
+            "completeness": 74,
+            "unsupported_claims": [
+              "readme"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 85,
+          "details": {
+            "relevance": 90,
+            "completeness": 75,
+            "clarity": 88,
+            "conciseness": 85,
+            "feedback": "回答直接回应了\"什么是LangGraph\"的问题，核心定义、定位、用途和行业采用情况均有覆盖，结构清晰。但作为information_lookup意图，缺少GitHub仓库星标、开源协议、技术栈等基础信息，且未从社区渠道获取补充证据。证据来源单一（仅Web搜索摘要），完整性有提升空间。末尾的证据不足说明虽诚实但略显冗余。"
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "question": "How many stars does langchain-ai/langgraph have?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.stars"
+      ],
+      "answer": "## Research Findings\n\n---\n\n### 直接回答：LangGraph GitHub Stars\n\n根据 **GitStarClub**（一个追踪 GitHub 仓库星数历史的第三方站点）的数据：\n\n> **截至 2026 年 6 月 21 日，`langchain-ai/langgraph` 拥有约 35,300 颗 GitHub Stars。**\n\n关键里程碑：\n- **2025 年 3 月**：突破 10,000 stars\n- **2026 年 5 月**（最新记录月份）：单月 +207 stars，增长已明显放缓\n\n> 📎 来源：web_search → [gitstarclub.com/langchain-ai/langgraph](https://gitstarclub.com/langchain-ai/langgraph)\n\n---\n\n### 关于社区评价与争议\n\n本次研究在社区侧（Reddit、Twitter、V2Ex）进行了多次搜索，但**均未返回有效结果**：\n\n| 平台 | 搜索词 | 结果 |\n|------|--------|------|\n| Reddit | `LangGraph review controversy 2024 2025` | 空 |\n| Reddit | `LangGraph` | 空 |\n| V2EX | `LangGraph` | 空 |\n\n因此，**本次无法从社区来源获取 LangGraph 近期的评价或争议信息**。这可能是因为社区搜索工具对 \"LangGraph\" 这一关键词的覆盖有限。\n\n---\n\n### 证据来源汇总\n\n| 来源类型 | 状态 | 证据 |\n|----------|------|------|\n| Web ✅ | 已满足 | GitStarClub 星数数据 |\n| Community ❌ | 尝试 3 次，均无结果 | — |\n| GitHub 🚫 | 本次任务主动排除 | — |\n\n---\n\n### 研究局限\n\n1. **星数来源非官方**：数据来自第三方站点 GitStarClub，未经 GitHub 官方 API 直接验证（GitHub 工具在本次任务中被排除）。\n2. **社区评价缺失**：Community 搜索工具未能返回 LangGraph 相关讨论，无法完成用户关于\"社区评价和主要争议\"的研究目标。\n3. **如需更准确数据**，建议直接访问 [github.com/langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) 查看实时 Star 数。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "langchain-ai/langgraph"
+          ],
+          "focus": [
+            "community"
+          ],
+          "time_range": "latest",
+          "depth": "quick",
+          "raw_query": "How many stars does langchain-ai/langgraph have?"
+        },
+        "discovered_sources": {
+          "web": [
+            "https://gitstarclub.com/langchain-ai/langgraph",
+            "https://github.com/langchain-ai/langgraph",
+            "https://docs.langchain.com/oss/python/langgraph/"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "langchain-ai/langgraph GitHub stars count 2024 2025"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://gitstarclub.com/langchain-ai/langgraph\", \"title\": \"Web 搜索结果: https://gitstarclub.com/langchain-ai/langgraph\", \"url\": \"https://gitstarclub.com/langchain-ai/langgraph\", \"score\": 0.0, \"reason\": \"Title: langchain-ai/langgraph — Star History & Timel...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:1/6\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://gitstarclub.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://gitstarclub.com/langchain-ai/langgraph",
+                  "url": "https://gitstarclub.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+                  "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+                  "url": "https://docs.langchain.com/oss/python/langgraph/",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:1/6\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://gitstarclub.com/langchain-ai/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://gitstarclub.com/langchain-ai/langgraph\", \"evidence\": {\"url\": \"https://gitstarclub.com/langchain-ai/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://git...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:2/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://gitstarclub.com/langchain-ai/langgraph",
+                "evidence": {
+                  "url": "https://gitstarclub.com/langchain-ai/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://gitstarclub.com/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:2/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "",
+            "action": {
+              "tool": "community_search",
+              "input": {
+                "query": "LangGraph review controversy 2024 2025",
+                "platforms": [
+                  "reddit",
+                  "twitter"
+                ]
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"community\", \"type\": \"empty_result\", \"summary\": \"社区搜索未找到结果。query=LangGraph review controversy 2024 2025, platforms=['reddit', 'twitter']\", \"suggestion\": \"请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。\"}\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:3/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=LangGraph review controversy 2024 2025, platforms=['reddit', 'twitter']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:3/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "",
+            "action": {
+              "tool": "community_search",
+              "input": {
+                "query": "LangGraph",
+                "platforms": [
+                  "reddit"
+                ]
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"community\", \"type\": \"empty_result\", \"summary\": \"社区搜索未找到结果。query=LangGraph, platforms=['reddit']\", \"suggestion\": \"请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。\"}\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:4/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=LangGraph, platforms=['reddit']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:4/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 5,
+            "thought": "",
+            "action": {
+              "tool": "community_search",
+              "input": {
+                "query": "LangGraph",
+                "platforms": [
+                  "v2ex"
+                ]
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"community\", \"type\": \"empty_result\", \"summary\": \"社区搜索未找到结果。query=LangGraph, platforms=['v2ex']\", \"suggestion\": \"请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。\"}\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:5/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=LangGraph, platforms=['v2ex']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:5/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 6,
+            "thought": "",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://ossinsight.io/analyze/langchain-ai/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://ossinsight.io/analyze/langchain-ai/langgraph\", \"evidence\": {\"url\": \"https://ossinsight.io/analyze/langchain-ai/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: ...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:6/6\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://ossinsight.io/analyze/langchain-ai/langgraph",
+                "evidence": {
+                  "url": "https://ossinsight.io/analyze/langchain-ai/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://ossinsight.io/analyze/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:6/6\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 7,
+            "thought": "## Research Findings\n\n---\n\n### 直接回答：LangGraph GitHub Stars\n\n根据 **GitStarClub**（一个追踪 GitHub 仓库星数历史的第三方站点）的数据：\n\n> **截至 2026 年 6 月 21 日，`langchain-ai/langgraph` 拥有约 35,300 颗 GitHub Stars。**...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "langchain-ai/langgraph GitHub stars count 2024 2025"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://gitstarclub.com/langchain-ai/langgraph\", \"title\": \"Web 搜索结果: https://gitstarclub.com/langchain-ai/langgraph\", \"url\": \"https://gitstarclub.com/langchain-ai/langgraph\", \"score\": 0.0, \"reason\": \"Title: langchain-ai/langgraph — Star History & Timel...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:1/6\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://gitstarclub.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://gitstarclub.com/langchain-ai/langgraph",
+                  "url": "https://gitstarclub.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+                  "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+                  "url": "https://docs.langchain.com/oss/python/langgraph/",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:1/6\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://gitstarclub.com/langchain-ai/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://gitstarclub.com/langchain-ai/langgraph\", \"evidence\": {\"url\": \"https://gitstarclub.com/langchain-ai/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://git...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:2/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://gitstarclub.com/langchain-ai/langgraph",
+                "evidence": {
+                  "url": "https://gitstarclub.com/langchain-ai/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://gitstarclub.com/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:2/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "",
+            "action": {
+              "tool": "community_search",
+              "input": {
+                "query": "LangGraph review controversy 2024 2025",
+                "platforms": [
+                  "reddit",
+                  "twitter"
+                ]
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"community\", \"type\": \"empty_result\", \"summary\": \"社区搜索未找到结果。query=LangGraph review controversy 2024 2025, platforms=['reddit', 'twitter']\", \"suggestion\": \"请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。\"}\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:3/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=LangGraph review controversy 2024 2025, platforms=['reddit', 'twitter']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:3/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "",
+            "action": {
+              "tool": "community_search",
+              "input": {
+                "query": "LangGraph",
+                "platforms": [
+                  "reddit"
+                ]
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"community\", \"type\": \"empty_result\", \"summary\": \"社区搜索未找到结果。query=LangGraph, platforms=['reddit']\", \"suggestion\": \"请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。\"}\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:4/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=LangGraph, platforms=['reddit']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:4/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 5,
+            "thought": "",
+            "action": {
+              "tool": "community_search",
+              "input": {
+                "query": "LangGraph",
+                "platforms": [
+                  "v2ex"
+                ]
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"community\", \"type\": \"empty_result\", \"summary\": \"社区搜索未找到结果。query=LangGraph, platforms=['v2ex']\", \"suggestion\": \"请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。\"}\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:5/6\nEvidence Sources:\nWeb\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=LangGraph, platforms=['v2ex']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:5/6\nEvidence Sources:\nWeb\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 6,
+            "thought": "",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://ossinsight.io/analyze/langchain-ai/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://ossinsight.io/analyze/langchain-ai/langgraph\", \"evidence\": {\"url\": \"https://ossinsight.io/analyze/langchain-ai/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: ...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:6/6\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://ossinsight.io/analyze/langchain-ai/langgraph",
+                "evidence": {
+                  "url": "https://ossinsight.io/analyze/langchain-ai/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://ossinsight.io/analyze/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nCommunity\nWeb\nMinimum Evidence Sources:2\nRequired Evidence Sources:Community, Web\nAvoid Sources:GitHub\nAllowed Tools:community_search, community_reader, web_search, webpage_reader\nBlocked Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:6\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nCommunity:0\nWeb:1\nTool Calls:6/6\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 7,
+            "thought": "## Research Findings\n\n---\n\n### 直接回答：LangGraph GitHub Stars\n\n根据 **GitStarClub**（一个追踪 GitHub 仓库星数历史的第三方站点）的数据：\n\n> **截至 2026 年 6 月 21 日，`langchain-ai/langgraph` 拥有约 35,300 颗 GitHub Stars。**...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": [
+          {
+            "source": "web",
+            "identifier": "https://gitstarclub.com/langchain-ai/langgraph",
+            "title": "Web 搜索结果: https://gitstarclub.com/langchain-ai/langgraph",
+            "url": "https://gitstarclub.com/langchain-ai/langgraph",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://github.com/langchain-ai/langgraph",
+            "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+            "url": "https://github.com/langchain-ai/langgraph",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+            "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+            "url": "https://docs.langchain.com/oss/python/langgraph/",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph — Star History & Timeline · GitStarClub\nURL: https://gitstarclub.com/langchain-ai/langgraph\nPublished: 2023-08-09T19:12:54.000Z\nAuthor: N/A\nHighlights:\nAs of June 21, 2026, langchain-ai/langgraph has 35.3k GitHub stars. GitStarClub tracks its Python profile, 10k in March 2025, and latest recorded month of May 2026 with +207 stars, combining identity, milestone, current-star, and monthly curve fields for answerable repository history without runtime inference. — GitS...(truncated)"
+          },
+          {
+            "url": "https://gitstarclub.com/langchain-ai/langgraph",
+            "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://gitstarclub.com/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+          },
+          {
+            "url": "https://ossinsight.io/analyze/langchain-ai/langgraph",
+            "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://ossinsight.io/analyze/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+          }
+        ]
+      },
+      "latency_seconds": 121.068,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "order": 0.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [
+              "web_search",
+              "webpage_reader",
+              "community_search",
+              "community_search",
+              "community_search",
+              "webpage_reader"
+            ],
+            "predicted_unique": [
+              "community_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "missed_tools": [
+              "github_project_profile",
+              "github_search"
+            ],
+            "extra_tools": [
+              "community_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "duplicate_calls": 3
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 23,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 50,
+            "missing_evidence": [
+              "repository.stars"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 1139,
+              "evidence_empty": false,
+              "unsupported_claims": [
+                "number:35300",
+                "number:10000",
+                "repository.stars",
+                "community_posts"
+              ],
+              "unsupported_count": 4,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.stars"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 81,
+          "details": {
+            "grounding": 70,
+            "contradictions": 100,
+            "completeness": 81,
+            "unsupported_claims": [
+              "repository.stars"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 89,
+          "details": {
+            "relevance": 95,
+            "completeness": 85,
+            "clarity": 90,
+            "conciseness": 75,
+            "feedback": "回答直接给出了星数（约35,300），高度相关。但用户仅问星数，回答却包含大量社区搜索失败记录、研究局限等无关内容，显得冗余。结构清晰但不够简洁，核心信息被稀释。"
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "question": "What programming language is LangGraph written in?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.language"
+      ],
+      "answer": "根据 Current Research Policy 的 Status 已经变为 \"Ready to Finish\"，我停止继续调用工具，直接输出最终结论。\n\n---\n\n## Research Findings\n\n### LangGraph 使用的编程语言\n\n根据 Web 搜索结果（来源：[langchain-ai/langgraph GitHub 仓库](https://github.com/langchain-ai/langgraph)），**LangGraph 主要使用以下编程语言**：\n\n| 语言 | 说明 |\n|------|------|\n| **Python** 🐍 | 主要实现语言，官方主仓库 `langchain-ai/langgraph` 的核心代码，也是文档和社区的主要目标语言。 |\n| **TypeScript** | 第二主要语言，用于 JavaScript/TypeScript 版本（独立仓库 `langchain-ai/langgraphjs`）。 |\n| **JavaScript** | 与 TypeScript 共同构成 JS 生态的实现。 |\n\n此外，仓库中还有少量 **Makefile** 和 **Dockerfile** 用于构建和部署。\n\n### 关键结论\n\n- LangGraph 是 **多语言项目**，同时提供 **Python** 和 **JavaScript/TypeScript** 两个版本。\n- **Python 版本**是主线和最成熟的分支（对应文档：[docs.langchain.com/oss/python/langgraph/](https://docs.langchain.com/oss/python/langgraph/)）。\n- **JavaScript/TypeScript 版本** 独立维护在 `langchain-ai/langgraphjs` 仓库中。\n\n> **证据来源**：Web Search（GitHub 仓库元数据）。由于网络限制，GitHub 页面直接读取和 GitHub API 均暂时不可用，以上信息基于 Web 搜索返回的仓库摘要。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "technology"
+          ],
+          "time_range": "any",
+          "depth": "quick",
+          "raw_query": "What programming language is LangGraph written in?"
+        },
+        "discovered_sources": {
+          "web": [
+            "https://github.com/langchain-ai/langgraph",
+            "https://docs.langchain.com/oss/python/langgraph/",
+            "https://github.com/langchain-ai/langgraphjs)"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub 搜索暂时遇到网络问题。让我改用 Web 搜索来查找 LangGraph 的相关信息。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph programming language GitHub"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph\", \"url\": \"https://github.com/langchain-ai/langgraph\", \"score\": 0.0, \"reason\": \"Title: langchain-ai/langgraph: Build resilient agents.\\nURL: https:...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+                  "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+                  "url": "https://docs.langchain.com/oss/python/langgraph/",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraphjs)",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraphjs)",
+                  "url": "https://github.com/langchain-ai/langgraphjs)",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "Web 搜索结果已经显示 LangGraph 仓库位于 `langchain-ai/langgraph`，并且列出了语言标签。让我读取 GitHub 仓库页面获取更准确的语言信息。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://github.com/langchain-ai/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://github.com/langchain-ai/langgraph\", \"evidence\": {\"url\": \"https://github.com/langchain-ai/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/la...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://github.com/langchain-ai/langgraph",
+                "evidence": {
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "根据 Current Research Policy 的 Status 已经变为 \"Ready to Finish\"，我停止继续调用工具，直接输出最终结论。\n\n---\n\n## Research Findings\n\n### LangGraph 使用的编程语言\n\n根据 Web 搜索结果（来源：[langchain-ai/langgraph GitHub 仓库](https:...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub 搜索暂时遇到网络问题。让我改用 Web 搜索来查找 LangGraph 的相关信息。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph programming language GitHub"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph\", \"url\": \"https://github.com/langchain-ai/langgraph\", \"score\": 0.0, \"reason\": \"Title: langchain-ai/langgraph: Build resilient agents.\\nURL: https:...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+                  "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+                  "url": "https://docs.langchain.com/oss/python/langgraph/",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraphjs)",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraphjs)",
+                  "url": "https://github.com/langchain-ai/langgraphjs)",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "Web 搜索结果已经显示 LangGraph 仓库位于 `langchain-ai/langgraph`，并且列出了语言标签。让我读取 GitHub 仓库页面获取更准确的语言信息。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://github.com/langchain-ai/langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://github.com/langchain-ai/langgraph\", \"evidence\": {\"url\": \"https://github.com/langchain-ai/langgraph\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/la...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://github.com/langchain-ai/langgraph",
+                "evidence": {
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "根据 Current Research Policy 的 Status 已经变为 \"Ready to Finish\"，我停止继续调用工具，直接输出最终结论。\n\n---\n\n## Research Findings\n\n### LangGraph 使用的编程语言\n\n根据 Web 搜索结果（来源：[langchain-ai/langgraph GitHub 仓库](https:...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": [
+          {
+            "source": "web",
+            "identifier": "https://github.com/langchain-ai/langgraph",
+            "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+            "url": "https://github.com/langchain-ai/langgraph",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+            "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+            "url": "https://docs.langchain.com/oss/python/langgraph/",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://github.com/langchain-ai/langgraphjs)",
+            "title": "Web 搜索结果: https://github.com/langchain-ai/langgraphjs)",
+            "url": "https://github.com/langchain-ai/langgraphjs)",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 384\n...\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created:\n...\n2023-08-\n...\n8:33:12Z\n...\n- Dockerfile\n- JavaScript\n- Makefile\n- Python\n- TypeScript\n...\n- agents\n- ai\n- ai-agents\n- chatgpt\n- deepagents\n- ...(truncated)"
+          },
+          {
+            "url": "https://github.com/langchain-ai/langgraph",
+            "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+          }
+        ]
+      },
+      "latency_seconds": 47.237,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "f1": 0.4,
+            "order": 1.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [
+              "github_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "predicted_unique": [
+              "github_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "missed_tools": [
+              "github_project_profile"
+            ],
+            "extra_tools": [
+              "web_search",
+              "webpage_reader"
+            ],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 32,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 80,
+            "missing_evidence": [
+              "repository.language"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 926,
+              "evidence_empty": false,
+              "unsupported_claims": [
+                "readme"
+              ],
+              "unsupported_count": 1,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.language"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 80,
+          "details": {
+            "grounding": 70,
+            "contradictions": 100,
+            "completeness": 74,
+            "unsupported_claims": [
+              "readme"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 90,
+          "details": {
+            "relevance": 95,
+            "completeness": 90,
+            "clarity": 85,
+            "conciseness": 75,
+            "feedback": "回答直接回应了用户关于LangGraph编程语言的问题，明确给出Python和TypeScript/JavaScript两个主要语言，并区分了主仓库与JS独立仓库。信息较为完整，表格结构清晰。但开头关于\"Research Policy Status\"的元信息属于冗余内容，与用户问题无关；结尾关于网络限制的说明也略显多余，影响了简洁性。"
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "question": "What license does LangGraph use?",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "repository.license"
+      ],
+      "answer": "## Research Findings\n\n### LangGraph 的许可证\n\n**LangGraph 使用 MIT License。**\n\n根据 Web Search 获取的证据，LangGraph（仓库：`langchain-ai/langgraph`）的 LICENSE 文件中明确标注为 **MIT License**，版权归属于 **LangChain, Inc.（2024）**。\n\nMIT License 是一种非常宽松的开源许可证，允许任何人自由地使用、复制、修改、合并、发布、分发、再许可和/或出售该软件的副本，只需保留原始版权声明和许可声明即可。\n\n---\n\n**证据来源：**\n\n| 来源 | 内容 |\n|------|------|\n| Web Search → `github.com/langchain-ai/langgraph/blob/main/LICENSE` | 明确显示 \"MIT License\" + \"Copyright (c) 2024 LangChain, Inc.\" |\n\n---\n\n**备注：** 本次研究共调用 3 次工具（GitHub Search 不可用、Web Search 命中、Webpage Reader 不可用），已满足 Required Source（Web）条件，研究终止。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "official"
+          ],
+          "time_range": "latest",
+          "depth": "quick",
+          "raw_query": "What license does LangGraph use?"
+        },
+        "discovered_sources": {
+          "web": [
+            "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+            "https://www.langchain.com/langgraph",
+            "https://github.com/langchain-ai/langgraph?tab=readme-ov-file"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub Search 暂时不可用，我直接通过 Web Search 来查找 LangGraph 的许可证信息。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph license"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"score\": 0.0, \"reason\": \"Title: MIT Li...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "score": 0.0,
+                  "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://www.langchain.com/langgraph",
+                  "title": "Web 搜索结果: https://www.langchain.com/langgraph",
+                  "url": "https://www.langchain.com/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "url": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "score": 0.0,
+                  "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "已找到 LangGraph 的 LICENSE 文件链接。让我直接读取它来获取确切证据。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"evidence\": {\"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries excee...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                "evidence": {
+                  "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/langchain-ai/langgraph/blob/main/LICENSE (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "## Research Findings\n\n### LangGraph 的许可证\n\n**LangGraph 使用 MIT License。**\n\n根据 Web Search 获取的证据，LangGraph（仓库：`langchain-ai/langgraph`）的 LICENSE 文件中明确标注为 **MIT License**，版权归属于 **LangChain, I...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub Search 暂时不可用，我直接通过 Web Search 来查找 LangGraph 的许可证信息。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph license"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"score\": 0.0, \"reason\": \"Title: MIT Li...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "score": 0.0,
+                  "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://www.langchain.com/langgraph",
+                  "title": "Web 搜索结果: https://www.langchain.com/langgraph",
+                  "url": "https://www.langchain.com/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "url": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "score": 0.0,
+                  "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "已找到 LangGraph 的 LICENSE 文件链接。让我直接读取它来获取确切证据。",
+            "action": {
+              "tool": "webpage_reader",
+              "input": {
+                "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"web\", \"type\": \"webpage\", \"summary\": \"读取网页正文: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"evidence\": {\"url\": \"https://github.com/langchain-ai/langgraph/blob/main/LICENSE\", \"content\": \"读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries excee...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                "evidence": {
+                  "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/langchain-ai/langgraph/blob/main/LICENSE (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nWeb\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "## Research Findings\n\n### LangGraph 的许可证\n\n**LangGraph 使用 MIT License。**\n\n根据 Web Search 获取的证据，LangGraph（仓库：`langchain-ai/langgraph`）的 LICENSE 文件中明确标注为 **MIT License**，版权归属于 **LangChain, I...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": [
+          {
+            "source": "web",
+            "identifier": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+            "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+            "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+            "score": 0.0,
+            "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://www.langchain.com/langgraph",
+            "title": "Web 搜索结果: https://www.langchain.com/langgraph",
+            "url": "https://www.langchain.com/langgraph",
+            "score": 0.0,
+            "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+            "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+            "url": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+            "score": 0.0,
+            "reason": "Title: MIT License - langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph/blob/main/LICENSE\nPublished: N/A\nAuthor: N/A\nHighlights:\n```\nMIT License\n\nCopyright (c) 2024 LangChain, Inc.\n...\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, an...(truncated)"
+          },
+          {
+            "url": "https://github.com/langchain-ai/langgraph/blob/main/LICENSE",
+            "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://github.com/langchain-ai/langgraph/blob/main/LICENSE (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+          }
+        ]
+      },
+      "latency_seconds": 45.65,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "f1": 0.4,
+            "order": 1.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [
+              "github_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "predicted_unique": [
+              "github_search",
+              "web_search",
+              "webpage_reader"
+            ],
+            "missed_tools": [
+              "github_project_profile"
+            ],
+            "extra_tools": [
+              "web_search",
+              "webpage_reader"
+            ],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 32,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 80,
+            "missing_evidence": [
+              "repository.license"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 574,
+              "evidence_empty": false,
+              "unsupported_claims": [
+                "repository.license"
+              ],
+              "unsupported_count": 1,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "repository.license"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 81,
+          "details": {
+            "grounding": 70,
+            "contradictions": 100,
+            "completeness": 82,
+            "unsupported_claims": [
+              "repository.license"
+            ],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 96,
+          "details": {
+            "relevance": 100,
+            "completeness": 95,
+            "clarity": 95,
+            "conciseness": 90,
+            "feedback": "回答直接命中问题核心，明确给出 MIT License 并附版权信息。对许可证含义做了简要解释，结构清晰。末尾的工具调用备注略显多余，可省略以提升简洁性。"
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "question": "Summarize the LangGraph README.",
+      "repo": "langchain-ai/langgraph",
+      "expected_intents": [
+        "information_lookup"
+      ],
+      "predicted_intents": [
+        "information_lookup"
+      ],
+      "intent_score": 100,
+      "expected_tools": [
+        "github_search",
+        "github_project_profile"
+      ],
+      "required_evidence": [
+        "readme"
+      ],
+      "answer": "没有获取到任何证据，因此无法继续研究。\n\n可能原因：\n- 目标仓库不存在或无法访问\n- 网络/API 限制\n- 研究对象没有公开数据\n\n请尝试提供其他项目名称或 GitHub 仓库地址。",
+      "trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "official",
+            "technology"
+          ],
+          "time_range": "latest",
+          "depth": "quick",
+          "raw_query": "Summarize the LangGraph README."
+        },
+        "discovered_sources": {
+          "web": [
+            "https://github.com/langchain-ai/langgraph",
+            "https://docs.langchain.com/oss/python/langgraph/",
+            "https://github.com/langchain-ai/langgraphjs)"
+          ]
+        },
+        "steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub 搜索暂时不可用（SSL 错误），转为 Web 搜索来定位 LangGraph 的官方仓库和文档。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph LangChain GitHub repository"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph\", \"url\": \"https://github.com/langchain-ai/langgraph\", \"score\": 0.0, \"reason\": \"Title: langchain-ai/langgraph: Build resilient agents.\\nURL: https:...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+                  "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+                  "url": "https://docs.langchain.com/oss/python/langgraph/",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraphjs)",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraphjs)",
+                  "url": "https://github.com/langchain-ai/langgraphjs)",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "找到官方仓库 `langchain-ai/langgraph`。现在通过 GitHub 项目画像获取 README 内容。",
+            "action": {
+              "tool": "github_project_profile",
+              "input": {
+                "owner": "langchain-ai",
+                "repo": "langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_project_profile 调用失败。\", \"evidence\": {\"tool\": \"github_project_profile\", \"input\": {\"owner\": \"langchain-ai\", \"repo\": \"langgraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): ...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_project_profile 调用失败。",
+                "evidence": {
+                  "tool": "github_project_profile",
+                  "input": {
+                    "owner": "langchain-ai",
+                    "repo": "langgraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "## Research Findings：LangGraph README 摘要\n\n### 数据来源\n\n- **Web 搜索**：`https://github.com/langchain-ai/langgraph`（GitHub 仓库页面）\n\n> ⚠️ **说明**：GitHub API（`github_search`、`github_project_profile`...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ],
+        "react_steps": [
+          {
+            "index": 1,
+            "thought": "",
+            "action": {
+              "tool": "github_search",
+              "input": {
+                "query": "LangGraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_search 调用失败。\", \"evidence\": {\"tool\": \"github_search\", \"input\": {\"query\": \"LangGraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/rep...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:0\nTool Calls:1/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 2,
+            "thought": "GitHub 搜索暂时不可用（SSL 错误），转为 Web 搜索来定位 LangGraph 的官方仓库和文档。",
+            "action": {
+              "tool": "web_search",
+              "input": {
+                "query": "LangGraph LangChain GitHub repository"
+              }
+            },
+            "observation": "Tool Result:\n[{\"source\": \"web\", \"identifier\": \"https://github.com/langchain-ai/langgraph\", \"title\": \"Web 搜索结果: https://github.com/langchain-ai/langgraph\", \"url\": \"https://github.com/langchain-ai/langgraph\", \"score\": 0.0, \"reason\": \"Title: langchain-ai/langgraph: Build resilient agents.\\nURL: https:...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research",
+            "raw_output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+                  "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+                  "url": "https://docs.langchain.com/oss/python/langgraph/",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraphjs)",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraphjs)",
+                  "url": "https://github.com/langchain-ai/langgraphjs)",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+                }
+              ],
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:2/4\nEvidence Sources:\nNone\nStatus:Continue Research"
+            }
+          },
+          {
+            "index": 3,
+            "thought": "找到官方仓库 `langchain-ai/langgraph`。现在通过 GitHub 项目画像获取 README 内容。",
+            "action": {
+              "tool": "github_project_profile",
+              "input": {
+                "owner": "langchain-ai",
+                "repo": "langgraph"
+              }
+            },
+            "observation": "Tool Result:\n{\"source\": \"tool_gateway\", \"type\": \"tool_error\", \"summary\": \"github_project_profile 调用失败。\", \"evidence\": {\"tool\": \"github_project_profile\", \"input\": {\"owner\": \"langchain-ai\", \"repo\": \"langgraph\"}, \"error_type\": \"SSLError\", \"error\": \"HTTPSConnectionPool(host='api.github.com', port=443): ...(truncated)\n\nLatest Policy Hint:\n当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer",
+            "raw_output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_project_profile 调用失败。",
+                "evidence": {
+                  "tool": "github_project_profile",
+                  "input": {
+                    "owner": "langchain-ai",
+                    "repo": "langgraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)')))"
+                }
+              },
+              "policy_hint": "当前 Research Policy: \nObjective:information_lookup\nPreferred Sources: \nGitHub\nWeb\nMinimum Evidence Sources:1\nRequired Evidence Sources:Web\nAvoid Sources:None\nAllowed Tools:github_search, github_project_profile, github_project_health, github_release_summary, github_ecosystem, web_search, webpage_reader\nBlocked Tools:None\nMaximum Discovery Per Source:1\nMaximum Reader Per Source:2\nMaximum Tool Calls:4\nStopping Condition:required_sources_satisfied\n\nCurrent Progress\nGitHub:0\nWeb:1\nTool Calls:3/4\nEvidence Sources:\nGitHub\nStatus:Ready to Finish - stop calling tools and write final answer"
+            }
+          },
+          {
+            "index": 4,
+            "thought": "## Research Findings：LangGraph README 摘要\n\n### 数据来源\n\n- **Web 搜索**：`https://github.com/langchain-ai/langgraph`（GitHub 仓库页面）\n\n> ⚠️ **说明**：GitHub API（`github_search`、`github_project_profile`...(truncated)",
+            "action": null,
+            "observation": "（生成最终回答）"
+          }
+        ]
+      },
+      "evidence": {
+        "repository": null,
+        "readme": null,
+        "releases": [],
+        "issues": [],
+        "pull_requests": [],
+        "community_posts": [],
+        "web_pages": [
+          {
+            "source": "web",
+            "identifier": "https://github.com/langchain-ai/langgraph",
+            "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+            "url": "https://github.com/langchain-ai/langgraph",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+            "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+            "url": "https://docs.langchain.com/oss/python/langgraph/",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+          },
+          {
+            "source": "web",
+            "identifier": "https://github.com/langchain-ai/langgraphjs)",
+            "title": "Web 搜索结果: https://github.com/langchain-ai/langgraphjs)",
+            "url": "https://github.com/langchain-ai/langgraphjs)",
+            "score": 0.0,
+            "reason": "Title: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n# langchain-ai/langgraph\n...\n- Stars: 38412\n- Forks: 6467\n- Watchers: 38412\n- Open issues: 649\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n...\n## README\n\n \n \n \n \n \n \n \n \n \n\n \n Low-level orchestration framework for building stateful agents. \n \n\n \n \n \n \n \n \n\n \n\nTrus...(truncated)"
+          }
+        ]
+      },
+      "latency_seconds": 73.868,
+      "error": null,
+      "evaluations": {
+        "intent": {
+          "layer": "intent",
+          "implemented": true,
+          "score": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "intent_score": 100
+          },
+          "details": {
+            "expected_intents": [
+              "information_lookup"
+            ],
+            "predicted_intents": [
+              "information_lookup"
+            ],
+            "correct_intents": [
+              "information_lookup"
+            ],
+            "missed_intents": [],
+            "extra_intents": []
+          }
+        },
+        "tool_selection": {
+          "layer": "tool_selection",
+          "implemented": true,
+          "score": {
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "order": 1.0
+          },
+          "details": {
+            "expected_tools": [
+              "github_search",
+              "github_project_profile"
+            ],
+            "predicted_tools": [
+              "github_search",
+              "web_search",
+              "github_project_profile"
+            ],
+            "predicted_unique": [
+              "github_project_profile",
+              "github_search",
+              "web_search"
+            ],
+            "missed_tools": [],
+            "extra_tools": [
+              "web_search"
+            ],
+            "duplicate_calls": 0
+          }
+        },
+        "evidence": {
+          "layer": "evidence",
+          "implemented": true,
+          "score": 30,
+          "details": {
+            "completeness": 0,
+            "freshness": 40,
+            "coverage": 75,
+            "missing_evidence": [
+              "readme"
+            ],
+            "freshness_details": {
+              "status": "missing",
+              "newest": null,
+              "note": "No timestamp fields found in evidence."
+            },
+            "coverage_details": {
+              "answer_length": 93,
+              "evidence_empty": false,
+              "unsupported_claims": [],
+              "unsupported_count": 0,
+              "expected_intents": [
+                "information_lookup"
+              ]
+            },
+            "required_evidence": [
+              "readme"
+            ]
+          }
+        },
+        "reasoning": {
+          "layer": "reasoning",
+          "implemented": true,
+          "score": 85,
+          "details": {
+            "grounding": 86,
+            "contradictions": 100,
+            "completeness": 57,
+            "unsupported_claims": [],
+            "contradiction_list": []
+          }
+        },
+        "answer": {
+          "layer": "answer",
+          "implemented": true,
+          "score": 20,
+          "details": {
+            "relevance": 0,
+            "completeness": 0,
+            "clarity": 60,
+            "conciseness": 80,
+            "feedback": "回答完全没有回应\"Summarize the LangGraph README\"这一核心问题，未提供任何关于 LangGraph README 的摘要信息。虽然回复结构清晰、无废话，并给出了失败原因和后续建议，但本质上是一次任务失败的声明，而非对用户问题的回答。相关性和完整性均为零。"
+          }
+        }
+      }
+    }
+  ]
+}

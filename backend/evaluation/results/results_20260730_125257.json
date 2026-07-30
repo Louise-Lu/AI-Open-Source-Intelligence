@@ -1,0 +1,1123 @@
+{
+  "summary": {
+    "total": 3,
+    "errors": 0,
+    "intent_accuracy": 82.0,
+    "context_plan_score": 96.0,
+    "tool_efficiency": 100.0,
+    "source_recall": 1.0,
+    "tool_precision": 1.0,
+    "tool_f1": 1.0,
+    "avg_tool_calls": 3.3333333333333335,
+    "evidence_quality": 0.0,
+    "completeness_score": 4.866666666666666,
+    "avg_latency_seconds": 33.38833333333333,
+    "total_estimated_cost": 0.05450000000000001,
+    "categories": {
+      "information_lookup": {
+        "count": 3,
+        "errors": 0,
+        "intent": [
+          83.0,
+          75.0,
+          88.0
+        ],
+        "completeness": [
+          4.6,
+          5.0,
+          5.0
+        ]
+      }
+    },
+    "intent_accuracy_display": "82.0%",
+    "context_plan_display": "96.0%",
+    "avg_tool_calls_display": "3.3",
+    "tool_efficiency_display": "100.0%",
+    "source_recall_display": "100.0%",
+    "evidence_quality_display": "0",
+    "completeness_display": "4.9/5",
+    "avg_latency_display": "33.4s",
+    "total_cost_display": "¥0.0545"
+  },
+  "results": [
+    {
+      "id": 1,
+      "query": "What is LangGraph?",
+      "category": "information_lookup",
+      "error": null,
+      "latency_seconds": 45.654,
+      "full_trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "focus": [
+            "official",
+            "developer",
+            "technology"
+          ],
+          "time_range": "any",
+          "depth": "quick",
+          "entities": [
+            "LangGraph"
+          ]
+        },
+        "execution_plan": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "official",
+            "developer",
+            "technology"
+          ],
+          "time_range": "any",
+          "user_goal": "了解 LangGraph 的基本信息和数据",
+          "mode": "quick",
+          "source_scope": [
+            "github",
+            "web"
+          ],
+          "preferred_tools": [
+            "github_search",
+            "github_project_profile",
+            "web_search",
+            "webpage_reader"
+          ],
+          "avoid_sources": [],
+          "required_evidence": [
+            "github"
+          ],
+          "max_tool_calls": 4,
+          "max_discovery_per_source": 2,
+          "max_empty_retry_per_source": 1,
+          "max_reader_per_source": 2,
+          "max_evidence_items": 8,
+          "min_evidence_items": 2,
+          "stop_conditions": {
+            "min_sources": 1,
+            "min_evidence_items": 2
+          }
+        },
+        "tool_trace": [
+          {
+            "step_index": 0,
+            "timestamp": "2026-07-30T04:51:53.167967+00:00",
+            "tool": "github_search",
+            "input": {
+              "query": "LangGraph"
+            },
+            "output": {
+              "result": [
+                {
+                  "source": "github",
+                  "identifier": "langchain-ai/langgraph",
+                  "title": "langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 38462.0,
+                  "reason": "Build resilient agents."
+                },
+                {
+                  "source": "github",
+                  "identifier": "google-gemini/gemini-fullstack-langgraph-quickstart",
+                  "title": "google-gemini/gemini-fullstack-langgraph-quickstart",
+                  "url": "https://github.com/google-gemini/gemini-fullstack-langgraph-quickstart",
+                  "score": 18287.0,
+                  "reason": "Get started with building Fullstack Agents using Gemini 2.5 and LangGraph"
+                }
+              ],
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 1/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 1,
+            "timestamp": "2026-07-30T04:51:53.168058+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "langchain-ai",
+              "repo": "langgraph"
+            },
+            "output": {
+              "result": {
+                "source": "github",
+                "type": "project_profile",
+                "summary": "langchain-ai/langgraph 是一个以 Python 为主的项目，当前 stars=38462。",
+                "evidence": {
+                  "repository": {
+                    "full_name": "langchain-ai/langgraph",
+                    "description": "Build resilient agents.",
+                    "language": "Python",
+                    "stars": 38462,
+                    "forks": 6477,
+                    "topics": [
+                      "agents",
+                      "ai",
+                      "ai-agents",
+                      "chatgpt",
+                      "deepagents",
+                      "enterprise",
+                      "framework",
+                      "gemini",
+                      "generative-ai",
+                      "langchain",
+                      "langgraph",
+                      "llm",
+                      "multiagent",
+                      "open-source",
+                      "openai",
+                      "pydantic",
+                      "python",
+                      "rag"
+                    ],
+                    "license": "MIT License",
+                    "created_at": "2023-08-09T18:33:12Z",
+                    "updated_at": "2026-07-30T04:44:45Z"
+                  },
+                  "readme": "<div align=\"center\">\n  <a href=\"https://www.langchain.com/langgraph\">\n    <picture>\n      <source media=\"(prefers-color-scheme: dark)\" srcset=\".github/images/logo-dark.svg\">\n      <source media=\"(prefers-color-scheme: light)\" srcset=\".github/images/logo-light.svg\">\n      <img alt=\"LangGraph Logo\" src=\".github/images/logo-dark.svg\" width=\"50%\">\n    </picture>\n  </a>\n</div>\n\n<div align=\"center\">\n  <h3>Low-level orchestration framework for building stateful agents.</h3>\n</div>\n\n<div align=\"center\">\n  <a href=\"https://opensource.org/licenses/MIT\" target=\"_blank\"><img src=\"https://img.shields.io/pypi/l/langgraph\" alt=\"PyPI - License\"></a>\n  <a href=\"https://pypistats.org/packages/langgraph\" target=\"_blank\"><img src=\"https://img.shields.io/pepy/dt/langgraph\" alt=\"PyPI - Downloads\"></a>\n  <a href=\"https://pypi.org/project/langgraph/\" target=\"_blank\"><img src=\"https://img.shields.io/pypi/v/langgraph.svg?label=%20\" alt=\"Version\"></a>\n  <a href=\"https://x.com/langchain_oss\" target=\"_blank\"><img src=\"https://img.shields.io/twitter/url/https/twitter.com/langchain_oss.svg?style=social&label=Follow%20%40LangChain\" alt=\"Twitter / X\"></a>\n</div>\n\n<br>\n\nTrusted by companies shaping the future of agents – including Klarna, Replit, Elastic, and more – LangGraph is a low-level orchestration framework for building, managing, and deploying long-running, stateful agents.\n\n```bash\npip install -U langgraph\n```\n\n> [!TIP]\n> If you're looking to quickly build agents, check out **[Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview)** — a higher-level package built on LangGraph for agents that can plan, use subagents, and leverage file systems for complex tasks.\n\nFor an equivalent JS/TS library, check out [LangGraph.js](https://github.com/langchain-ai/langgraphjs) and the [JS docs](https://docs.langchain.com/oss/javascript/langgraph/overview).\n\n## Why use LangGraph?\n\nLangGraph provides low-level supporting infrastructure for *any* long-running, stateful workflow or agent:\n\n- **[Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)** — Build agents that persist through failures and can run for extended periods, automatically resuming from exactly where they left off.\n- **[Human-in-the-loop](https://docs.langchain.com/oss/python/langgraph/interrupts)** — Seamlessly incorporate human oversight by inspecting and modifying agent state at any point during execution.\n- **[Comprehensive memory](https://docs.langchain.com/oss/python/langgraph/memory)** — Create truly stateful agents with both short-term working memory for ongoing reasoning and long-term persistent memory across sessions.\n- **[Debugging with LangSmith](https://www.langchain.com/langsmith)** — Gain deep visibility into complex agent behavior with visualization tools that trace execution paths, capture state transitions, and provide detailed runtime metrics.\n- **[Production-ready deployment](https://docs.langchain.com/langsmith/deployments)** — Deploy sophisticated agent systems confidently with scalable infrastructure designed to handle the unique challenges of stateful, long-running workflows.\n\n> [!TIP]\n> For developing, debugging, and deploying AI agents and LLM applications, see [LangSmith](https://docs.langchain.com/langsmith/home).\n\n## LangGraph ecosystem\n\nWhile LangGraph can be used standalone, it also integrates seamlessly with any LangChain product, giving developers a full suite of tools for building agents.\n\nTo improve your LLM application development, pair LangGraph with:\n\n- [Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview) – Build agents that can plan, use subagents, and leverage file systems for complex tasks.\n- [LangChain](https://docs.langchain.com/oss/python/langchain/overview) – Provides integrations and composable components to streamline LLM application development.\n- [LangSmith](https://www.langchain.com/langsmith) – Helpful for agent evals and observability. Debug poor-performing LLM app runs, evaluate agent trajectories, gain visibility in production, and improve performance over time.\n- [LangSmith Deployment](https://docs.langchain.com/langsmith/deployments) – Deploy and scale agents effortlessly with a purpose-built deployment platform for long-running, stateful workflows. Discover, reuse, configure, and share agents across teams – and iterate quickly with visual prototyping in [LangSmith Studio](https://docs.langchain.com/langsmith/studio).\n\n---\n\n## Documentation\n\n- [docs.langchain.com](https://docs.langchain.com/oss/python/langgraph/overview) – Comprehensive documentation, including conceptual overviews and guides\n- [reference.langchain.com/python/langgraph](https://reference.langchain.com/python/langgraph) – API reference docs for LangGraph packages\n- [LangGraph Quickstart](https://docs.langchain.com/oss/python/langgraph/quickstart) – Get started building with LangGraph\n- [Chat LangChain](https://chat.langchain.com/) – Chat with the LangChain documentation and get answers to your questions\n\n**Discussions**: Visit the [LangChain Forum](https://forum.langchain.com) to connect with the community and share all of your technical questions, ideas, and feedback.\n\n## Additional resources\n\n- **[Guides](https://docs.langchain.com/oss/python/learn)** – Quick, actionable code snippets for topics such as streaming, adding memory & persistence, and design patterns (e.g. branching, subgraphs, etc.).\n- **[LangChain Academy](https://academy.langchain.com/courses/intro-to-langgraph)** – Learn the basics of LangGraph in our free, structured course.\n- **[Case studies](https://www.langchain.com/built-with-langgraph)** – Hear how industry leaders use LangGraph to ship AI applications at scale.\n- [Contributing Guide](https://docs.langchain.com/oss/python/contributing/overview) – Learn how to contribute to LangChain projects and find good first issues.\n- [Code of Conduct](https://github.com/langchain-ai/langchain/?tab=coc-ov-file) – Our community guidelines and standards for participation.\n\n---\n\n## Acknowledgements\n\nLangGraph is inspired by [Pregel](https://research.google/pubs/pub37252/) and [Apache Beam](https://beam.apache.org/). The public interface draws inspiration from [NetworkX](https://networkx.org/documentation/latest/). LangGraph is built by LangChain Inc, the creators of LangChain, but can be used without LangChain.\n"
+                }
+              },
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 2/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 2,
+            "timestamp": "2026-07-30T04:51:53.168079+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangGraph"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 3/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 3,
+            "timestamp": "2026-07-30T04:51:53.168123+00:00",
+            "tool": "github_project_health",
+            "input": {
+              "owner": "langchain-ai",
+              "repo": "langgraph"
+            },
+            "output": {
+              "result": {
+                "source": "github",
+                "type": "project_health",
+                "summary": "langchain-ai/langgraph 近 30 天提交数=32，近 90 天提交数=224。",
+                "evidence": {
+                  "issues": [
+                    {
+                      "title": "langgraph-api injects private CONFIG_KEY_RUNTIME (__pregel_runtime) into factory-visible config; factories that re-bind it crash with '_ReadRuntime' has no 'override'",
+                      "state": "open",
+                      "created_at": "2026-07-29T20:58:01Z",
+                      "comments": 0
+                    },
+                    {
+                      "title": "[Proposal] OpenEval Import/Export Support",
+                      "state": "open",
+                      "created_at": "2026-07-29T04:25:16Z",
+                      "comments": 1
+                    },
+                    {
+                      "title": "Reading a nested subgraph's state hydrates every DeltaChannel empty",
+                      "state": "open",
+                      "created_at": "2026-07-28T20:25:05Z",
+                      "comments": 1
+                    },
+                    {
+                      "title": "[Feature Proposal] Durable tool execution idempotency & retry middleware",
+                      "state": "open",
+                      "created_at": "2026-07-28T03:42:25Z",
+                      "comments": 1
+                    },
+                    {
+                      "title": "Regression in 1.1.7 (#7498): time travel to a subgraph checkpoint reruns the whole subgraph from __start__",
+                      "state": "open",
+                      "created_at": "2026-07-27T12:12:21Z",
+                      "comments": 4
+                    }
+                  ],
+                  "pull_requests": [
+                    {
+                      "title": "ci: preserve dependency bounds in Dependabot uv updates",
+                      "state": "open",
+                      "created_at": "2026-07-27T09:08:28Z",
+                      "merged": false
+                    },
+                    {
+                      "title": "chore(deps): fix vulnerable dev dependencies",
+                      "state": "open",
+                      "created_at": "2026-07-25T21:51:34Z",
+                      "merged": false
+                    },
+                    {
+                      "title": "fix(cli): add monorepo commands to dockerfile",
+                      "state": "open",
+                      "created_at": "2026-07-20T17:26:42Z",
+                      "merged": false
+                    },
+                    {
+                      "title": "chore: add session_name to runs params",
+                      "state": "open",
+                      "created_at": "2026-07-14T16:13:13Z",
+                      "merged": false
+                    },
+                    {
+                      "title": "fix: root messages inbox bounds",
+                      "state": "open",
+                      "created_at": "2026-07-09T04:08:49Z",
+                      "merged": false
+                    }
+                  ],
+                  "commit_activity": {
+                    "commits_last_30_days": 32,
+                    "commits_last_90_days": 224,
+                    "active_contributors_count": 19
+                  }
+                }
+              },
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 2\n  Tool Calls: 4/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Ready to Finish - stop calling tools and write final answer"
+            }
+          }
+        ],
+        "evidence": {
+          "repository": null,
+          "readme": null,
+          "releases": [],
+          "issues": [],
+          "pull_requests": [],
+          "community_posts": [],
+          "web_pages": []
+        },
+        "final_answer": "---\n\n## Research Findings\n\n### 什么是 LangGraph？\n\n**LangGraph** 是由 LangChain Inc. 开发的一个**低级编排框架（low-level orchestration framework）**，用于构建、管理和部署长时间运行的、有状态的 AI Agent。简单来说，它是一个帮助开发者构建具备记忆、能中断恢复、可加入人工审核的智能代理的基础设施。\n\n---\n\n### 核心信息\n\n| 维度 | 内容 |\n|------|------|\n| **官方定义** | \"Build resilient agents.\" — 构建具备韧性的智能代理 |\n| **一句话描述** | 低级编排框架，用于构建有状态的 Agent |\n| **开发方** | LangChain Inc. |\n| **仓库** | [langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) |\n| **许可证** | MIT License |\n| **主语言** | Python（另有 LangGraph.js 对应 JS/TS） |\n| **创建日期** | 2023-08-09 |\n| **Star 数** | 38,462 |\n| **Fork 数** | 6,477 |\n\n> 📌 来源：GitHub 项目画像（`langchain-ai/langgraph`）\n\n---\n\n### 关键特性\n\n1. **持久化执行（Durable Execution）**：Agent 在遇到故障时可以自动从断点恢复，支持长时间运行。\n2. **人机协同（Human-in-the-loop）**：在执行的任意阶段插入人工审核，检查和修改 Agent 状态。\n3. **全面记忆（Comprehensive Memory）**：同时支持短期工作记忆和跨会话的长期持久记忆。\n4. **调试与可观测性**：与 LangSmith 集成，可视化追踪执行路径和状态转换。\n5. **生产级部署**：通过 LangSmith Deployment 可规模化部署有状态的工作流。\n\n> 📌 来源：GitHub README（`langchain-ai/langgraph`）\n\n---\n\n### 项目活跃度\n\n- **近 30 天**：32 次提交\n- **近 90 天**：224 次提交\n- **活跃贡献者**：19 人\n\n项目目前非常活跃，Issue 和 PR 涵盖了功能提案（如 OpenEval 导入导出、持久工具执行幂等性）、Bug 修复等持续迭代内容。\n\n> 📌 来源：GitHub 项目健康度（`langchain-ai/langgraph`）\n\n---\n\n### 生态定位\n\nLangGraph 是 LangChain 生态的一部分，但**可以脱离 LangChain 独立使用**。其设计灵感来源于 Google 的 **Pregel** 和 **Apache Beam**，接口风格借鉴 **NetworkX**。已被 Klarna、Replit、Elastic 等公司采用。对于想快速上手构建 Agent 的用户，官方还提供了更高层的封装包 **Deep Agents**。\n\n---\n\n### 证据来源汇总\n\n| # | 来源 | 证据类型 | 内容 |\n|---|------|----------|------|\n| 1 | GitHub | `github_project_profile` | 项目基础画像：定位、特性、生态、元数据 |\n| 2 | GitHub | `github_project_health` | 项目健康度：提交活跃度、Issue/PR 动态 |\n\n> ⚠️ Web 搜索（`web_search(\"LangGraph\")`）返回空结果，本次研究未获得 Web 来源的独立证据，但 GitHub 两条证据已充分覆盖 information_lookup 目标。"
+      },
+      "evaluations": {
+        "intent_accuracy": {
+          "layer": "intent_accuracy",
+          "implemented": true,
+          "score": 83,
+          "details": {
+            "checks": {
+              "objective": {
+                "expected": "information_lookup",
+                "predicted": "information_lookup",
+                "match": true,
+                "weight": 0.4
+              },
+              "focus": {
+                "expected": [
+                  "technology"
+                ],
+                "predicted": [
+                  "developer",
+                  "official",
+                  "technology"
+                ],
+                "score": 0.333,
+                "weight": 0.25
+              },
+              "time_range": {
+                "expected": "any",
+                "predicted": "any",
+                "match": true,
+                "weight": 0.2
+              },
+              "depth": {
+                "expected": "standard",
+                "predicted": "quick",
+                "match": true,
+                "weight": 0.15
+              }
+            },
+            "objective_match": true,
+            "focus_score": 0.333,
+            "time_range_match": true,
+            "depth_match": true
+          }
+        },
+        "context_builder": {
+          "layer": "context_builder",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "source_scope_match": 100,
+            "required_evidence_match": 100,
+            "tool_budget_reasonable": 100,
+            "expected_sources": [
+              "github",
+              "web"
+            ],
+            "actual_sources": [
+              "github",
+              "web"
+            ],
+            "expected_required": [
+              "github"
+            ],
+            "actual_required": [
+              "github"
+            ],
+            "expected_max_tools": 8,
+            "actual_max_tools": 4
+          }
+        },
+        "tool_efficiency": {
+          "layer": "tool_efficiency",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "total_tool_calls": 4,
+            "discovery_calls": 2,
+            "reader_calls": 2,
+            "blocked_calls": 0,
+            "useful_calls": 4,
+            "tool_efficiency": 1.0,
+            "source_recall": 1.0,
+            "tool_precision": 1.0,
+            "f1": 1.0,
+            "called_sources": [
+              "github",
+              "web"
+            ],
+            "expected_sources": [
+              "github",
+              "web"
+            ],
+            "required_evidence": [
+              "github"
+            ],
+            "missing_sources": []
+          }
+        },
+        "evidence_quality": {
+          "layer": "evidence_quality",
+          "implemented": true,
+          "score": 0,
+          "details": {
+            "base_level": 0,
+            "grounding_ratio": 0.0,
+            "total_claims": 1,
+            "grounded_claims": 0,
+            "unsupported_claims": [
+              "no_evidence_for_answer"
+            ],
+            "source_counts": {},
+            "unique_sources": 0,
+            "total_evidence_items": 0,
+            "required_evidence": [
+              "github"
+            ],
+            "covered_required": [],
+            "missing_required": [
+              "github"
+            ]
+          }
+        },
+        "research_completeness": {
+          "layer": "research_completeness",
+          "implemented": true,
+          "score": 4.6,
+          "details": {
+            "question_addressed": 5,
+            "dimension_coverage": 5,
+            "evidence_grounding": 4,
+            "overall_quality": 4,
+            "feedback": "回答完整覆盖了\"什么是LangGraph\"\"核心特性\"\"使用场景\"三个期望维度，结构清晰。优点：定义准确、特性列举全面、生态定位明确。小缺陷：证据仅来自GitHub两条来源，Web搜索返回空结果，缺乏第三方独立验证；\"use cases\"部分仅提及Klarna/Replit/Elastic等公司采用，未展开具体应用场景示例。"
+          }
+        },
+        "runtime_performance": {
+          "layer": "runtime_performance",
+          "implemented": true,
+          "score": 75,
+          "details": {
+            "total_latency": 45.65,
+            "latency_rating": "normal",
+            "phase_timings": {
+              "intent_latency": 1.936,
+              "context_builder_latency": 0.0,
+              "agent_latency": 42.194,
+              "final_generation_latency": 0.0
+            },
+            "tool_call_count": 4,
+            "tool_budget_ok": true,
+            "max_tool_calls_limit": 6,
+            "token_usage": {
+              "input_tokens": 11300,
+              "output_tokens": 4570,
+              "total_tokens": 15870,
+              "estimated_llm_calls": 4
+            },
+            "estimated_cost_yuan": 0.0204
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "query": "How many stars does langchain-ai/langgraph have?",
+      "category": "information_lookup",
+      "error": null,
+      "latency_seconds": 25.617,
+      "full_trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "focus": [
+            "developer"
+          ],
+          "time_range": "any",
+          "depth": "quick",
+          "entities": [
+            "langchain-ai/langgraph"
+          ]
+        },
+        "execution_plan": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "developer"
+          ],
+          "time_range": "any",
+          "user_goal": "了解 LangGraph 的基本信息和数据",
+          "mode": "quick",
+          "source_scope": [
+            "github",
+            "web"
+          ],
+          "preferred_tools": [
+            "github_search",
+            "github_project_profile",
+            "web_search",
+            "webpage_reader"
+          ],
+          "avoid_sources": [],
+          "required_evidence": [
+            "github"
+          ],
+          "max_tool_calls": 4,
+          "max_discovery_per_source": 2,
+          "max_empty_retry_per_source": 1,
+          "max_reader_per_source": 2,
+          "max_evidence_items": 8,
+          "min_evidence_items": 2,
+          "stop_conditions": {
+            "min_sources": 1,
+            "min_evidence_items": 2
+          }
+        },
+        "tool_trace": [
+          {
+            "step_index": 0,
+            "timestamp": "2026-07-30T04:52:22.248217+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "langchain-ai",
+              "repo": "langgraph"
+            },
+            "output": {
+              "result": {
+                "source": "github",
+                "type": "project_profile",
+                "summary": "langchain-ai/langgraph 是一个以 Python 为主的项目，当前 stars=38463。",
+                "evidence": {
+                  "repository": {
+                    "full_name": "langchain-ai/langgraph",
+                    "description": "Build resilient agents.",
+                    "language": "Python",
+                    "stars": 38463,
+                    "forks": 6477,
+                    "topics": [
+                      "agents",
+                      "ai",
+                      "ai-agents",
+                      "chatgpt",
+                      "deepagents",
+                      "enterprise",
+                      "framework",
+                      "gemini",
+                      "generative-ai",
+                      "langchain",
+                      "langgraph",
+                      "llm",
+                      "multiagent",
+                      "open-source",
+                      "openai",
+                      "pydantic",
+                      "python",
+                      "rag"
+                    ],
+                    "license": "MIT License",
+                    "created_at": "2023-08-09T18:33:12Z",
+                    "updated_at": "2026-07-30T04:51:25Z"
+                  },
+                  "readme": "<div align=\"center\">\n  <a href=\"https://www.langchain.com/langgraph\">\n    <picture>\n      <source media=\"(prefers-color-scheme: dark)\" srcset=\".github/images/logo-dark.svg\">\n      <source media=\"(prefers-color-scheme: light)\" srcset=\".github/images/logo-light.svg\">\n      <img alt=\"LangGraph Logo\" src=\".github/images/logo-dark.svg\" width=\"50%\">\n    </picture>\n  </a>\n</div>\n\n<div align=\"center\">\n  <h3>Low-level orchestration framework for building stateful agents.</h3>\n</div>\n\n<div align=\"center\">\n  <a href=\"https://opensource.org/licenses/MIT\" target=\"_blank\"><img src=\"https://img.shields.io/pypi/l/langgraph\" alt=\"PyPI - License\"></a>\n  <a href=\"https://pypistats.org/packages/langgraph\" target=\"_blank\"><img src=\"https://img.shields.io/pepy/dt/langgraph\" alt=\"PyPI - Downloads\"></a>\n  <a href=\"https://pypi.org/project/langgraph/\" target=\"_blank\"><img src=\"https://img.shields.io/pypi/v/langgraph.svg?label=%20\" alt=\"Version\"></a>\n  <a href=\"https://x.com/langchain_oss\" target=\"_blank\"><img src=\"https://img.shields.io/twitter/url/https/twitter.com/langchain_oss.svg?style=social&label=Follow%20%40LangChain\" alt=\"Twitter / X\"></a>\n</div>\n\n<br>\n\nTrusted by companies shaping the future of agents – including Klarna, Replit, Elastic, and more – LangGraph is a low-level orchestration framework for building, managing, and deploying long-running, stateful agents.\n\n```bash\npip install -U langgraph\n```\n\n> [!TIP]\n> If you're looking to quickly build agents, check out **[Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview)** — a higher-level package built on LangGraph for agents that can plan, use subagents, and leverage file systems for complex tasks.\n\nFor an equivalent JS/TS library, check out [LangGraph.js](https://github.com/langchain-ai/langgraphjs) and the [JS docs](https://docs.langchain.com/oss/javascript/langgraph/overview).\n\n## Why use LangGraph?\n\nLangGraph provides low-level supporting infrastructure for *any* long-running, stateful workflow or agent:\n\n- **[Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)** — Build agents that persist through failures and can run for extended periods, automatically resuming from exactly where they left off.\n- **[Human-in-the-loop](https://docs.langchain.com/oss/python/langgraph/interrupts)** — Seamlessly incorporate human oversight by inspecting and modifying agent state at any point during execution.\n- **[Comprehensive memory](https://docs.langchain.com/oss/python/langgraph/memory)** — Create truly stateful agents with both short-term working memory for ongoing reasoning and long-term persistent memory across sessions.\n- **[Debugging with LangSmith](https://www.langchain.com/langsmith)** — Gain deep visibility into complex agent behavior with visualization tools that trace execution paths, capture state transitions, and provide detailed runtime metrics.\n- **[Production-ready deployment](https://docs.langchain.com/langsmith/deployments)** — Deploy sophisticated agent systems confidently with scalable infrastructure designed to handle the unique challenges of stateful, long-running workflows.\n\n> [!TIP]\n> For developing, debugging, and deploying AI agents and LLM applications, see [LangSmith](https://docs.langchain.com/langsmith/home).\n\n## LangGraph ecosystem\n\nWhile LangGraph can be used standalone, it also integrates seamlessly with any LangChain product, giving developers a full suite of tools for building agents.\n\nTo improve your LLM application development, pair LangGraph with:\n\n- [Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview) – Build agents that can plan, use subagents, and leverage file systems for complex tasks.\n- [LangChain](https://docs.langchain.com/oss/python/langchain/overview) – Provides integrations and composable components to streamline LLM application development.\n- [LangSmith](https://www.langchain.com/langsmith) – Helpful for agent evals and observability. Debug poor-performing LLM app runs, evaluate agent trajectories, gain visibility in production, and improve performance over time.\n- [LangSmith Deployment](https://docs.langchain.com/langsmith/deployments) – Deploy and scale agents effortlessly with a purpose-built deployment platform for long-running, stateful workflows. Discover, reuse, configure, and share agents across teams – and iterate quickly with visual prototyping in [LangSmith Studio](https://docs.langchain.com/langsmith/studio).\n\n---\n\n## Documentation\n\n- [docs.langchain.com](https://docs.langchain.com/oss/python/langgraph/overview) – Comprehensive documentation, including conceptual overviews and guides\n- [reference.langchain.com/python/langgraph](https://reference.langchain.com/python/langgraph) – API reference docs for LangGraph packages\n- [LangGraph Quickstart](https://docs.langchain.com/oss/python/langgraph/quickstart) – Get started building with LangGraph\n- [Chat LangChain](https://chat.langchain.com/) – Chat with the LangChain documentation and get answers to your questions\n\n**Discussions**: Visit the [LangChain Forum](https://forum.langchain.com) to connect with the community and share all of your technical questions, ideas, and feedback.\n\n## Additional resources\n\n- **[Guides](https://docs.langchain.com/oss/python/learn)** – Quick, actionable code snippets for topics such as streaming, adding memory & persistence, and design patterns (e.g. branching, subgraphs, etc.).\n- **[LangChain Academy](https://academy.langchain.com/courses/intro-to-langgraph)** – Learn the basics of LangGraph in our free, structured course.\n- **[Case studies](https://www.langchain.com/built-with-langgraph)** – Hear how industry leaders use LangGraph to ship AI applications at scale.\n- [Contributing Guide](https://docs.langchain.com/oss/python/contributing/overview) – Learn how to contribute to LangChain projects and find good first issues.\n- [Code of Conduct](https://github.com/langchain-ai/langchain/?tab=coc-ov-file) – Our community guidelines and standards for participation.\n\n---\n\n## Acknowledgements\n\nLangGraph is inspired by [Pregel](https://research.google/pubs/pub37252/) and [Apache Beam](https://beam.apache.org/). The public interface draws inspiration from [NetworkX](https://networkx.org/documentation/latest/). LangGraph is built by LangChain Inc, the creators of LangChain, but can be used without LangChain.\n"
+                }
+              },
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 1/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 1,
+            "timestamp": "2026-07-30T04:52:22.248289+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "langchain-ai/langgraph GitHub stars"
+            },
+            "output": {
+              "result": [
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "url": "https://github.com/langchain-ai/langgraph?tab=readme-ov-file",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph?tab=readme-ov-file\nPublished: N/A\nAuthor: N/A\nHighlights:\n- Stars: 38436\n- Forks: 6473\n- Watchers: 38436\n- Open issues: 650\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n\n---\n\nTitle: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n- Stars: 3843...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://docs.langchain.com/oss/python/langgraph/",
+                  "title": "Web 搜索结果: https://docs.langchain.com/oss/python/langgraph/",
+                  "url": "https://docs.langchain.com/oss/python/langgraph/",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph?tab=readme-ov-file\nPublished: N/A\nAuthor: N/A\nHighlights:\n- Stars: 38436\n- Forks: 6473\n- Watchers: 38436\n- Open issues: 650\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n\n---\n\nTitle: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n- Stars: 3843...(truncated)"
+                },
+                {
+                  "source": "web",
+                  "identifier": "https://github.com/langchain-ai/langgraph",
+                  "title": "Web 搜索结果: https://github.com/langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 0.0,
+                  "reason": "Title: langchain-ai/langgraph\nURL: https://github.com/langchain-ai/langgraph?tab=readme-ov-file\nPublished: N/A\nAuthor: N/A\nHighlights:\n- Stars: 38436\n- Forks: 6473\n- Watchers: 38436\n- Open issues: 650\n- License: MIT License\n- Homepage: https://docs.langchain.com/oss/python/langgraph/\n- Default branch: main\n- Created: 2023-08-09T18:33:12Z\n\n---\n\nTitle: langchain-ai/langgraph: Build resilient agents.\nURL: https://github.com/langchain-ai/langgraph\nPublished: N/A\nAuthor: N/A\nHighlights:\n- Stars: 3843...(truncated)"
+                }
+              ],
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 2/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          }
+        ],
+        "evidence": {
+          "repository": null,
+          "readme": null,
+          "releases": [],
+          "issues": [],
+          "pull_requests": [],
+          "community_posts": [],
+          "web_pages": []
+        },
+        "final_answer": "## Research Findings\n\n**langchain-ai/langgraph 的 Star 数量：约 38,400+**\n\n| 证据来源 | Star 数 | 说明 |\n|---------|---------|------|\n| GitHub API（`github_project_profile`） | **38,463** | 直接调用 GitHub API，数据最实时 |\n| Web 搜索结果（GitHub 页面快照） | **38,436** | 搜索结果缓存，略有滞后 |\n\n两者数据基本一致（差异约 27，属正常的数据同步延迟），可以确定 **LangGraph 的 stars 在 3.8 万以上**。\n\n---\n\n**补充信息**（来自 GitHub 项目画像）：\n\n- **仓库全名**：`langchain-ai/langgraph`\n- **描述**：Build resilient agents.（构建高韧性智能体）\n- **语言**：Python\n- **Fork 数**：6,477\n- **许可证**：MIT License\n- **创建时间**：2023-08-09\n- **定位**：面向构建有状态、长时间运行 Agent 的低层级编排框架，被 Klarna、Replit、Elastic 等公司信赖使用。"
+      },
+      "evaluations": {
+        "intent_accuracy": {
+          "layer": "intent_accuracy",
+          "implemented": true,
+          "score": 75,
+          "details": {
+            "checks": {
+              "objective": {
+                "expected": "information_lookup",
+                "predicted": "information_lookup",
+                "match": true,
+                "weight": 0.4
+              },
+              "focus": {
+                "expected": [
+                  "technology"
+                ],
+                "predicted": [
+                  "developer"
+                ],
+                "score": 0.0,
+                "weight": 0.25
+              },
+              "time_range": {
+                "expected": "any",
+                "predicted": "any",
+                "match": true,
+                "weight": 0.2
+              },
+              "depth": {
+                "expected": "standard",
+                "predicted": "quick",
+                "match": true,
+                "weight": 0.15
+              }
+            },
+            "objective_match": true,
+            "focus_score": 0.0,
+            "time_range_match": true,
+            "depth_match": true
+          }
+        },
+        "context_builder": {
+          "layer": "context_builder",
+          "implemented": true,
+          "score": 94,
+          "details": {
+            "source_scope_match": 100,
+            "required_evidence_match": 100,
+            "tool_budget_reasonable": 75,
+            "expected_sources": [
+              "github"
+            ],
+            "actual_sources": [
+              "github",
+              "web"
+            ],
+            "expected_required": [
+              "github"
+            ],
+            "actual_required": [
+              "github"
+            ],
+            "expected_max_tools": 8,
+            "actual_max_tools": 4
+          }
+        },
+        "tool_efficiency": {
+          "layer": "tool_efficiency",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "total_tool_calls": 2,
+            "discovery_calls": 1,
+            "reader_calls": 1,
+            "blocked_calls": 0,
+            "useful_calls": 2,
+            "tool_efficiency": 1.0,
+            "source_recall": 1.0,
+            "tool_precision": 1.0,
+            "f1": 1.0,
+            "called_sources": [
+              "github",
+              "web"
+            ],
+            "expected_sources": [
+              "github"
+            ],
+            "required_evidence": [
+              "github"
+            ],
+            "missing_sources": []
+          }
+        },
+        "evidence_quality": {
+          "layer": "evidence_quality",
+          "implemented": true,
+          "score": 0,
+          "details": {
+            "base_level": 0,
+            "grounding_ratio": 0.0,
+            "total_claims": 1,
+            "grounded_claims": 0,
+            "unsupported_claims": [
+              "no_evidence_for_answer"
+            ],
+            "source_counts": {},
+            "unique_sources": 0,
+            "total_evidence_items": 0,
+            "required_evidence": [
+              "github"
+            ],
+            "covered_required": [],
+            "missing_required": [
+              "github"
+            ]
+          }
+        },
+        "research_completeness": {
+          "layer": "research_completeness",
+          "implemented": true,
+          "score": 5.0,
+          "details": {
+            "question_addressed": 5,
+            "dimension_coverage": 5,
+            "evidence_grounding": 5,
+            "overall_quality": 5,
+            "feedback": "回答直接给出了 langchain-ai/langgraph 的 star 数量（约 38,400+），完全覆盖了用户期望的 \"star count\" 维度。提供了两个独立证据来源（GitHub API 和 Web 搜索），数据相互印证，且明确标注了数据差异及原因。补充信息丰富但不喧宾夺主。整体研究质量高，可直接使用。"
+          }
+        },
+        "runtime_performance": {
+          "layer": "runtime_performance",
+          "implemented": true,
+          "score": 79,
+          "details": {
+            "total_latency": 25.62,
+            "latency_rating": "normal",
+            "phase_timings": {
+              "intent_latency": 1.949,
+              "context_builder_latency": 0.0,
+              "agent_latency": 22.217,
+              "final_generation_latency": 0.0
+            },
+            "tool_call_count": 2,
+            "tool_budget_ok": true,
+            "max_tool_calls_limit": 4,
+            "token_usage": {
+              "input_tokens": 8900,
+              "output_tokens": 2693,
+              "total_tokens": 11593,
+              "estimated_llm_calls": 3
+            },
+            "estimated_cost_yuan": 0.0143
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "query": "What programming language is LangGraph written in?",
+      "category": "information_lookup",
+      "error": null,
+      "latency_seconds": 28.894,
+      "full_trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "focus": [
+            "developer",
+            "technology"
+          ],
+          "time_range": "any",
+          "depth": "quick",
+          "entities": [
+            "LangGraph"
+          ]
+        },
+        "execution_plan": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "developer",
+            "technology"
+          ],
+          "time_range": "any",
+          "user_goal": "了解 LangGraph 的基本信息和数据",
+          "mode": "quick",
+          "source_scope": [
+            "github",
+            "web"
+          ],
+          "preferred_tools": [
+            "github_search",
+            "github_project_profile",
+            "web_search",
+            "webpage_reader"
+          ],
+          "avoid_sources": [],
+          "required_evidence": [
+            "github"
+          ],
+          "max_tool_calls": 4,
+          "max_discovery_per_source": 2,
+          "max_empty_retry_per_source": 1,
+          "max_reader_per_source": 2,
+          "max_evidence_items": 8,
+          "min_evidence_items": 2,
+          "stop_conditions": {
+            "min_sources": 1,
+            "min_evidence_items": 2
+          }
+        },
+        "tool_trace": [
+          {
+            "step_index": 0,
+            "timestamp": "2026-07-30T04:52:54.467237+00:00",
+            "tool": "github_search",
+            "input": {
+              "query": "LangGraph"
+            },
+            "output": {
+              "result": [
+                {
+                  "source": "github",
+                  "identifier": "langchain-ai/langgraph",
+                  "title": "langchain-ai/langgraph",
+                  "url": "https://github.com/langchain-ai/langgraph",
+                  "score": 38463.0,
+                  "reason": "Build resilient agents."
+                },
+                {
+                  "source": "github",
+                  "identifier": "google-gemini/gemini-fullstack-langgraph-quickstart",
+                  "title": "google-gemini/gemini-fullstack-langgraph-quickstart",
+                  "url": "https://github.com/google-gemini/gemini-fullstack-langgraph-quickstart",
+                  "score": 18287.0,
+                  "reason": "Get started with building Fullstack Agents using Gemini 2.5 and LangGraph"
+                }
+              ],
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 1/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 1,
+            "timestamp": "2026-07-30T04:52:54.467308+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "langchain-ai",
+              "repo": "langgraph"
+            },
+            "output": {
+              "result": {
+                "source": "github",
+                "type": "project_profile",
+                "summary": "langchain-ai/langgraph 是一个以 Python 为主的项目，当前 stars=38463。",
+                "evidence": {
+                  "repository": {
+                    "full_name": "langchain-ai/langgraph",
+                    "description": "Build resilient agents.",
+                    "language": "Python",
+                    "stars": 38463,
+                    "forks": 6477,
+                    "topics": [
+                      "agents",
+                      "ai",
+                      "ai-agents",
+                      "chatgpt",
+                      "deepagents",
+                      "enterprise",
+                      "framework",
+                      "gemini",
+                      "generative-ai",
+                      "langchain",
+                      "langgraph",
+                      "llm",
+                      "multiagent",
+                      "open-source",
+                      "openai",
+                      "pydantic",
+                      "python",
+                      "rag"
+                    ],
+                    "license": "MIT License",
+                    "created_at": "2023-08-09T18:33:12Z",
+                    "updated_at": "2026-07-30T04:51:25Z"
+                  },
+                  "readme": "<div align=\"center\">\n  <a href=\"https://www.langchain.com/langgraph\">\n    <picture>\n      <source media=\"(prefers-color-scheme: dark)\" srcset=\".github/images/logo-dark.svg\">\n      <source media=\"(prefers-color-scheme: light)\" srcset=\".github/images/logo-light.svg\">\n      <img alt=\"LangGraph Logo\" src=\".github/images/logo-dark.svg\" width=\"50%\">\n    </picture>\n  </a>\n</div>\n\n<div align=\"center\">\n  <h3>Low-level orchestration framework for building stateful agents.</h3>\n</div>\n\n<div align=\"center\">\n  <a href=\"https://opensource.org/licenses/MIT\" target=\"_blank\"><img src=\"https://img.shields.io/pypi/l/langgraph\" alt=\"PyPI - License\"></a>\n  <a href=\"https://pypistats.org/packages/langgraph\" target=\"_blank\"><img src=\"https://img.shields.io/pepy/dt/langgraph\" alt=\"PyPI - Downloads\"></a>\n  <a href=\"https://pypi.org/project/langgraph/\" target=\"_blank\"><img src=\"https://img.shields.io/pypi/v/langgraph.svg?label=%20\" alt=\"Version\"></a>\n  <a href=\"https://x.com/langchain_oss\" target=\"_blank\"><img src=\"https://img.shields.io/twitter/url/https/twitter.com/langchain_oss.svg?style=social&label=Follow%20%40LangChain\" alt=\"Twitter / X\"></a>\n</div>\n\n<br>\n\nTrusted by companies shaping the future of agents – including Klarna, Replit, Elastic, and more – LangGraph is a low-level orchestration framework for building, managing, and deploying long-running, stateful agents.\n\n```bash\npip install -U langgraph\n```\n\n> [!TIP]\n> If you're looking to quickly build agents, check out **[Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview)** — a higher-level package built on LangGraph for agents that can plan, use subagents, and leverage file systems for complex tasks.\n\nFor an equivalent JS/TS library, check out [LangGraph.js](https://github.com/langchain-ai/langgraphjs) and the [JS docs](https://docs.langchain.com/oss/javascript/langgraph/overview).\n\n## Why use LangGraph?\n\nLangGraph provides low-level supporting infrastructure for *any* long-running, stateful workflow or agent:\n\n- **[Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)** — Build agents that persist through failures and can run for extended periods, automatically resuming from exactly where they left off.\n- **[Human-in-the-loop](https://docs.langchain.com/oss/python/langgraph/interrupts)** — Seamlessly incorporate human oversight by inspecting and modifying agent state at any point during execution.\n- **[Comprehensive memory](https://docs.langchain.com/oss/python/langgraph/memory)** — Create truly stateful agents with both short-term working memory for ongoing reasoning and long-term persistent memory across sessions.\n- **[Debugging with LangSmith](https://www.langchain.com/langsmith)** — Gain deep visibility into complex agent behavior with visualization tools that trace execution paths, capture state transitions, and provide detailed runtime metrics.\n- **[Production-ready deployment](https://docs.langchain.com/langsmith/deployments)** — Deploy sophisticated agent systems confidently with scalable infrastructure designed to handle the unique challenges of stateful, long-running workflows.\n\n> [!TIP]\n> For developing, debugging, and deploying AI agents and LLM applications, see [LangSmith](https://docs.langchain.com/langsmith/home).\n\n## LangGraph ecosystem\n\nWhile LangGraph can be used standalone, it also integrates seamlessly with any LangChain product, giving developers a full suite of tools for building agents.\n\nTo improve your LLM application development, pair LangGraph with:\n\n- [Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview) – Build agents that can plan, use subagents, and leverage file systems for complex tasks.\n- [LangChain](https://docs.langchain.com/oss/python/langchain/overview) – Provides integrations and composable components to streamline LLM application development.\n- [LangSmith](https://www.langchain.com/langsmith) – Helpful for agent evals and observability. Debug poor-performing LLM app runs, evaluate agent trajectories, gain visibility in production, and improve performance over time.\n- [LangSmith Deployment](https://docs.langchain.com/langsmith/deployments) – Deploy and scale agents effortlessly with a purpose-built deployment platform for long-running, stateful workflows. Discover, reuse, configure, and share agents across teams – and iterate quickly with visual prototyping in [LangSmith Studio](https://docs.langchain.com/langsmith/studio).\n\n---\n\n## Documentation\n\n- [docs.langchain.com](https://docs.langchain.com/oss/python/langgraph/overview) – Comprehensive documentation, including conceptual overviews and guides\n- [reference.langchain.com/python/langgraph](https://reference.langchain.com/python/langgraph) – API reference docs for LangGraph packages\n- [LangGraph Quickstart](https://docs.langchain.com/oss/python/langgraph/quickstart) – Get started building with LangGraph\n- [Chat LangChain](https://chat.langchain.com/) – Chat with the LangChain documentation and get answers to your questions\n\n**Discussions**: Visit the [LangChain Forum](https://forum.langchain.com) to connect with the community and share all of your technical questions, ideas, and feedback.\n\n## Additional resources\n\n- **[Guides](https://docs.langchain.com/oss/python/learn)** – Quick, actionable code snippets for topics such as streaming, adding memory & persistence, and design patterns (e.g. branching, subgraphs, etc.).\n- **[LangChain Academy](https://academy.langchain.com/courses/intro-to-langgraph)** – Learn the basics of LangGraph in our free, structured course.\n- **[Case studies](https://www.langchain.com/built-with-langgraph)** – Hear how industry leaders use LangGraph to ship AI applications at scale.\n- [Contributing Guide](https://docs.langchain.com/oss/python/contributing/overview) – Learn how to contribute to LangChain projects and find good first issues.\n- [Code of Conduct](https://github.com/langchain-ai/langchain/?tab=coc-ov-file) – Our community guidelines and standards for participation.\n\n---\n\n## Acknowledgements\n\nLangGraph is inspired by [Pregel](https://research.google/pubs/pub37252/) and [Apache Beam](https://beam.apache.org/). The public interface draws inspiration from [NetworkX](https://networkx.org/documentation/latest/). LangGraph is built by LangChain Inc, the creators of LangChain, but can be used without LangChain.\n"
+                }
+              },
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 2/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 2,
+            "timestamp": "2026-07-30T04:52:54.467327+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangGraph programming language"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 3/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 3,
+            "timestamp": "2026-07-30T04:52:54.467381+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "langchain-ai",
+              "repo": "langgraphjs"
+            },
+            "output": {
+              "result": {
+                "source": "github",
+                "type": "project_profile",
+                "summary": "langchain-ai/langgraphjs 是一个以 TypeScript 为主的项目，当前 stars=3155。",
+                "evidence": {
+                  "repository": {
+                    "full_name": "langchain-ai/langgraphjs",
+                    "description": "Framework to build resilient language agents as graphs.",
+                    "language": "TypeScript",
+                    "stars": 3155,
+                    "forks": 535,
+                    "topics": [
+                      "agents",
+                      "ai",
+                      "artificial-intelligence",
+                      "generative-ai",
+                      "llm",
+                      "node",
+                      "typescript"
+                    ],
+                    "license": "MIT License",
+                    "created_at": "2024-01-09T17:40:12Z",
+                    "updated_at": "2026-07-29T09:20:14Z"
+                  },
+                  "readme": "<div align=\"center\">\n  <a href=\"https://www.langchain.com/langgraph\">\n    <picture>\n      <source media=\"(prefers-color-scheme: dark)\" srcset=\"https://raw.githubusercontent.com/langchain-ai/langgraphjs/HEAD/.github/images/logo-dark.svg\">\n      <source media=\"(prefers-color-scheme: light)\" srcset=\"https://raw.githubusercontent.com/langchain-ai/langgraphjs/HEAD/.github/images/logo-light.svg\">\n      <img alt=\"LangGraph Logo\" src=\"https://raw.githubusercontent.com/langchain-ai/langgraphjs/HEAD/.github/images/logo-dark.svg\" width=\"50%\">\n    </picture>\n  </a>\n</div>\n\n<div align=\"center\">\n  <h3>Low-level orchestration framework for building stateful agents.</h3>\n</div>\n\n<div align=\"center\">\n  <a href=\"https://docs.langchain.com/oss/javascript/langgraph/overview\" target=\"_blank\"><img src=\"https://img.shields.io/badge/docs-latest-blue\" alt=\"Docs\"></a>\n  <a href=\"https://www.npmjs.com/package/@langchain/langgraph\" target=\"_blank\"><img src=\"https://img.shields.io/npm/v/@langchain/langgraph?logo=npm\" alt=\"Version\"></a>\n  <a href=\"https://www.npmjs.com/package/@langchain/langgraph\" target=\"_blank\"><img src=\"https://img.shields.io/npm/dm/@langchain/langgraph\" alt=\"npm - Downloads\"></a>\n  <a href=\"https://github.com/langchain-ai/langgraphjs/issues\" target=\"_blank\"><img src=\"https://img.shields.io/github/issues-raw/langchain-ai/langgraphjs\" alt=\"Open Issues\"></a>\n</div>\n\nLangGraph — used by Replit, Uber, LinkedIn, GitLab and more — is a low-level orchestration framework for building controllable agents. While langchain provides integrations and composable components to streamline LLM application development, the LangGraph library enables agent orchestration — offering customizable architectures, long-term memory, and human-in-the-loop to reliably handle complex tasks.\n\n```bash\nnpm install @langchain/langgraph @langchain/core\n```\n\n> [!TIP]\n> If you're looking to quickly build agents, check out **[Deep Agents](https://docs.langchain.com/oss/javascript/deepagents/overview)** — a higher-level package built on LangGraph for agents that can plan, use subagents, and leverage file systems for complex tasks.\n\nFor an equivalent Python library, check out [LangGraph](https://github.com/langchain-ai/langgraph) and the [Python docs](https://docs.langchain.com/oss/python/langgraph/overview).\n\n## Why use LangGraph?\n\nLangGraph provides low-level supporting infrastructure for *any* long-running, stateful workflow or agent:\n\n- **[Durable execution](https://docs.langchain.com/oss/javascript/langgraph/durable-execution)** — Build agents that persist through failures and can run for extended periods, automatically resuming from exactly where they left off.\n- **[Human-in-the-loop](https://docs.langchain.com/oss/javascript/langgraph/interrupts)** — Seamlessly incorporate human oversight by inspecting and modifying agent state at any point during execution.\n- **[Comprehensive memory](https://docs.langchain.com/oss/javascript/langgraph/memory)** — Create truly stateful agents with both short-term working memory for ongoing reasoning and long-term persistent memory across sessions.\n- **[Debugging with LangSmith](https://www.langchain.com/langsmith)** — Gain deep visibility into complex agent behavior with visualization tools that trace execution paths, capture state transitions, and provide detailed runtime metrics.\n- **[Production-ready deployment](https://docs.langchain.com/langsmith/deployments)** — Deploy sophisticated agent systems confidently with scalable infrastructure designed to handle the unique challenges of stateful, long-running workflows.\n\n> [!TIP]\n> For developing, debugging, and deploying AI agents and LLM applications, see [LangSmith](https://docs.langchain.com/langsmith/home).\n\n## LangGraph’s ecosystem\n\nWhile LangGraph can be used standalone, it also integrates seamlessly with any LangChain product, giving developers a full suite of tools for building agents. To improve your LLM application development, pair LangGraph with:\n\n- [Deep Agents (JS)](https://docs.langchain.com/oss/javascript/deepagents/overview) — Build agents that can plan, use subagents, and leverage file systems for complex tasks. A higher-level package built on top of LangGraph.\n- [LangChain](https://docs.langchain.com/oss/javascript/langchain/overview) – Provides integrations and composable components to streamline LLM application development.\n- [LangSmith](http://www.langchain.com/langsmith) — Helpful for agent evals and observability. Debug poor-performing LLM app runs, evaluate agent trajectories, gain visibility in production, and improve performance over time.\n\n## Additional resources\n\n- [LangChain Forum](https://forum.langchain.com/): Connect with the community and share all of your technical questions, ideas, and feedback.\n- [LangChain Academy](https://academy.langchain.com/courses/intro-to-langgraph): Learn the basics of LangGraph in our free, structured course.\n- [Streaming Cookbook](https://github.com/langchain-ai/streaming-cookbook): Documentation and examples around LangGraphs's streaming capabilities.\n- [API Reference](https://reference.langchain.com/javascript/langchain-langgraph): Detailed reference on core classes, methods, how to use the graph and checkpointing APIs, and higher-level prebuilt components.\n- [Built with LangGraph](https://www.langchain.com/built-with-langgraph): Hear how industry leaders use LangGraph to ship powerful, production-ready AI applications.\n\n## Acknowledgements\n\nLangGraph is inspired by [Pregel](https://research.google/pubs/pub37252/) and [Apache Beam](https://beam.apache.org/). The public interface draws inspiration from [NetworkX](https://networkx.org/documentation/latest/). LangGraph is built by LangChain Inc, the creators of LangChain, but can be used without LangChain.\n"
+                }
+              },
+              "policy_hint": "Current Research Policy\n\nObjective: information_lookup\n\nPreferred Sources:\n  - GitHub\n  - Web\n\nPreferred Tools:\n  - github_search\n  - github_project_profile\n  - web_search\n  - webpage_reader\n\nEvidence Needed:\n  Required Evidence: GitHub\n  Min Evidence Items: 2\n  Max Evidence Items: 8\n\nBudget:\n  Max Discovery Per Source: 2\n  Max Empty Retry Per Source: 1\n  Max Reader Per Source: 2\n  Max Tool Calls: 4\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 2\n  Tool Calls: 4/4\n\nStop Conditions:\n  Min Sources: 1\n  Min Evidence Items: 2\n\nStatus: Ready to Finish - stop calling tools and write final answer"
+            }
+          }
+        ],
+        "evidence": {
+          "repository": null,
+          "readme": null,
+          "releases": [],
+          "issues": [],
+          "pull_requests": [],
+          "community_posts": [],
+          "web_pages": []
+        },
+        "final_answer": "## Research Findings\n\nLangGraph 主要使用 **Python** 编写，同时还有一个 JavaScript/TypeScript 版本。\n\n### 证据详情\n\n| 仓库 | 语言 | Stars | 来源 |\n|------|------|-------|------|\n| `langchain-ai/langgraph` | **Python** | 38,463 | GitHub 项目画像 |\n| `langchain-ai/langgraphjs` | **TypeScript** | 3,155 | GitHub 项目画像 |\n\n### 详细说明\n\n1. **LangGraph 主项目** ([langchain-ai/langgraph](https://github.com/langchain-ai/langgraph))：使用 **Python** 开发，通过 `pip install -U langgraph` 安装，是目前最主流的版本（38k+ stars），于 2023 年 8 月创建。\n\n2. **LangGraph.js** ([langchain-ai/langgraphjs](https://github.com/langchain-ai/langgraphjs))：是 LangGraph 的 JavaScript/TypeScript 版本，使用 **TypeScript** 编写，通过 `npm install @langchain/langgraph` 安装，于 2024 年 1 月创建。\n\n两个仓库的 README 互相声明对方为对应语言的等效版本。简而言之：**如果你问的是主流版本，答案是 Python；LangChain 官方也同时维护了一个 TypeScript 版本 LangGraph.js。**"
+      },
+      "evaluations": {
+        "intent_accuracy": {
+          "layer": "intent_accuracy",
+          "implemented": true,
+          "score": 88,
+          "details": {
+            "checks": {
+              "objective": {
+                "expected": "information_lookup",
+                "predicted": "information_lookup",
+                "match": true,
+                "weight": 0.4
+              },
+              "focus": {
+                "expected": [
+                  "technology"
+                ],
+                "predicted": [
+                  "developer",
+                  "technology"
+                ],
+                "score": 0.5,
+                "weight": 0.25
+              },
+              "time_range": {
+                "expected": "any",
+                "predicted": "any",
+                "match": true,
+                "weight": 0.2
+              },
+              "depth": {
+                "expected": "standard",
+                "predicted": "quick",
+                "match": true,
+                "weight": 0.15
+              }
+            },
+            "objective_match": true,
+            "focus_score": 0.5,
+            "time_range_match": true,
+            "depth_match": true
+          }
+        },
+        "context_builder": {
+          "layer": "context_builder",
+          "implemented": true,
+          "score": 94,
+          "details": {
+            "source_scope_match": 100,
+            "required_evidence_match": 100,
+            "tool_budget_reasonable": 75,
+            "expected_sources": [
+              "github"
+            ],
+            "actual_sources": [
+              "github",
+              "web"
+            ],
+            "expected_required": [
+              "github"
+            ],
+            "actual_required": [
+              "github"
+            ],
+            "expected_max_tools": 8,
+            "actual_max_tools": 4
+          }
+        },
+        "tool_efficiency": {
+          "layer": "tool_efficiency",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "total_tool_calls": 4,
+            "discovery_calls": 2,
+            "reader_calls": 2,
+            "blocked_calls": 0,
+            "useful_calls": 4,
+            "tool_efficiency": 1.0,
+            "source_recall": 1.0,
+            "tool_precision": 1.0,
+            "f1": 1.0,
+            "called_sources": [
+              "github",
+              "web"
+            ],
+            "expected_sources": [
+              "github"
+            ],
+            "required_evidence": [
+              "github"
+            ],
+            "missing_sources": []
+          }
+        },
+        "evidence_quality": {
+          "layer": "evidence_quality",
+          "implemented": true,
+          "score": 0,
+          "details": {
+            "base_level": 0,
+            "grounding_ratio": 0.0,
+            "total_claims": 1,
+            "grounded_claims": 0,
+            "unsupported_claims": [
+              "no_evidence_for_answer"
+            ],
+            "source_counts": {},
+            "unique_sources": 0,
+            "total_evidence_items": 0,
+            "required_evidence": [
+              "github"
+            ],
+            "covered_required": [],
+            "missing_required": [
+              "github"
+            ]
+          }
+        },
+        "research_completeness": {
+          "layer": "research_completeness",
+          "implemented": true,
+          "score": 5.0,
+          "details": {
+            "question_addressed": 5,
+            "dimension_coverage": 5,
+            "evidence_grounding": 5,
+            "overall_quality": 5,
+            "feedback": "回答直接、准确地回答了LangGraph的编程语言问题。不仅给出了主流版本Python，还补充了TypeScript/JavaScript版本，覆盖了期望的\"programming language\"维度。所有结论均有GitHub仓库数据支撑（stars数、安装命令、创建时间等），无主观推断。整体研究质量高，可直接使用。"
+          }
+        },
+        "runtime_performance": {
+          "layer": "runtime_performance",
+          "implemented": true,
+          "score": 95,
+          "details": {
+            "total_latency": 28.89,
+            "latency_rating": "fast",
+            "phase_timings": {
+              "intent_latency": 1.87,
+              "context_builder_latency": 0.0,
+              "agent_latency": 25.597,
+              "final_generation_latency": 0.0
+            },
+            "tool_call_count": 4,
+            "tool_budget_ok": true,
+            "max_tool_calls_limit": 4,
+            "token_usage": {
+              "input_tokens": 11300,
+              "output_tokens": 4266,
+              "total_tokens": 15566,
+              "estimated_llm_calls": 4
+            },
+            "estimated_cost_yuan": 0.0198
+          }
+        }
+      }
+    }
+  ]
+}

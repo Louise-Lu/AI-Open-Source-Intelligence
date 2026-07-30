@@ -1,0 +1,1465 @@
+{
+  "summary": {
+    "total": 3,
+    "errors": 0,
+    "intent_accuracy": 83.66666666666667,
+    "context_plan_score": 94.0,
+    "tool_efficiency": 100.0,
+    "source_recall": 1.0,
+    "tool_precision": 1.0,
+    "tool_f1": 1.0,
+    "parameter_accuracy": 1.0,
+    "avg_tool_calls": 8.666666666666666,
+    "evidence_quality": 77.0,
+    "completeness_score": 2.0,
+    "answer_quality": 41.0,
+    "avg_latency_seconds": 154.78333333333333,
+    "total_estimated_cost": 0.201,
+    "overall_score": 59.3,
+    "categories": {
+      "information_lookup": {
+        "count": 1,
+        "errors": 0,
+        "intent": [
+          77.0
+        ],
+        "completeness": [
+          4.0
+        ]
+      },
+      "evaluation": {
+        "count": 1,
+        "errors": 0,
+        "intent": [
+          88.0
+        ],
+        "completeness": [
+          1.0
+        ]
+      },
+      "comparison": {
+        "count": 1,
+        "errors": 0,
+        "intent": [
+          86.0
+        ],
+        "completeness": [
+          1.0
+        ]
+      }
+    },
+    "overall_display": "59.3",
+    "intent_accuracy_display": "83.7%",
+    "context_plan_display": "94.0%",
+    "avg_tool_calls_display": "8.7",
+    "tool_efficiency_display": "100.0%",
+    "source_recall_display": "100.0%",
+    "evidence_quality_display": "77",
+    "completeness_display": "2.0/5",
+    "answer_quality_display": "41",
+    "avg_latency_display": "154.8s",
+    "total_cost_display": "¥0.2010"
+  },
+  "results": [
+    {
+      "id": 1,
+      "query": "What is LangGraph?",
+      "category": "information_lookup",
+      "error": null,
+      "latency_seconds": 118.709,
+      "full_trace": {
+        "intent": {
+          "objective": "information_lookup",
+          "focus": [
+            "official",
+            "developer",
+            "technology"
+          ],
+          "depth": "quick",
+          "entities": [
+            "LangGraph"
+          ]
+        },
+        "execution_plan": {
+          "objective": "information_lookup",
+          "entities": [
+            "LangGraph"
+          ],
+          "focus": [
+            "official",
+            "developer",
+            "technology"
+          ],
+          "time_range": "any",
+          "user_goal": "了解 LangGraph 的基本信息和数据",
+          "mode": "quick",
+          "source_scope": [
+            "github",
+            "web"
+          ],
+          "avoid_sources": [],
+          "required_evidence": [
+            "github"
+          ],
+          "community_platforms": [],
+          "max_tool_calls": 6,
+          "max_discovery_per_source": 2,
+          "max_empty_retry_per_source": 1,
+          "max_reader_per_source": 2,
+          "max_evidence_items": 6,
+          "min_evidence_items": 2,
+          "stop_conditions": {
+            "min_sources": 1,
+            "min_evidence_items": 2
+          }
+        },
+        "tool_trace": [
+          {
+            "step_index": 0,
+            "timestamp": "2026-07-30T13:52:13.922519+00:00",
+            "tool": "github_search",
+            "input": {
+              "query": "LangGraph"
+            },
+            "output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangGraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangGraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 1/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 1,
+            "timestamp": "2026-07-30T13:52:13.922556+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangGraph"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 2/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 2,
+            "timestamp": "2026-07-30T13:52:13.922595+00:00",
+            "tool": "github_search",
+            "input": {
+              "query": "langgraph-ai/langgraph"
+            },
+            "output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "langgraph-ai/langgraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=langgraph-ai%2Flanggraph&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 3/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 3,
+            "timestamp": "2026-07-30T13:52:13.922621+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangGraph LangChain framework"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 4/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 4,
+            "timestamp": "2026-07-30T13:52:13.922657+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "langchain-ai",
+              "repo": "langgraph"
+            },
+            "output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_project_profile 调用失败。",
+                "evidence": {
+                  "tool": "github_project_profile",
+                  "input": {
+                    "owner": "langchain-ai",
+                    "repo": "langgraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 5/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 5,
+            "timestamp": "2026-07-30T13:52:13.922691+00:00",
+            "tool": "webpage_reader",
+            "input": {
+              "url": "https://langchain-ai.github.io/langgraph/"
+            },
+            "output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://langchain-ai.github.io/langgraph/",
+                "evidence": {
+                  "url": "https://langchain-ai.github.io/langgraph/",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://langchain-ai.github.io/langgraph/ (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub, Web\n  Evidence Items: 2\n  Tool Calls: 6/6\n\nStatus: Ready to Finish - stop calling tools and write final answer"
+            }
+          }
+        ],
+        "evidence": {
+          "repository": null,
+          "readme": null,
+          "releases": [],
+          "issues": [],
+          "pull_requests": [],
+          "community_posts": [],
+          "web_pages": [
+            {
+              "url": "https://langchain-ai.github.io/langgraph/",
+              "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://langchain-ai.github.io/langgraph/ (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+            }
+          ]
+        },
+        "final_answer": "---\n\n# Research Findings: LangGraph\n\n## ⚠️ 研究过程说明\n\n本次研究共发起 **6 次工具调用**（达到上限），覆盖了 GitHub 和 Web 两个来源。但所有网络请求均因 **SSL 连接错误**（`SSL: UNEXPECTED_EOF_WHILE_READING`）而失败，未能获取实时证据。以下结论基于模型训练数据中的已知信息，**请谨慎对待，建议在网络恢复后重新验证**。\n\n---\n\n## LangGraph 是什么？\n\n**LangGraph** 是由 **LangChain 团队**（`langchain-ai`）开发的一个开源框架，专门用于构建**有状态的、多参与者（multi-actor）的 LLM 应用**。它将大语言模型（LLM）应用建模为**图（Graph）结构**，其中节点代表计算步骤（如 LLM 调用、工具调用），边代表数据流和控制流。\n\n### 核心特性\n\n| 特性 | 说明 |\n|------|------|\n| **图结构** | 使用有向图（支持循环）来定义 Agent 工作流，而非简单的链式调用 |\n| **状态管理** | 内置持久化状态机制，支持长时运行、可恢复的 Agent |\n| **人机协作** | 原生支持 `interrupt` 机制，可在关键节点暂停等待人工审批 |\n| **流式执行** | 支持逐节点流式输出，便于实时监控 Agent 行为 |\n| **与 LangChain 兼容** | 可无缝集成 LangChain 的 tools、models 和 prompts 生态 |\n\n### 典型使用场景\n\n- **复杂 Agent 系统**：需要规划、反思、多步推理的 AI Agent\n- **多 Agent 协作**：多个 Agent 以图节点形式协作\n- **人机协同工作流**：需要人工审批的关键决策流程\n- **RAG 管道**：比线性链更灵活的知识检索流程\n\n### 技术架构\n\nLangGraph 的核心抽象包括：\n\n1. **StateGraph**：定义状态对象和图结构的入口\n2. **Nodes**：处理状态的函数/可调用对象（LLM 调用、工具执行等）\n3. **Edges**：节点间的连接，支持条件边（基于状态路由）和普通边\n4. **Checkpointer**：持久化状态，支持从断点恢复\n\n### 与 LangChain 的关系\n\nLangGraph 是 LangChain 生态的延伸，但可以**独立使用**。LangChain 提供了丰富的模型集成和工具抽象，而 LangGraph 专注于**控制流和状态管理**。两者结合使用时能力最强。\n\n---\n\n## 证据来源说明\n\n| 来源 | 状态 | 说明 |\n|------|------|------|\n| GitHub (`langchain-ai/langgraph`) | ❌ SSL 错误 | 仓库信息、Star 数、版本等实时数据未能获取 |\n| Web (langchain-ai.github.io/langgraph) | ❌ SSL 错误 | 官方文档未能读取 |\n| Web Search | ❌ 空结果 | 搜索引擎未能返回有效链接 |\n\n---\n\n## 建议后续验证\n\n由于本次研究所有网络请求均失败，建议在网络恢复后：\n\n1. 访问 GitHub 仓库 `github.com/langchain-ai/langgraph` 获取最新 Star 数、Release 版本、贡献者等指标\n2. 阅读官方文档 `langchain-ai.github.io/langgraph` 了解最新 API\n3. 查看 PyPI 下载量了解实际采用情况\n\n以上结论中的技术描述基于训练数据，可能存在版本滞后，请以官方最新文档为准。"
+      },
+      "evaluations": {
+        "intent_accuracy": {
+          "layer": "intent_accuracy",
+          "implemented": true,
+          "score": 77,
+          "details": {
+            "checks": {
+              "objective": {
+                "expected": "information_lookup",
+                "predicted": "information_lookup",
+                "match": true,
+                "weight": 0.5
+              },
+              "focus": {
+                "expected": [
+                  "technology"
+                ],
+                "predicted": [
+                  "developer",
+                  "official",
+                  "technology"
+                ],
+                "score": 0.333,
+                "weight": 0.35
+              },
+              "depth": {
+                "expected": "standard",
+                "predicted": "quick",
+                "match": true,
+                "weight": 0.15
+              }
+            },
+            "objective_match": true,
+            "focus_score": 0.333,
+            "depth_match": true
+          }
+        },
+        "context_builder": {
+          "layer": "context_builder",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "source_scope_match": 100,
+            "required_evidence_match": 100,
+            "tool_budget_reasonable": 100,
+            "expected_sources": [
+              "github",
+              "web"
+            ],
+            "actual_sources": [
+              "github",
+              "web"
+            ],
+            "expected_required": [
+              "github"
+            ],
+            "actual_required": [
+              "github"
+            ],
+            "expected_max_tools": 6,
+            "actual_max_tools": 6
+          }
+        },
+        "tool_efficiency": {
+          "layer": "tool_efficiency",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "total_tool_calls": 6,
+            "discovery_calls": 4,
+            "reader_calls": 2,
+            "blocked_calls": 0,
+            "useful_calls": 6,
+            "tool_precision": 1.0,
+            "source_recall": 1.0,
+            "parameter_accuracy": 1.0,
+            "f1": 1.0,
+            "called_sources": [
+              "github",
+              "web"
+            ],
+            "expected_sources": [
+              "github",
+              "web"
+            ],
+            "required_evidence": [
+              "github"
+            ],
+            "missing_sources": [],
+            "parameter_checks": [
+              {
+                "tool": "github_search",
+                "query": "LangGraph",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "LangGraph",
+                "matched": true
+              },
+              {
+                "tool": "github_search",
+                "query": "langgraph-ai/langgraph",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "LangGraph LangChain framework",
+                "matched": true
+              }
+            ]
+          }
+        },
+        "evidence_quality": {
+          "layer": "evidence_quality",
+          "implemented": true,
+          "score": 53,
+          "details": {
+            "base_level": 1,
+            "grounding_ratio": 0.0,
+            "total_claims": 2,
+            "grounded_claims": 0,
+            "unsupported_claims": [
+              "attr:stars",
+              "source:releases"
+            ],
+            "source_counts": {
+              "web": 1
+            },
+            "unique_sources": 1,
+            "total_evidence_items": 1,
+            "required_evidence": [
+              "github"
+            ],
+            "covered_required": [],
+            "missing_required": [
+              "github"
+            ]
+          }
+        },
+        "research_completeness": {
+          "layer": "research_completeness",
+          "implemented": true,
+          "score": 4.0,
+          "details": {
+            "question_addressed": 5,
+            "dimension_coverage": 5,
+            "evidence_grounding": 2,
+            "overall_quality": 3,
+            "feedback": "回答完整覆盖了\"什么是LangGraph\"、\"核心特性\"和\"使用场景\"三个期望维度，内容结构清晰、技术描述准确。但所有网络请求均因SSL错误失败，结论完全依赖模型训练数据，缺乏实时证据支撑。研究过程透明地说明了这一局限，但证据基础薄弱，建议网络恢复后补充官方文档和GitHub仓库的实际数据。"
+          }
+        },
+        "answer_quality": {
+          "layer": "answer_quality",
+          "implemented": true,
+          "score": 87,
+          "details": {
+            "relevance": 90,
+            "completeness": 85,
+            "clarity": 88,
+            "conciseness": 80,
+            "feedback": "回答直接回应了\"LangGraph是什么\"的问题，从核心特性、使用场景、技术架构、与LangChain关系等多角度进行了阐述，内容较为完整。结构清晰，使用了表格和分层标题。但开头的研究过程说明和结尾的证据来源说明篇幅偏长，略显冗余；且所有信息均来自训练数据而非实时证据，可信度打了折扣。"
+          }
+        },
+        "runtime_performance": {
+          "layer": "runtime_performance",
+          "implemented": true,
+          "score": 28,
+          "details": {
+            "total_latency": 118.71,
+            "latency_rating": "slow",
+            "phase_timings": {
+              "intent_latency": 1.493,
+              "context_builder_latency": 0.0,
+              "agent_latency": 115.595,
+              "final_generation_latency": 0.0
+            },
+            "tool_call_count": 6,
+            "tool_budget_ok": true,
+            "max_tool_calls_limit": 6,
+            "token_usage": {
+              "input_tokens": 37109,
+              "output_tokens": 5757,
+              "total_tokens": 42866,
+              "estimated_llm_calls": 10,
+              "tool_input_tokens": 109,
+              "tool_output_tokens": 944
+            },
+            "estimated_cost_yuan": 0.0486
+          }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "query": "最近大家怎么看 LangChain？",
+      "category": "evaluation",
+      "error": null,
+      "latency_seconds": 131.298,
+      "full_trace": {
+        "intent": {
+          "objective": "evaluation",
+          "focus": [
+            "community",
+            "sentiment",
+            "recent_updates"
+          ],
+          "depth": "standard",
+          "entities": [
+            "LangChain"
+          ]
+        },
+        "execution_plan": {
+          "objective": "evaluation",
+          "entities": [
+            "LangChain"
+          ],
+          "focus": [
+            "community",
+            "sentiment",
+            "recent_updates"
+          ],
+          "time_range": "recent",
+          "user_goal": "了解 LangChain 近期的社区评价和主要争议",
+          "mode": "quick",
+          "source_scope": [
+            "community",
+            "web",
+            "github"
+          ],
+          "avoid_sources": [],
+          "required_evidence": [
+            "community"
+          ],
+          "community_platforms": [
+            "reddit",
+            "twitter"
+          ],
+          "max_tool_calls": 6,
+          "max_discovery_per_source": 2,
+          "max_empty_retry_per_source": 1,
+          "max_reader_per_source": 2,
+          "max_evidence_items": 8,
+          "min_evidence_items": 3,
+          "stop_conditions": {
+            "min_sources": 1,
+            "min_evidence_items": 3
+          }
+        },
+        "tool_trace": [
+          {
+            "step_index": 0,
+            "timestamp": "2026-07-30T13:54:31.075928+00:00",
+            "tool": "community_search",
+            "input": {
+              "query": "LangChain review 2026",
+              "platforms": [
+                "reddit",
+                "twitter"
+              ]
+            },
+            "output": {
+              "result": [
+                {
+                  "source": "community",
+                  "identifier": "twitter:unavailable",
+                  "title": "Twitter/X 不可用",
+                  "url": "",
+                  "score": 0.0,
+                  "reason": "Twitter/X API 当前不可用（凭据过期或服务异常），请勿重试 community_search 获取 Twitter 数据。可改用 web_search 搜索 Twitter 相关内容。"
+                }
+              ],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 1/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 1,
+            "timestamp": "2026-07-30T13:54:31.075956+00:00",
+            "tool": "community_search",
+            "input": {
+              "query": "LangChain",
+              "platforms": [
+                "reddit"
+              ]
+            },
+            "output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=LangChain, platforms=['reddit']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 2/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 2,
+            "timestamp": "2026-07-30T13:54:31.075972+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangChain review Reddit 2026"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 3/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 3,
+            "timestamp": "2026-07-30T13:54:31.075985+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangChain criticism controversy"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 4/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 4,
+            "timestamp": "2026-07-30T13:54:31.076005+00:00",
+            "tool": "github_search",
+            "input": {
+              "query": "LangChain"
+            },
+            "output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "LangChain"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=LangChain&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 5/6\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 5,
+            "timestamp": "2026-07-30T13:54:31.076017+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangChain"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 6/6\n\nStatus: Ready to Finish - stop calling tools and write final answer"
+            }
+          }
+        ],
+        "evidence": {
+          "repository": null,
+          "readme": null,
+          "releases": [],
+          "issues": [],
+          "pull_requests": [],
+          "community_posts": [
+            {
+              "source": "community",
+              "identifier": "twitter:unavailable",
+              "title": "Twitter/X 不可用",
+              "url": "",
+              "score": 0.0,
+              "reason": "Twitter/X API 当前不可用（凭据过期或服务异常），请勿重试 community_search 获取 Twitter 数据。可改用 web_search 搜索 Twitter 相关内容。"
+            }
+          ],
+          "web_pages": []
+        },
+        "final_answer": "---\n\n## Research Findings：LangChain 近期社区评价与争议\n\n### 研究执行摘要\n\n本次研究在 **6 次工具调用全部耗尽** 后，**未能获取任何有效证据**。以下是详细情况：\n\n---\n\n### 工具调用记录\n\n| # | 工具 | 查询 | 结果 |\n|---|------|------|------|\n| 1 | `community_search` | `LangChain review 2026` (Reddit + Twitter) | Twitter API 不可用（凭据过期/服务异常）；Reddit 无结果 |\n| 2 | `community_search` | `LangChain` (Reddit) | 空结果 |\n| 3 | `web_search` | `LangChain review Reddit 2026` | 空 |\n| 4 | `web_search` | `LangChain criticism controversy` | 空 |\n| 5 | `github_search` | `LangChain` | SSL 错误（`SSLEOFError`） |\n| 6 | `web_search` | `LangChain` | 空 |\n\n---\n\n### 失败原因分析\n\n1. **社区数据源（Reddit）**：两次搜索均返回空结果，可能是社区搜索索引未覆盖 LangChain 相关内容，或 Reddit API 存在限制。\n2. **社区数据源（Twitter/X）**：API 返回明确错误——凭据过期或服务异常，完全不可用。\n3. **Web 搜索**：三次不同颗粒度的查询（从具体到通用）全部返回空结果，表明 Web 搜索后端当前可能存在问题。\n4. **GitHub**：SSL 证书/连接错误导致无法访问 GitHub API，属于网络层故障。\n\n---\n\n### 结论\n\n> ⚠️ **本次研究未能获取任何关于 LangChain 社区评价和主要争议的证据。**\n\n这不是因为 LangChain 缺乏社区讨论，而是因为研究工具链在当前环境下发生了系统性故障：\n\n- **所有三个允许的数据源**（Community、Web、GitHub）均无法正常工作。\n- 0 条证据被收集，远未达到 `min_evidence_items: 3` 的要求。\n- 工具调用已达上限（6/6），状态为 **Ready to Finish**。\n\n### 建议\n\n如需获取 LangChain 近期社区评价，建议：\n\n1. **手动查阅** Reddit 的 `r/LangChain`、`r/MachineLearning` 等板块；\n2. **直接访问** GitHub 仓库 `langchain-ai/langchain` 查看 Issues、Discussions 和最近 Release Notes；\n3. **搜索 Hacker News** (`news.ycombinator.com`) 上关于 LangChain 的讨论；\n4. 待工具链恢复后重新执行本研究。"
+      },
+      "evaluations": {
+        "intent_accuracy": {
+          "layer": "intent_accuracy",
+          "implemented": true,
+          "score": 88,
+          "details": {
+            "checks": {
+              "objective": {
+                "expected": "evaluation",
+                "predicted": "evaluation",
+                "match": true,
+                "weight": 0.5
+              },
+              "focus": {
+                "expected": [
+                  "community",
+                  "sentiment"
+                ],
+                "predicted": [
+                  "community",
+                  "recent_updates",
+                  "sentiment"
+                ],
+                "score": 0.667,
+                "weight": 0.35
+              },
+              "depth": {
+                "expected": "standard",
+                "predicted": "standard",
+                "match": true,
+                "weight": 0.15
+              }
+            },
+            "objective_match": true,
+            "focus_score": 0.667,
+            "depth_match": true
+          }
+        },
+        "context_builder": {
+          "layer": "context_builder",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "source_scope_match": 100,
+            "required_evidence_match": 100,
+            "tool_budget_reasonable": 100,
+            "expected_sources": [
+              "community",
+              "github",
+              "web"
+            ],
+            "actual_sources": [
+              "community",
+              "github",
+              "web"
+            ],
+            "expected_required": [
+              "community"
+            ],
+            "actual_required": [
+              "community"
+            ],
+            "expected_max_tools": 10,
+            "actual_max_tools": 6
+          }
+        },
+        "tool_efficiency": {
+          "layer": "tool_efficiency",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "total_tool_calls": 6,
+            "discovery_calls": 6,
+            "reader_calls": 0,
+            "blocked_calls": 0,
+            "useful_calls": 6,
+            "tool_precision": 1.0,
+            "source_recall": 1.0,
+            "parameter_accuracy": 1.0,
+            "f1": 1.0,
+            "called_sources": [
+              "community",
+              "github",
+              "web"
+            ],
+            "expected_sources": [
+              "community",
+              "github",
+              "web"
+            ],
+            "required_evidence": [
+              "community"
+            ],
+            "missing_sources": [],
+            "parameter_checks": [
+              {
+                "tool": "community_search",
+                "query": "LangChain review 2026",
+                "matched": true
+              },
+              {
+                "tool": "community_search",
+                "query": "LangChain",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "LangChain review Reddit 2026",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "LangChain criticism controversy",
+                "matched": true
+              },
+              {
+                "tool": "github_search",
+                "query": "LangChain",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "LangChain",
+                "matched": true
+              }
+            ]
+          }
+        },
+        "evidence_quality": {
+          "layer": "evidence_quality",
+          "implemented": true,
+          "score": 78,
+          "details": {
+            "base_level": 1,
+            "grounding_ratio": 0.5,
+            "total_claims": 2,
+            "grounded_claims": 1,
+            "unsupported_claims": [
+              "source:releases"
+            ],
+            "source_counts": {
+              "community": 1
+            },
+            "unique_sources": 1,
+            "total_evidence_items": 1,
+            "required_evidence": [
+              "community"
+            ],
+            "covered_required": [
+              "community"
+            ],
+            "missing_required": []
+          }
+        },
+        "research_completeness": {
+          "layer": "research_completeness",
+          "implemented": true,
+          "score": 1.0,
+          "details": {
+            "question_addressed": 1,
+            "dimension_coverage": 1,
+            "evidence_grounding": 1,
+            "overall_quality": 1,
+            "feedback": "研究完全未能回答用户问题。6次工具调用全部失败，未获取任何关于LangChain社区评价、近期讨论或主要争议的有效证据。三个期望维度（community sentiment、recent discussion、major concerns）均未覆盖。回答仅记录了工具故障日志，对用户问题本身无实质贡献。整体不可用，需在工具链恢复后完全重做。"
+          }
+        },
+        "answer_quality": {
+          "layer": "answer_quality",
+          "implemented": true,
+          "score": 26,
+          "details": {
+            "relevance": 10,
+            "completeness": 5,
+            "clarity": 70,
+            "conciseness": 60,
+            "feedback": "回答完全未回应用户关于\"大家怎么看 LangChain\"的核心问题，没有提供任何社区评价、情绪或争议信息。虽然如实记录了工具调用失败的过程，结构清晰，但对用户毫无实质帮助。大量篇幅用于描述失败原因和工具日志，属于本末倒置。建议在工具失败时至少提供基于已有知识的补充说明，而非仅输出空结果报告。"
+          }
+        },
+        "runtime_performance": {
+          "layer": "runtime_performance",
+          "implemented": true,
+          "score": 17,
+          "details": {
+            "total_latency": 131.3,
+            "latency_rating": "slow",
+            "phase_timings": {
+              "intent_latency": 1.641,
+              "context_builder_latency": 0.0,
+              "agent_latency": 128.017,
+              "final_generation_latency": 0.0
+            },
+            "tool_call_count": 6,
+            "tool_budget_ok": true,
+            "max_tool_calls_limit": 10,
+            "token_usage": {
+              "input_tokens": 37122,
+              "output_tokens": 5107,
+              "total_tokens": 42229,
+              "estimated_llm_calls": 10,
+              "tool_input_tokens": 122,
+              "tool_output_tokens": 440
+            },
+            "estimated_cost_yuan": 0.0473
+          }
+        }
+      }
+    },
+    {
+      "id": 31,
+      "query": "LangGraph 和 CrewAI 哪个更适合做 multi-agent 系统？",
+      "category": "comparison",
+      "error": null,
+      "latency_seconds": 214.343,
+      "full_trace": {
+        "intent": {
+          "objective": "comparison",
+          "focus": [
+            "benchmark",
+            "technology",
+            "ecosystem",
+            "community",
+            "adoption"
+          ],
+          "depth": "deep",
+          "entities": [
+            "LangGraph",
+            "CrewAI"
+          ]
+        },
+        "execution_plan": {
+          "objective": "comparison",
+          "entities": [
+            "CrewAI",
+            "LangGraph"
+          ],
+          "focus": [
+            "benchmark",
+            "technology",
+            "ecosystem",
+            "community",
+            "adoption"
+          ],
+          "time_range": "any",
+          "user_goal": "对比分析 CrewAI、LangGraph 的差异和取舍",
+          "mode": "deep",
+          "source_scope": [
+            "github",
+            "community",
+            "web"
+          ],
+          "avoid_sources": [],
+          "required_evidence": [
+            "github"
+          ],
+          "community_platforms": [
+            "reddit",
+            "twitter"
+          ],
+          "max_tool_calls": 12,
+          "max_discovery_per_source": 2,
+          "max_empty_retry_per_source": 1,
+          "max_reader_per_source": 2,
+          "max_evidence_items": 12,
+          "min_evidence_items": 4,
+          "stop_conditions": {
+            "min_sources": 2,
+            "min_evidence_items": 4
+          }
+        },
+        "tool_trace": [
+          {
+            "step_index": 0,
+            "timestamp": "2026-07-30T13:58:11.485791+00:00",
+            "tool": "github_search",
+            "input": {
+              "query": "CrewAI"
+            },
+            "output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_search 调用失败。",
+                "evidence": {
+                  "tool": "github_search",
+                  "input": {
+                    "query": "CrewAI"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /search/repositories?q=CrewAI&sort=stars&order=desc&per_page=10 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 1/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 1,
+            "timestamp": "2026-07-30T13:58:11.485816+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "CrewAI vs LangGraph multi-agent comparison"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: None\n  Evidence Items: 0\n  Tool Calls: 2/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 2,
+            "timestamp": "2026-07-30T13:58:11.485839+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "crewAIInc",
+              "repo": "crewAI"
+            },
+            "output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_project_profile 调用失败。",
+                "evidence": {
+                  "tool": "github_project_profile",
+                  "input": {
+                    "owner": "crewAIInc",
+                    "repo": "crewAI"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/crewAIInc/crewAI (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 3/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 3,
+            "timestamp": "2026-07-30T13:58:11.485859+00:00",
+            "tool": "community_search",
+            "input": {
+              "query": "CrewAI LangGraph multi-agent 2025 2026",
+              "platforms": [
+                "reddit",
+                "twitter"
+              ]
+            },
+            "output": {
+              "result": [
+                {
+                  "source": "community",
+                  "identifier": "twitter:unavailable",
+                  "title": "Twitter/X 不可用",
+                  "url": "",
+                  "score": 0.0,
+                  "reason": "Twitter/X API 当前不可用（凭据过期或服务异常），请勿重试 community_search 获取 Twitter 数据。可改用 web_search 搜索 Twitter 相关内容。"
+                }
+              ],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 4/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 4,
+            "timestamp": "2026-07-30T13:58:11.485875+00:00",
+            "tool": "community_search",
+            "input": {
+              "query": "CrewAI vs LangGraph multi-agent",
+              "platforms": [
+                "reddit"
+              ]
+            },
+            "output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=CrewAI vs LangGraph multi-agent, platforms=['reddit']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 5/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 5,
+            "timestamp": "2026-07-30T13:58:11.485890+00:00",
+            "tool": "community_search",
+            "input": {
+              "query": "CrewAI",
+              "platforms": [
+                "reddit"
+              ]
+            },
+            "output": {
+              "result": {
+                "source": "community",
+                "type": "empty_result",
+                "summary": "社区搜索未找到结果。query=CrewAI, platforms=['reddit']",
+                "suggestion": "请尝试更简短的关键词，例如只用实体名 'CrewAI'，去掉 sentiment/year 等修饰词。"
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 6/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 6,
+            "timestamp": "2026-07-30T13:58:11.485904+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "CrewAI LangGraph multi-agent system"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 7/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 7,
+            "timestamp": "2026-07-30T13:58:11.485916+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "LangGraph"
+            },
+            "output": {
+              "result": [],
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub\n  Evidence Items: 1\n  Tool Calls: 8/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 8,
+            "timestamp": "2026-07-30T13:58:11.485934+00:00",
+            "tool": "webpage_reader",
+            "input": {
+              "url": "https://docs.crewai.com/"
+            },
+            "output": {
+              "result": {
+                "source": "web",
+                "type": "webpage",
+                "summary": "读取网页正文: https://docs.crewai.com/",
+                "evidence": {
+                  "url": "https://docs.crewai.com/",
+                  "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://docs.crewai.com/ (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub, Web\n  Evidence Items: 2\n  Tool Calls: 9/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 9,
+            "timestamp": "2026-07-30T13:58:11.485953+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "langchain-ai",
+              "repo": "langgraph"
+            },
+            "output": {
+              "result": {
+                "source": "tool_gateway",
+                "type": "tool_error",
+                "summary": "github_project_profile 调用失败。",
+                "evidence": {
+                  "tool": "github_project_profile",
+                  "input": {
+                    "owner": "langchain-ai",
+                    "repo": "langgraph"
+                  },
+                  "error_type": "SSLError",
+                  "error": "HTTPSConnectionPool(host='api.github.com', port=443): Max retries exceeded with url: /repos/langchain-ai/langgraph (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub, Web\n  Evidence Items: 3\n  Tool Calls: 10/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 10,
+            "timestamp": "2026-07-30T13:58:11.485972+00:00",
+            "tool": "github_project_profile",
+            "input": {
+              "owner": "joaomdmoura",
+              "repo": "crewAI"
+            },
+            "output": {
+              "result": {
+                "source": "research_policy",
+                "type": "tool_policy_block",
+                "summary": "ResearchPolicy 阻止了 github_project_profile 调用。",
+                "evidence": {
+                  "blocked_tool": "github_project_profile",
+                  "blocked_source": "github",
+                  "input": {
+                    "owner": "joaomdmoura",
+                    "repo": "crewAI"
+                  },
+                  "reason": "GitHub Evidence Reader 已调用 2 次。",
+                  "suggestion": "请停止继续读取同一来源，基于已有证据生成结论。"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub, Web\n  Evidence Items: 3\n  Tool Calls: 10/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 11,
+            "timestamp": "2026-07-30T13:58:11.485998+00:00",
+            "tool": "youtube_search",
+            "input": {
+              "query": "CrewAI vs LangGraph multi-agent comparison"
+            },
+            "output": {
+              "result": {
+                "source": "research_policy",
+                "type": "tool_policy_block",
+                "summary": "ResearchPolicy 阻止了 youtube_search 调用。",
+                "evidence": {
+                  "blocked_tool": "youtube_search",
+                  "blocked_source": "youtube",
+                  "input": {
+                    "query": "CrewAI vs LangGraph multi-agent comparison"
+                  },
+                  "reason": "YouTube 不在本次允许的数据源范围内。",
+                  "suggestion": "请切换到允许来源: GitHub, Web, Community。"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub, Web\n  Evidence Items: 3\n  Tool Calls: 10/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 12,
+            "timestamp": "2026-07-30T13:58:11.486017+00:00",
+            "tool": "community_search",
+            "input": {
+              "query": "LangGraph",
+              "platforms": [
+                "reddit"
+              ]
+            },
+            "output": {
+              "result": {
+                "source": "research_policy",
+                "type": "tool_policy_block",
+                "summary": "ResearchPolicy 阻止了 community_search 调用。",
+                "evidence": {
+                  "blocked_tool": "community_search",
+                  "blocked_source": "community",
+                  "input": {
+                    "query": "LangGraph",
+                    "platforms": [
+                      "reddit"
+                    ]
+                  },
+                  "reason": "Community Discovery 已达到上限（1 次成功 + 2 次空结果）。",
+                  "suggestion": "请调用 Evidence Tool 读取已发现资源: community_reader。"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub, Web\n  Evidence Items: 3\n  Tool Calls: 10/12\n\nStatus: Continue Research"
+            }
+          },
+          {
+            "step_index": 13,
+            "timestamp": "2026-07-30T13:58:11.486035+00:00",
+            "tool": "web_search",
+            "input": {
+              "query": "CrewAI 多智能体系统"
+            },
+            "output": {
+              "result": {
+                "source": "research_policy",
+                "type": "tool_policy_block",
+                "summary": "ResearchPolicy 阻止了 web_search 调用。",
+                "evidence": {
+                  "blocked_tool": "web_search",
+                  "blocked_source": "web",
+                  "input": {
+                    "query": "CrewAI 多智能体系统"
+                  },
+                  "reason": "Web Discovery 已达到上限（0 次成功 + 3 次空结果）。",
+                  "suggestion": "请调用 Evidence Tool 读取已发现资源: webpage_reader。"
+                }
+              },
+              "policy_hint": "Research Progress\n\nCollected Evidence:\n  Sources: GitHub, Web\n  Evidence Items: 3\n  Tool Calls: 10/12\n\nStatus: Continue Research"
+            }
+          }
+        ],
+        "evidence": {
+          "repository": null,
+          "readme": null,
+          "releases": [],
+          "issues": [],
+          "pull_requests": [],
+          "community_posts": [
+            {
+              "source": "community",
+              "identifier": "twitter:unavailable",
+              "title": "Twitter/X 不可用",
+              "url": "",
+              "score": 0.0,
+              "reason": "Twitter/X API 当前不可用（凭据过期或服务异常），请勿重试 community_search 获取 Twitter 数据。可改用 web_search 搜索 Twitter 相关内容。"
+            }
+          ],
+          "web_pages": [
+            {
+              "url": "https://docs.crewai.com/",
+              "content": "读取失败: HTTPSConnectionPool(host='r.jina.ai', port=443): Max retries exceeded with url: /https://docs.crewai.com/ (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1017)')))"
+            }
+          ]
+        },
+        "final_answer": "Sorry, need more steps to process this request."
+      },
+      "evaluations": {
+        "intent_accuracy": {
+          "layer": "intent_accuracy",
+          "implemented": true,
+          "score": 86,
+          "details": {
+            "checks": {
+              "objective": {
+                "expected": "comparison",
+                "predicted": "comparison",
+                "match": true,
+                "weight": 0.5
+              },
+              "focus": {
+                "expected": [
+                  "community",
+                  "ecosystem",
+                  "technology"
+                ],
+                "predicted": [
+                  "adoption",
+                  "benchmark",
+                  "community",
+                  "ecosystem",
+                  "technology"
+                ],
+                "score": 0.6,
+                "weight": 0.35
+              },
+              "depth": {
+                "expected": "standard",
+                "predicted": "deep",
+                "match": true,
+                "weight": 0.15
+              }
+            },
+            "objective_match": true,
+            "focus_score": 0.6,
+            "depth_match": true
+          }
+        },
+        "context_builder": {
+          "layer": "context_builder",
+          "implemented": true,
+          "score": 82,
+          "details": {
+            "source_scope_match": 100,
+            "required_evidence_match": 50,
+            "tool_budget_reasonable": 100,
+            "expected_sources": [
+              "community",
+              "github",
+              "web"
+            ],
+            "actual_sources": [
+              "community",
+              "github",
+              "web"
+            ],
+            "expected_required": [
+              "community",
+              "github"
+            ],
+            "actual_required": [
+              "github"
+            ],
+            "expected_max_tools": 14,
+            "actual_max_tools": 12
+          }
+        },
+        "tool_efficiency": {
+          "layer": "tool_efficiency",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "total_tool_calls": 14,
+            "discovery_calls": 10,
+            "reader_calls": 4,
+            "blocked_calls": 0,
+            "useful_calls": 14,
+            "tool_precision": 1.0,
+            "source_recall": 1.0,
+            "parameter_accuracy": 1.0,
+            "f1": 1.0,
+            "called_sources": [
+              "community",
+              "github",
+              "web",
+              "youtube"
+            ],
+            "expected_sources": [
+              "community",
+              "github",
+              "web"
+            ],
+            "required_evidence": [
+              "community",
+              "github"
+            ],
+            "missing_sources": [],
+            "parameter_checks": [
+              {
+                "tool": "github_search",
+                "query": "CrewAI",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "CrewAI vs LangGraph multi-agent comparison",
+                "matched": true
+              },
+              {
+                "tool": "community_search",
+                "query": "CrewAI LangGraph multi-agent 2025 2026",
+                "matched": true
+              },
+              {
+                "tool": "community_search",
+                "query": "CrewAI vs LangGraph multi-agent",
+                "matched": true
+              },
+              {
+                "tool": "community_search",
+                "query": "CrewAI",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "CrewAI LangGraph multi-agent system",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "LangGraph",
+                "matched": true
+              },
+              {
+                "tool": "youtube_search",
+                "query": "CrewAI vs LangGraph multi-agent comparison",
+                "matched": true
+              },
+              {
+                "tool": "community_search",
+                "query": "LangGraph",
+                "matched": true
+              },
+              {
+                "tool": "web_search",
+                "query": "CrewAI 多智能体系统",
+                "matched": true
+              }
+            ]
+          }
+        },
+        "evidence_quality": {
+          "layer": "evidence_quality",
+          "implemented": true,
+          "score": 100,
+          "details": {
+            "base_level": 1,
+            "grounding_ratio": 1.0,
+            "total_claims": 1,
+            "grounded_claims": 1,
+            "unsupported_claims": [],
+            "source_counts": {
+              "community": 1,
+              "web": 1
+            },
+            "unique_sources": 2,
+            "total_evidence_items": 2,
+            "required_evidence": [
+              "community",
+              "github"
+            ],
+            "covered_required": [
+              "community"
+            ],
+            "missing_required": [
+              "github"
+            ]
+          }
+        },
+        "research_completeness": {
+          "layer": "research_completeness",
+          "implemented": true,
+          "score": 1.0,
+          "details": {
+            "question_addressed": 1,
+            "dimension_coverage": 1,
+            "evidence_grounding": 1,
+            "overall_quality": 1,
+            "feedback": "回答仅为\"Sorry, need more steps to process this request.\"，完全没有对LangGraph与CrewAI的multi-agent系统适用性进行任何比较分析。三个期望维度（架构差异、用例适配、社区偏好）均未涉及，也未引用收集到的任何证据。该回答完全不可用，需要重新研究。"
+          }
+        },
+        "answer_quality": {
+          "layer": "answer_quality",
+          "implemented": true,
+          "score": 10,
+          "details": {
+            "relevance": 0,
+            "completeness": 0,
+            "clarity": 0,
+            "conciseness": 100,
+            "feedback": "回答完全未回应问题，仅返回一条错误/占位信息，未提供任何关于 LangGraph 与 CrewAI 的比较、技术分析、社区或生态信息。虽然文字简短，但属于无效回答。"
+          }
+        },
+        "runtime_performance": {
+          "layer": "runtime_performance",
+          "implemented": true,
+          "score": 44,
+          "details": {
+            "total_latency": 214.34,
+            "latency_rating": "slow",
+            "phase_timings": {
+              "intent_latency": 1.986,
+              "context_builder_latency": 0.0,
+              "agent_latency": 209.06,
+              "final_generation_latency": 0.0
+            },
+            "tool_call_count": 14,
+            "tool_budget_ok": true,
+            "max_tool_calls_limit": 14,
+            "token_usage": {
+              "input_tokens": 86914,
+              "output_tokens": 9106,
+              "total_tokens": 96020,
+              "estimated_llm_calls": 18,
+              "tool_input_tokens": 314,
+              "tool_output_tokens": 1883
+            },
+            "estimated_cost_yuan": 0.1051
+          }
+        }
+      }
+    }
+  ]
+}
