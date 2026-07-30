@@ -1,12 +1,12 @@
 # analyzer.py — Research Signal Analyzer
 #
 # 职责: 从多源 IntelligenceEvidence 中提取结构化信号
-# 输入: list[IntelligenceEvidence] + ResearchContext
-#       ResearchContext { objective, user_goal, entities, focus, time_range, depth, execution_plan }
+# 输入: list[IntelligenceEvidence] + ExecutionPlan
+#       ExecutionPlan { objective, user_goal, entities, focus, time_range, depth, source_scope, ... }
 # 输出: ExtractedSignals { technology, community, ecosystem, risks }
 #
 # 与旧 SignalExtractor 的区别:
-#   - Analyzer 可以根据 ResearchContext 选择分析维度，但不参与 Tool Selection
+#   - Analyzer 可以根据 ExecutionPlan 选择分析维度，但不参与 Tool Selection
 #   - 支持跨 step 的 evidence 综合分析
 #   - 引入 cross-source correlation（跨源关联分析）
 
@@ -15,10 +15,10 @@ from __future__ import annotations
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from llms.deepseek import deepseek_model
+from llms.deepseek import deepseek_structured_model
 from evidence.models import IntelligenceEvidence
 from research_agent.schemas.research import (
-    ResearchContext,
+    ExecutionPlan,
     ExtractedSignals,
     TechnologySignal,
     CommunitySignal,
@@ -37,21 +37,21 @@ class ResearchAgentAnalyzer:
     """
 
     def __init__(self):
-        self.tech_llm = deepseek_model.with_structured_output(TechnologySignal)
-        self.community_llm = deepseek_model.with_structured_output(CommunitySignal)
-        self.ecosystem_llm = deepseek_model.with_structured_output(EcosystemSignal_)
-        self.risk_llm = deepseek_model.with_structured_output(RiskSignal)
+        self.tech_llm = deepseek_structured_model.with_structured_output(TechnologySignal)
+        self.community_llm = deepseek_structured_model.with_structured_output(CommunitySignal)
+        self.ecosystem_llm = deepseek_structured_model.with_structured_output(EcosystemSignal_)
+        self.risk_llm = deepseek_structured_model.with_structured_output(RiskSignal)
 
     def analyze(
         self,
         evidences: list[IntelligenceEvidence],
-        research_context: ResearchContext | None = None,
+        plan: ExecutionPlan | None = None,
     ) -> ExtractedSignals:
         """从多份 evidence 中提取所有维度的信号。
 
         Args:
             evidences: 各 step 收集到的 evidence 列表
-            research_context: 上下文（用于确定需要哪些维度的信号）
+            plan: 执行计划（用于确定需要哪些维度的信号）
 
         Returns:
             ExtractedSignals: 各维度信号容器
@@ -62,10 +62,10 @@ class ResearchAgentAnalyzer:
 
         # 合并所有 evidence 为统一 JSON
         merged_json = self._merge_evidences(evidences)
-        context_text = self._context_text(research_context)
+        context_text = self._context_text(plan)
 
         # 确定需要哪些维度
-        needed_dimensions = self._needed_dimensions(research_context)
+        needed_dimensions = self._needed_dimensions(plan)
 
         signals = ExtractedSignals()
         extractors = {
@@ -144,31 +144,32 @@ class ResearchAgentAnalyzer:
         return json.dumps(merged, ensure_ascii=False, indent=2) if merged else "{}"
 
     @staticmethod
-    def _context_text(research_context: ResearchContext | None) -> str:
-        if research_context is None:
+    def _context_text(plan: ExecutionPlan | None) -> str:
+        if plan is None:
             return "无"
-        if isinstance(research_context, ResearchContext):
+        if isinstance(plan, ExecutionPlan):
             return (
-                f"研究目标: {research_context.user_goal}\n"
-                f"关注维度: {', '.join(research_context.focus or []) or '未指定'}\n"
-                f"时间范围: {research_context.time_range}\n"
-                f"深度: {research_context.depth}\n"
-                f"执行计划: {research_context.execution_plan.model_dump() if hasattr(research_context.execution_plan, 'model_dump') else research_context.execution_plan}"
+                f"研究目标: {plan.user_goal}\n"
+                f"关注维度: {', '.join(plan.focus or []) or '未指定'}\n"
+                f"时间范围: {plan.time_range}\n"
+                f"深度: {plan.mode}\n"
+                f"来源范围: {', '.join(plan.source_scope or []) or '未指定'}\n"
+
             )
         return "无"
 
     @staticmethod
-    def _needed_dimensions(research_context: ResearchContext | None) -> set[str]:
-        """从 ResearchContext 推导需要哪些信号维度。"""
-        if research_context is None:
+    def _needed_dimensions(plan: ExecutionPlan | None) -> set[str]:
+        """从 ExecutionPlan 推导需要哪些信号维度。"""
+        if plan is None:
             return {"technology"}  # 默认至少提取技术维度
 
-        if not isinstance(research_context, ResearchContext):
+        if not isinstance(plan, ExecutionPlan):
             return {"technology"}
 
         # Context 驱动的分析：这里只决定 Analyzer 提取哪些维度，不参与 Tool Selection。
         # 如果用户明确只关心社区/情绪，就不要再额外提取技术维度，减少一次 LLM 调用。
-        focus = set(research_context.focus or [])
+        focus = set(plan.focus or [])
         if focus:
             dimensions = set()
             if focus & {"technology", "benchmark"}:
@@ -184,7 +185,7 @@ class ResearchAgentAnalyzer:
 
         # 没有明确 focus 时，按 objective 推导默认维度。
         dimensions = set()
-        obj = research_context.objective
+        obj = plan.objective
 
         # 所有研究类型默认提取技术维度
         dimensions.add("technology")
@@ -198,7 +199,7 @@ class ResearchAgentAnalyzer:
             dimensions.add("ecosystem")
 
         # standard/deep 深度添加风险维度
-        if research_context.depth in ("standard", "deep"):
+        if plan.mode in ("standard", "deep"):
             dimensions.add("risk")
 
         return dimensions

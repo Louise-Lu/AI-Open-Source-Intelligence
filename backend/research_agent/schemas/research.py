@@ -6,8 +6,9 @@
 #              | greeting | small_talk | help
 #   entities:  研究涉及的实体
 #   focus:     用户真正关心的信息维度
-#   time_range: latest | recent | historical | any
 #   depth:     quick | standard | deep
+#
+# time_range 和 platform_hint 由正则从 raw_query 提取，不经过 LLM。
 
 from __future__ import annotations
 
@@ -36,8 +37,15 @@ class ResearchObjective(str, Enum):
 
 
 class ResearchIntent(BaseModel):
-    """深度理解用户的研究意图。
-    - 纯粹表达「用户想做什么 + 什么信息维度 + 关注什么时间 + 多深」
+    """用户研究意图 — LLM 只负责理解，不负责推断执行策略。
+
+    4 个字段：
+    - objective: 用户想做什么（分类）
+    - entities: 研究对象是谁（提取）
+    - focus: 用户关心什么维度（语义理解）
+    - depth: 需要多深（判断）
+
+    time_range 和 platform_hint 由正则从 raw_query 提取，不经过 LLM。
     """
 
     objective: Literal[
@@ -78,16 +86,6 @@ class ResearchIntent(BaseModel):
         default_factory=list,
         description="用户真正关心的信息维度，可多选，不代表任务",
     )
-    time_range: Literal[
-        "latest",
-        "recent",
-        "historical",
-        "future",
-        "any",
-    ] = Field(
-        default="any",
-        description="时间范围: latest (最新), recent (最近几个月), historical (历史), future (未来), any (不限)",
-    )
     depth: Literal[
         "quick",
         "standard",
@@ -102,9 +100,54 @@ class ResearchIntent(BaseModel):
     )
 
 
-class ExecutionPlan(BaseModel):
-    """执行控制计划：约束工具来源、预算和停止条件，避免 ReAct Agent 发散。"""
+class StopConditions(BaseModel):
+    """停止条件 — 同时满足时 Agent 必须停止搜索。"""
 
+    min_sources: int = Field(
+        default=1,
+        description="至少需要覆盖的不同证据来源数",
+    )
+    min_evidence_items: int = Field(
+        default=2,
+        description="至少需要收集的证据条目数",
+    )
+
+
+class ExecutionPlan(BaseModel):
+    """统一执行计划：合并了研究上下文和执行控制。
+
+    包含：
+    - 来自 Intent 的研究目标信息（objective, entities, focus）
+    - ContextBuilder 生成的执行参数（user_goal, mode, source_scope, …）
+    - 预算和停止条件（max_tool_calls, stop_conditions 等）
+
+    avoid_sources 用于主动排除明显无关的来源。
+    community_platforms 由用户显式指定或根据 entity_origin 推断。
+    """
+
+    # ===== 来自 Intent =====
+    objective: str = Field(
+        default="information_lookup",
+        description="研究目标，例如 evaluation、trend_analysis",
+    )
+    entities: list[str] = Field(
+        default_factory=list,
+        description="标准化后的研究对象",
+    )
+    focus: list[str] = Field(
+        default_factory=list,
+        description="用户关注的信息维度，例如 community、market、technology",
+    )
+    time_range: str = Field(
+        default="any",
+        description="时间范围，例如 recent、past_year、any",
+    )
+
+    # ===== ContextBuilder 生成 =====
+    user_goal: str = Field(
+        default="",
+        description="一句话描述用户真正想解决的问题",
+    )
     mode: Literal["quick", "standard", "deep"] = Field(
         default="standard",
         description="执行深度，决定工具预算大小",
@@ -113,81 +156,49 @@ class ExecutionPlan(BaseModel):
         default_factory=list,
         description="允许使用的数据源，例如 community/web/github",
     )
-    required_sources: list[str] = Field(
-        default_factory=list,
-        description="达到停止条件所需的证据来源",
-    )
     avoid_sources: list[str] = Field(
         default_factory=list,
-        description="本任务应避免使用的数据源",
+        description="本任务应避免使用的数据源（仅用于明显无关来源）",
     )
-    allowed_tools: list[str] = Field(
+    required_evidence: list[str] = Field(
         default_factory=list,
-        description="本次研究允许调用的工具名白名单；为空表示按 source_scope 推导",
+        description="达到停止条件必须覆盖的证据来源类型",
     )
-    blocked_tools: list[str] = Field(
+    community_platforms: list[str] = Field(
         default_factory=list,
-        description="本次研究禁止调用的工具名黑名单",
+        description="社区搜索目标平台，由用户显式指定或根据 entity_origin 推断",
     )
+
+    # ===== 预算 =====
     max_tool_calls: int = Field(
         default=8,
         description="本次研究最多允许的工具调用次数",
     )
     max_discovery_per_source: int = Field(
+        default=2,
+        description="每个来源最多允许的 Discovery 调用次数（含空结果）",
+    )
+    max_empty_retry_per_source: int = Field(
         default=1,
-        description="每个来源最多允许的 Discovery 调用次数",
+        description="每个来源 Discovery 返回空结果后允许重试的次数",
     )
     max_reader_per_source: int = Field(
-        default=1,
+        default=2,
         description="每个来源最多允许的 Evidence Reader 调用次数",
     )
-    stop_when: str = Field(
-        default="required_sources_satisfied",
-        description="停止规则，例如 required_sources_satisfied",
+    max_evidence_items: int = Field(
+        default=10,
+        description="本次研究最多收集的证据条目总数上限",
+    )
+    min_evidence_items: int = Field(
+        default=2,
+        description="停止前至少需要收集的证据条目数",
     )
 
-
-class ResearchContext(BaseModel):
-    """
-    提供给 ReAct Agent 的研究上下文。
-    描述"用户真正想解决的问题"，而不是告诉 Agent 怎么做。
-    """
-
-    # ===== 来自 Intent =====
-
-    objective: str = Field(
-        description="研究目标，例如 evaluation、trend_analysis"
-    )
-
-    entities: list[str] = Field(
-        default_factory=list,
-        description="标准化后的研究对象"
-    )
-
-    focus: list[str] = Field(
-        default_factory=list,
-        description="用户关注的信息维度，例如 community、market、technology"
-    )
-
-    time_range: str = Field(
-        default="any",
-        description="时间范围，例如 recent、past_year、any"
-    )
-
-    depth: str = Field(
-        default="standard",
-        description="研究深度：quick / standard / deep"
-    )
-
-    # ===== Context Builder 生成 =====
-
-    user_goal: str = Field(
-        description="一句话描述用户真正想解决的问题"
-    )
-
-    execution_plan: ExecutionPlan = Field(
-        default_factory=ExecutionPlan,
-        description="执行控制计划，用于约束 Agent 工具调用边界",
+    # ===== 停止条件 =====
+    stop_conditions: StopConditions = Field(
+        default_factory=StopConditions,
+        description="结构化停止条件：min_sources + min_evidence_items 同时满足时停止",
     )
 
 

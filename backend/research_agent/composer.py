@@ -16,7 +16,7 @@ import json
 import logging
 import re
 
-from llms.deepseek import deepseek_model
+from llms.deepseek import deepseek_structured_model
 from evidence.models import IntelligenceEvidence
 from research_agent.schemas.research import ResearchBrief, ExtractedSignals
 
@@ -68,7 +68,7 @@ class ResearchBriefComposer:
     """
 
     def __init__(self):
-        self.llm = deepseek_model.with_structured_output(ResearchBrief)
+        self.llm = deepseek_structured_model.with_structured_output(ResearchBrief)
 
     def compose(
         self,
