@@ -16,20 +16,6 @@ async function requestJson(url, options) {
 }
 
 export async function getComparison(repo1, repo2) {
-  try {
-    return await requestJson(`${API_BASE_URL}/comparison`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ repo1, repo2 }),
-    });
-  } catch (error) {
-    if (error?.status !== 404 && error?.status !== 405) {
-      throw error;
-    }
-
-    const params = new URLSearchParams({ repo1, repo2 });
-    return requestJson(`${API_BASE_URL}/compare?${params.toString()}`);
-  }
+  const params = new URLSearchParams({ repo1, repo2 });
+  return requestJson(`${API_BASE_URL}/repositories/compare?${params.toString()}`);
 }

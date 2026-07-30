@@ -16,16 +16,6 @@ async function requestJson(url, options) {
 }
 
 export async function getReleaseDiff(owner, repo, oldTag, newTag) {
-  return requestJson(`${API_BASE_URL}/release-diff`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      owner,
-      repo,
-      old_tag: oldTag,
-      new_tag: newTag,
-    }),
-  });
+  const params = new URLSearchParams({ old_tag: oldTag, new_tag: newTag });
+  return requestJson(`${API_BASE_URL}/release-diff/repositories/${owner}/${repo}/releases/diff?${params.toString()}`);
 }

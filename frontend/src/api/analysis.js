@@ -16,19 +16,5 @@ async function requestJson(url, options) {
 }
 
 export async function getAnalysis(owner, repo) {
-  try {
-    return await requestJson(`${API_BASE_URL}/analysis`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ owner, repo }),
-    });
-  } catch (error) {
-    if (error?.status !== 404 && error?.status !== 405) {
-      throw error;
-    }
-
-    return requestJson(`${API_BASE_URL}/repositories/${owner}/${repo}/analysis`);
-  }
+  return requestJson(`${API_BASE_URL}/repositories/${owner}/${repo}/analysis`);
 }
