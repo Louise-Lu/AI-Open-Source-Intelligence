@@ -1,773 +1,425 @@
-# Agent Architecture
+# Research Agent 架构文档
 
-## Overview
+## 概述
 
-AI Intelligence Agent 采用 ReAct（Reason + Act）模式。
+AI Intelligence Agent 是一个基于 LangGraph ReAct 模式的多源研究系统。用户提出自然语言问题，Agent 自主规划搜索策略、调用工具收集证据、最终生成结构化研究简报。
 
-用 LangGraph 把 Agent 的循环（Reason → Act → Observe）实现。
+核心设计原则：
 
-- LangGraph
-- Tool Calling
-- create_react_agent
-
-Agent 不采用固定 Workflow，而是根据用户目标自主规划分析过程，并动态决定调用哪些 Tool。
-
-整个分析过程由一个 Agent 完成，而不是多个 Agent 协同。
+- **Fail Fast**：非研究意图直接返回，无实体不启动 Agent，无证据不生成简报
+- **确定性 + 自主性结合**：意图理解、实体解析、执行计划用确定性规则；工具调用由 LLM 自主决策
+- **策略约束**：Research Policy 对 Agent 的工具调用进行预算控制和来源限制
+- **多层兜底**：每个 LLM 调用都有规则兜底，保证系统可用性
 
 ---
 
-## Architecture
+## 整体流水线
 
 ```text
-Prompt + policy_hint
+用户查询
+  │
+  ▼
+┌─────────────────────────────────────────────────┐
+│  1. Intent Understanding（意图理解）              │
+│     intent.py → ResearchIntent                   │
+│     objective / entities / focus / depth          │
+└─────────────────────┬───────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────┐
+│  2. Entity Extraction & Resolution（实体提取与标准化）│
+│     entity_extractor.py → ExtractedEntity        │
+│     entity_resolver.py → ResolvedEntity          │
+│     name / entity_scope / entity_origin           │
+└─────────────────────┬───────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────┐
+│  3. ExecutionPlan Builder（执行计划构建）          │
+│     context_builder.py → ExecutionPlan           │
+│     mode / source_scope / budget / stop_conditions│
+└─────────────────────┬───────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────┐
+│  4. Research Policy（运行时策略初始化）            │
+│     research_policy.py                           │
+│     start_research_policy(plan)                  │
+└─────────────────────┬───────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────┐
+│  5. ReAct Agent（自主工具调用）                    │
+│     intelligence_agent.py                        │
+│     Discovery → Capability → Observe → Loop      │
+│     before_tool_call / after_tool_call 约束       │
+└─────────────────────┬───────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────┐
+│  6. Signal Extraction（结构化信号提取）            │
+│     signal_extractor.py                          │
+│     technology / community / ecosystem / risk     │
+└─────────────────────┬───────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────┐
+│  7. Composer（研究简报生成）                       │
+│     composer.py → ResearchBrief                  │
+│     summary / key_findings / analysis / sources   │
+└─────────────────────────────────────────────────┘
+```
+
+编排入口：`services/chat_service.py` 的 `ChatService.chat()` 方法串联以上所有步骤。
+
+---
+
+## 模块详解
+
+### 1. 意图理解 — `intent.py`
+
+将用户自然语言查询解析为结构化的 `ResearchIntent`。
+
+**输出字段：**
+
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `objective` | 研究目标分类 | `evaluation`, `trend_analysis`, `information_lookup` |
+| `entities` | 研究对象 | `["LangGraph"]` |
+| `focus` | 用户关心的信息维度 | `["community", "sentiment"]` |
+| `depth` | 研究深度 | `quick`, `standard`, `deep` |
+
+**实现方式：**
+
+- LLM 结构化输出（`deepseek_structured_model`）为主
+- 规则兜底（`_rule_based_route`）：关键词匹配推断 objective/focus/depth
+- 非研究意图（greeting/small_talk/help）快速判断，直接返回不走 Agent
+
+**正则提取（不经过 LLM）：**
+
+- `extract_time_range(query)`：从查询中提取时间范围（latest/recent/historical/any）
+- `extract_platforms(query)`：从查询中提取用户显式提到的平台（reddit/twitter/bilibili/v2ex 等）
+
+---
+
+### 2. 实体提取与标准化 — `entity_extractor.py` + `entity_resolver.py`
+
+**Entity Extractor** 从查询中提取原始实体名称：
+
+- LLM 结构化输出 → `ExtractedEntity(name=...)`
+- 规则兜底：已知项目名列表匹配
+
+**Entity Resolver** 将原始实体标准化为 `ResolvedEntity`：
+
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `name` | 标准名称 | `"langgraph"` |
+| `entity_scope` | 信息存在的平台 | `["github", "web"]` |
+| `entity_origin` | 项目归属 | `"international"` / `"chinese"` / `"unknown"` |
+| `aliases` | 别名列表 | `["langgraph", "langchain-ai/langgraph"]` |
+| `official_name` | 官方名称 | `"LangGraph"` |
+
+`entity_scope` 直接决定后续 `source_scope`（Agent 能访问哪些数据源），`entity_origin` 影响社区平台推断。
+
+---
+
+### 3. 执行计划构建 — `context_builder.py`
+
+`ExecutionPlanBuilder` 根据 `ResearchIntent` + `ResolvedEntity` 列表，纯规则组装出 `ExecutionPlan`，不调用 LLM。
+
+**ExecutionPlan 核心字段：**
+
+```text
+┌─ 来自 Intent ──────────────────────────────┐
+│  objective    研究目标                       │
+│  entities     标准化后的研究对象              │
+│  focus        用户关注的信息维度              │
+│  time_range   时间范围（正则提取）            │
+├─ ContextBuilder 生成 ──────────────────────┤
+│  user_goal    一句话任务描述                  │
+│  mode         quick / standard / deep        │
+│  source_scope 允许的数据源                   │
+│  avoid_sources 主动排除的来源                │
+│  required_evidence 必须覆盖的证据类型        │
+│  community_platforms  社区搜索目标平台       │
+├─ 预算 ─────────────────────────────────────┤
+│  max_tool_calls             总工具调用上限   │
+│  max_discovery_per_source   每源 Discovery 上限│
+│  max_empty_retry_per_source 空结果重试上限   │
+│  max_reader_per_source      每源 Reader 上限 │
+│  max_evidence_items         证据条目上限     │
+├─ 停止条件 ─────────────────────────────────┤
+│  stop_conditions.min_sources        最少来源数│
+│  stop_conditions.min_evidence_items 最少证据数│
+└────────────────────────────────────────────┘
+```
+
+**社区平台推断逻辑：**
+
+- 中国项目（`entity_origin=chinese`）→ `["bilibili", "reddit"]`
+- 海外项目（`entity_origin=international`）→ `["reddit", "twitter"]`
+- 用户显式提到平台时优先使用用户指定的
+
+---
+
+### 4. 运行时策略 — `research_policy.py`
+
+在 Agent 执行期间管理工具调用约束。使用 `ContextVar` 实现请求隔离。
+
+**生命周期：**
+
+```text
+start_research_policy(plan)   ← 初始化
     ↓
-LLM 产生 thought
+before_tool_call(name, input) ← 每次工具调用前检查
     ↓
-LLM 决定下一步调用哪个 tool
+[Tool 执行]
     ↓
-before_tool_call() 做硬约束检查
+after_tool_call(name, output) ← 每次工具调用后更新状态
     ↓
-Tool 执行
+build_policy_hint()           ← 生成给 LLM 看的进度提示
     ↓
-after_tool_call() 更新 policy state
+clear_research_policy()       ← 研究结束清理
+```
+
+**before_tool_call 检查顺序：**
+
+1. 工具来源不在 `source_scope` 或在 `avoid_sources` → 拦截
+2. 工具预算耗尽（`max_total_tool_calls`）→ 拦截
+3. 停止条件满足（`required_evidence` + `min_sources` + `min_evidence_items`）→ 拦截
+4. Discovery 工具：`discovery_count + empty_count >= max_discovery + max_empty_retry` → 拦截
+5. Reader 工具：`reader_count >= max_reader_per_source` → 拦截
+
+**停止条件（`_is_ready_to_finish`）：**
+
+同时满足以下三项才正常停止：
+- `required_evidence` 全部覆盖
+- `evidence_sources` 数量 >= `min_sources`
+- `evidence_items` >= `min_evidence_items`
+
+或者硬性上限：工具预算用完 / 证据条目达到上限。
+
+---
+
+### 5. ReAct Agent — `intelligence_agent.py`
+
+基于 LangGraph `create_react_agent` 构建的自主研究执行引擎。
+
+**Agent 循环：**
+
+```text
+LLM 接收：system_prompt + policy_hint + 历史消息
     ↓
-build_policy_hint() 生成最新 hint
+LLM 产生 thought（推理下一步）
     ↓
-返回结果给 LLM 观察：
-{
-    result: 工具结果,
-    policy_hint: 最新策略提示
-}
+LLM 选择工具 + 构造参数
     ↓
-LLM 根据观察结果 + 新的 policy_hint 决定下一步
+before_tool_call() 硬约束检查
+    ├── 拦截 → 返回 policy_block 给 LLM
+    └── 放行 → 工具执行
+              ↓
+         after_tool_call() 更新状态
+              ↓
+         build_policy_hint() 生成新提示
+              ↓
+         结果 + policy_hint 返回 LLM 观察
+              ↓
+         LLM 决定：继续搜索 / 切换来源 / 停止
 ```
 
-这里可以分成两层：
+**Agent 系统提示词包含：**
 
-## LLM 负责决策
+- 执行计划摘要（user_goal、source_scope、mode）
+- 工具分类说明（Discovery 工具 vs Capability 工具）
+- 搜索查询生成原则（根据 objective 选择修饰词）
+- 研究原则（先 Discovery 后 Capability、避免重复、空结果换关键词）
 
-LLM 根据这些信息做“软决策”：
+---
+
+### 6. 工具体系 — `agent/tools/`
+
+工具分为三层：
 
 ```text
-Research Goal
-Prompt 原则
-Current Research Policy / policy_hint
-上一步 tool 返回结果
-自己的 thought
+┌─ Discovery 工具（发现）──────────────────────┐
+│  搜索各平台，返回轻量级 DiscoveryResult       │
+│  github_search / huggingface_search           │
+│  community_search / web_search / youtube_search│
+├─ Capability 工具（采集）─────────────────────┤
+│  深入读取，返回重量级 CapabilityResult         │
+│  github_project_profile / github_project_health│
+│  github_release_summary / github_ecosystem     │
+│  huggingface_model_profile / community_reader  │
+│  webpage_reader / youtube_transcript           │
+│  rss_reader / podcast_transcript               │
+├─ 原始数据层（_raw.py）───────────────────────┤
+│  封装各平台底层 API 调用                       │
+│  Discovery 和 Capability 共享                  │
+└──────────────────────────────────────────────┘
 ```
 
-所以它会判断：
-
-```text
-现在是该继续 Discovery？
-还是已经发现资源，应该进入 Evidence？
-还是证据已经够了，可以停止？
-```
-
-比如：
-
-```text
-min_evidence_sources = 3
-```
-
-而当前只有：
-
-```python
-evidence_sources = ["community"]
-```
-
-那 `policy_hint` 会告诉它：
+**两阶段流水线：Discover → Acquire**
 
 ```text
-当前已有 1 个证据来源，目标是至少 3 个。
-继续探索下一个优先数据源，补充交叉验证。
+Agent 调用 github_search("LangGraph")
+    → 返回 DiscoveryResult: {identifier: "langchain-ai/langgraph", title: "...", url: "..."}
+    → Agent 决定深入读取
+Agent 调用 github_project_profile("langchain-ai", "langgraph")
+    → 返回 CapabilityResult: {source: "github", evidence: {仓库信息 + README}}
 ```
 
-于是 LLM 理论上就会去选：
+**各平台工具一览：**
 
-```python
-web_search(...)
-```
+| 平台 | Discovery | Capability |
+|------|-----------|------------|
+| GitHub | `github_search` | `github_project_profile`, `github_project_health`, `github_release_summary`, `github_ecosystem` |
+| HuggingFace | `huggingface_search` | `huggingface_model_profile` |
+| 社区 | `community_search`（Twitter/Reddit/B站/V2EX） | `community_reader`（统一入口，按 identifier 前缀分发） |
+| Web | `web_search`（Tavily + Exa） | `webpage_reader`（Jina Reader） |
+| YouTube | `youtube_search` | `youtube_transcript` |
+| RSS | — | `rss_reader` |
+| 播客 | — | `podcast_transcript` |
 
-然后再：
+---
 
-```python
-webpage_reader(...)
-```
+### 7. 信号提取 — `signal_extractor.py`
 
-## Python state 负责约束和记录
+从多源证据中提取结构化信号，支持四个维度：
 
-`state` 不是直接替 LLM 决策，而是负责记录和限制。
+| 维度 | 内容 |
+|------|------|
+| Technology | 技术架构、核心能力、性能基准 |
+| Community | 社区情绪、用户反馈、活跃度 |
+| Ecosystem | 集成情况、生态系统、采用率 |
+| Risk | 潜在风险、依赖问题、维护隐患 |
 
-它记录这些东西：
+**维度选择逻辑（`_needed_dimensions`）：**
 
-```python
-{
-    "objective": "trend_analysis",
-    "policy": ObjectivePolicy(...),
-    "last_discovery_source": "community",
-    "same_discovery_count": 1,
-    "discovery_counts": {
-        "community": 1
-    },
-    "discovered_resources": {
-        "community": ["reddit:pending:AI Agent"]
-    },
-    "evidence_sources": ["community"]
-}
-```
+- 根据 `focus` 决定：用户关心社区 → 只提取 Community，不额外提取 Technology
+- 根据 `objective` 兜底：所有研究默认提取 Technology，evaluation 加 Community，trend_analysis 加 Ecosystem
 
-它主要有两个作用。
+**并行执行：** 四个维度使用 `ThreadPoolExecutor` 并行调用 LLM 结构化输出。
 
-第一，生成下一轮给 LLM 看的 `policy_hint`：
+---
+
+### 8. 简报生成 — `composer.py`
+
+将证据和信号组合为最终的 `ResearchBrief`。
+
+**两种模式：**
+
+- **LLM 模式**（`compose`）：调用结构化输出生成完整简报
+- **快速模式**（`compose_fast`，默认）：不调用 LLM，直接从证据中提取关键信息拼装
+
+**ResearchBrief 结构：**
 
 ```text
-Current Progress
-- Community: 已探索（1 次）
-- Web: 未探索
-- GitHub: 未探索
-
-Evidence
-- 已获得 Community 证据。
+summary        一句话总结
+key_findings   关键发现列表
+analysis       详细分析
+signals        结构化信号（来自 SignalExtractor）
+sources        来源列表
+recommendations 建议
 ```
 
-第二，在工具调用前做硬限制：
+---
 
-```python
-before_tool_call(...)
-```
+## 数据模型 — `schemas/`
 
-例如如果 LLM 又想继续：
+### `schemas/entity.py`
 
-```python
-community_search(...)
-```
+| 模型 | 用途 |
+|------|------|
+| `ExtractedEntity` | 原始提取的实体（仅 name） |
+| `EntityExtraction` | 实体提取结果容器 |
+| `ResolvedEntity` | 标准化实体（含 scope、origin、aliases） |
 
-但之前已经发现了 Community 资源，Python 会拦截：
+### `schemas/research.py`
+
+| 模型 | 用途 |
+|------|------|
+| `ResearchIntent` | 用户研究意图（LLM 输出） |
+| `ExecutionPlan` | 统一执行计划（Intent 信息 + 执行参数 + 预算 + 停止条件） |
+| `StopConditions` | 结构化停止条件 |
+| `TechnologySignal` | 技术维度信号 |
+| `CommunitySignal` | 社区维度信号 |
+| `EcosystemSignal_` | 生态维度信号 |
+| `RiskSignal` | 风险维度信号 |
+| `ExtractedSignals` | 信号容器 |
+| `ResearchBrief` | 最终研究简报 |
+
+---
+
+## 目录结构
 
 ```text
-已经发现资源，下一步应该读取证据，而不是继续搜索同一来源。
-```
-
-或者如果它连续搜索同一个来源太多次，也会拦截：
-
-```text
-Community 已连续探索 2 次，建议切换到其它来源。
-```
-
-## 一句话总结
-
-你的理解可以总结成：
-
-```text
-LLM 根据 prompt + policy_hint + observation 自主选择下一步工具；
-Python state 负责记录进度，并在工具调用前做必要的硬约束；
-工具执行后，state 更新，再生成新的 policy_hint，影响下一轮 LLM thought。
-```
-
-也就是说：
-
-```text
-policy_hint = 给 LLM 的导航提示
-state = Runtime 的真实进度记录
-before_tool_call = 防止 LLM 走偏的刹车
-after_tool_call = 每次工具执行后的进度更新
-```
-<!-- 
-## Core Components
-
-### Intent Understanding
-
-负责理解用户真正的问题。
-
-例如：
-
-用户：
-
-"LangGraph 适合企业项目吗？"
-
-Agent 不会只生成 Summary。
-
-而会判断：
-
-需要：
-
-- Project Profile
-- Community Activity
-- Recent Release
-- Roadmap
-
----
-
-## Planning
-
-生成分析计划。
-
-例如：
-
-Step 1
-
-获取 Repository
-
-Step 2
-
-分析 Release
-
-Step 3
-
-分析 Issue
-
-Step 4
-
-生成报告
-
----
-
-## Tool Selection
-
-Agent 根据当前信息决定调用哪个 Tool。
-
-例如：
-
-Repository Tool
-
-Issue Tool
-
-Release Tool
-
-Compare Tool
-
----
-
-## Observation
-
-保存每次 Tool 返回结果。
-
-Agent 根据 Observation 判断：
-
-信息是否足够。
-
----
-
-## Reasoning
-
-根据 Observation 推理：
-
-是否继续搜索。
-
-是否切换 Tool。
-
-是否结束分析。
-
----
-
-## Report Generation
-
-最终生成：
-
-Project Intelligence Report。
-
-## 测试问题
-现在测试 Chat Agent，不只测一个简单问题。要覆盖：
-
-1. **直接查询（单工具）**
-2. **需要多个工具**
-3. **需要分析推理**
-4. **容易误调用**
-5. **上下文记忆（后面加 memory 测）**
-
----
-
-## 1. 查询仓库基础信息（Repository Tool）
-
-### 用户输入
-
-```
-LangGraph 有多少 stars？forks 多少？
-```
-
-预期 Agent：
-
-调用：
-
-```
-get_repository
-```
-
-可能答案：
-
-```
-LangGraph (langchain-ai/langgraph) 当前约有 37k stars，6k+ forks。
-
-该项目主要使用 Python 开发，采用 MIT License。
+backend/
+├── agent/                          # Agent 执行层
+│   ├── intelligence_agent.py       # ReAct Agent 定义
+│   ├── research_policy.py          # 运行时策略管理
+│   ├── state.py                    # Agent 状态定义
+│   ├── tool_gateway.py             # 工具网关
+│   ├── trace.py                    # 执行 trace 管理
+│   ├── schemas/
+│   │   └── discovery_result.py     # DiscoveryResult 模型
+│   └── tools/
+│       ├── _raw.py                 # 原始 API 调用层
+│       ├── _shared.py              # 共享工具（策略日志装饰器等）
+│       ├── discovery.py            # Discovery 工具（5 个）
+│       └── capability.py           # Capability 工具（9 个）
+│
+├── research_agent/                 # 研究编排层
+│   ├── intent.py                   # 意图理解
+│   ├── entity_extractor.py         # 实体提取
+│   ├── entity_resolver.py          # 实体标准化
+│   ├── context_builder.py          # 执行计划构建
+│   ├── signal_extractor.py         # 信号提取
+│   ├── composer.py                 # 简报生成
+│   ├── api/
+│   │   └── chat.py                 # Chat API 路由
+│   ├── prompts/
+│   │   └── extraction.py           # 提取相关 prompt
+│   ├── schemas/
+│   │   ├── entity.py               # 实体数据模型
+│   │   ├── research.py             # 研究流程数据模型
+│   │   └── chat.py                 # Chat 数据模型
+│   └── services/
+│       └── chat_service.py         # 主服务编排入口
+│
+└── llms/
+    └── deepseek.py                 # LLM 实例配置
+        ├── deepseek_model          # 通用模型（思考模式开启）
+        └── deepseek_structured_model # 结构化输出专用（思考模式关闭）
 ```
 
 ---
 
-## 2. 查询项目定位（Repository + README）
+## 关键设计决策
 
-### 用户输入
+### 为什么 time_range 不经过 LLM？
 
-```
-LangGraph 是做什么的？
-```
+时间范围用正则从 raw_query 提取（`extract_time_range`），不放在 `ResearchIntent` 里让 LLM 判断。原因：
+- 时间表达是确定性的（"最近" = recent，"去年" = historical）
+- 减少 LLM 输出字段，降低出错概率
+- 正则提取更快更稳定
 
-预期：
+### 为什么 ResearchContext 合并进 ExecutionPlan？
 
-调用：
+原来有两个模型：`ResearchContext`（研究上下文）和 `ExecutionPlan`（执行控制）。合并原因：
+- 两者高度重叠（entities、focus、depth 都重复）
+- Agent prompt 需要同时引用两者，增加复杂度
+- 合并后一个 `ExecutionPlan` 包含所有信息，简化下游引用
 
-```
-get_repository
-get_readme
-```
+### 为什么用 source_scope 而不是 allowed_tools？
 
-答案：
+原来用 `allowed_tools` / `blocked_tools` 做工具级白名单/黑名单。改为 `source_scope` / `avoid_sources` 做来源级控制。原因：
+- 工具级控制太细，新增工具就要更新白名单
+- 来源级控制更灵活：允许 "community" 就自动包含所有社区平台的工具
+- 与 Discovery/Capability 两阶段设计更匹配
 
-```
-LangGraph 是一个用于构建长期运行、有状态 AI Agent 的low-level编排框架。
+### 为什么空结果也消耗 Discovery 预算？
 
-它提供：
-- 状态管理
-- 持久化执行
-- Human-in-the-loop
-- Agent 工作流编排
-
-主要用于构建复杂的生产级 Agent 系统。
-```
-
----
-
-## 3. 查询维护情况（多个工具）
-
-### 用户输入
-
-```
-LangGraph 维护活跃吗？
-```
-
-预期：
-
-调用：
-
-```
-get_repository
-get_releases
-get_issues
-get_pull_requests
-```
-
-答案：
-
-```
-LangGraph 目前维护较为活跃。
-
-依据：
-
-- GitHub Stars 超过 3.7 万
-- 最近持续发布多个 Release
-- Issue 和 Pull Request 持续更新
-
-说明项目仍处于积极开发阶段。
-```
-
----
-
-## 4. Release 查询
-
-### 用户输入
-
-```
-LangGraph 最近更新了什么？
-```
-
-预期：
-
-调用：
-
-```
-get_releases
-```
-
-答案：
-
-```
-最近版本为 v1.2.9。
-
-该版本主要包含 bug 修复，例如：
-- delta channel 相关问题修复
-- metadata 和 counter 更新修复
-
-没有明显的新功能或 breaking change。
-```
-
----
-
-## 5. 比较两个项目（测试多仓库能力）
-
-### 用户输入
-
-```
-比较 LangGraph 和 LangChain
-```
-
-预期：
-
-调用：
-
-```
-get_repository(langchain-ai/langgraph)
-
-get_repository(langchain-ai/langchain)
-```
-
-答案：
-
-```
-LangGraph 和 LangChain 都属于 LangChain 生态。
-
-区别：
-
-LangChain：
-- 提供 LLM 应用开发组件
-- chains、retrievers、tools
-
-LangGraph：
-- 专注 Agent 工作流编排
-- 状态管理
-- 长运行 Agent
-
-如果构建复杂 Agent，LangGraph 更适合。
-```
-
----
-
-## 6. 测试不存在仓库
-
-### 用户输入
-
-```
-分析 abc/xyz 这个 GitHub 项目
-```
-
-预期：
-
-不要崩。
-
-答案：
-
-```
-无法找到该 GitHub Repository。
-
-请检查 owner 和 repository 名称是否正确。
-```
-
----
-
-## 7. 测试工具选择能力
-
-### 用户输入
-
-```
-LangGraph 最近有没有 bug？
-```
-
-正确：
-
-应该调用：
-
-```
-get_issues
-```
-
-而不是：
-
-```
-get_repository
-```
-
-答案：
-
-```
-GitHub Issues 中存在一些 bug 相关讨论。
-
-例如：
-- delta channel replay 问题
-- checkpoint consistency 问题
-
-这些问题主要集中在稳定性和性能优化方面。
-```
-
----
-
-## 8. 测试上下文（现在可能失败，等 memory）
-
-第一轮：
-
-```
-LangGraph 有多少 stars？
-```
-
-回答：
-
-```
-约37344 stars
-```
-
-第二轮：
-
-```
-它维护活跃吗？
-```
-
-未来应该理解：
-
-```
-它 = LangGraph
-```
-
-现在没有 memory 的情况下可能不知道。
-
----
-
-## 9. 测试复杂分析
-
-### 用户输入
-
-```
-LangGraph 适合企业生产环境吗？
-```
-
-预期：
-
-调用：
-
-```
-repository
-readme
-issues
-releases
-```
-
-答案：
-
-```
-LangGraph 具备企业使用的一些条件：
-
-优势：
-- MIT License
-- 活跃维护
-- 支持长期运行 Agent
-- 提供持久化和状态管理
-
-需要注意：
-- Agent 系统仍需要自行设计监控、安全和成本控制。
-```
-
----
-
-## 10. 测试中文回答
-
-### 用户输入
-
-```
-用中文总结一下 LangGraph
-```
-
-答案：
-
-```
-LangGraph 是一个面向生产级 AI Agent 的编排框架。
-
-它帮助开发者构建具有状态、记忆和复杂工作流能力的 Agent。
-```
-
----
-
-你测试的时候重点看三个东西：
-
-### ① 有没有乱调用 Tool
-
-例如：
-
-问：
-
-```
-LangGraph 有多少 stars？
-```
-
-应该：
-
-```
-get_repository
-```
-
-不要：
-
-```
-get_releases
-get_issues
-get_readme
-```
-
----
-
-### ② 有没有重复调用
-
-你之前的问题：
-
-```
-get_repository
-get_repository
-get_langchain
-```
-
-就是 Agent stop condition 不好。
-
----
-
-### ③ trace 是否合理
-
-理想：
-
-```
-User Question
-
-↓
-Agent
-
-↓
-Tool:
-get_repository
-
-↓
-Tool Result
-
-↓
-Final Answer
-```
-
-不要：
-
-```
-Tool
-Tool
-Tool
-Tool
-Sorry need more steps
-```
-
----
-# Agent Evaluation Framework
-Layer 1 Task Understanding
-
-Layer 2 Entity Resolution   <-- 新增
-
-Layer 3 Tool Planning
-
-Layer 4 Evidence Quality
-
-Layer 5 Reasoning
-
-Layer 6 Answer Quality
-- 第一层：Intent 是否理解正确
-    - 是否正确理解用户问题
-    - 是否正确识别 repository
-    - 是否正确识别任务类型
-
-- 第二层：Tool Selection（最重要）
-    - Tool Precision
-    - Tool Recall
-    - 是否遗漏 Tool
-    - 是否多调用 Tool
-    - Tool Call Order
-    - Tool 的参数
-
-- 第三层：Evidence Quality
-Agent 生成答案的时候，拿到的证据够不够？相关不相关？新不新？    
-    - Evidence Completeness
-    - Evidence Relevance
-    - Evidence Freshness
-    - 是否足够支持回答
-
-- 第四层：Reasoning Quality
-    - Logical Consistency
-    - Grounded Reasoning
-    - Unsupported Claims
-    - Hallucination
-    - Evidence → Reasoning → Conclusion
-- 第五层：Final Answer Quality
-    - Correctness
-    - Completeness
-    - Helpfulness
-    - Structure
-    - Readability
-
-```
-User Query
-     │
-     ▼
-──────────────────────────────────────
-Layer 1
-Intent Understanding
-──────────────────────────────────────
-Agent 是否理解了用户真正的问题？
-
-↓
-
-──────────────────────────────────────
-Layer 2
-Tool Selection
-──────────────────────────────────────
-是否选择了正确的工具？
-是否遗漏？
-是否多调用？
-调用顺序是否合理？
-
-↓
-
-──────────────────────────────────────
-Layer 3
-Evidence Collection
-──────────────────────────────────────
-Evidence 是否完整？
-是否来自正确的数据源？
-是否足够支持回答？
-
-↓
-
-──────────────────────────────────────
-Layer 4
-Reasoning / Intelligence
-──────────────────────────────────────
-Evidence
-      ↓
-Reasoning
-      ↓
-Conclusion
-
-分析逻辑是否合理？
-有没有跳跃推理？
-有没有幻觉？
-结论是否被 Evidence 支撑？
-
-↓
-
-──────────────────────────────────────
-Layer 5
-Final Answer
-──────────────────────────────────────
-是否真正回答用户问题？
-是否清晰？
-是否结构化？
-是否可执行？
-```
----
-
-| 问题    | 期望工具                         |
-| ----- | ---------------------------- |
-| 介绍项目  | README                       |
-| 项目活跃度 | repo + commits               |
-| 最近趋势  | releases + commits           |
-| 技术分析  | README + repo                |
-| 竞品比较  | 多个repo                       |
-| 商业价值  | repo + issues + contributors | -->
+原来空结果不消耗预算，让 Agent 无限重试。改为空结果计入 `empty_discovery_counts`，受 `max_empty_retry_per_source` 限制。原因：
+- 防止 Agent 对同一来源反复搜索空结果
+- 迫使 Agent 换关键词或切换来源
+- 总预算 = `max_discovery + max_empty_retry`，平衡探索与效率

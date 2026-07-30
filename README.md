@@ -434,7 +434,7 @@ backend/
 ├── config/                         #    配置
 ├── evaluation/                     #    评估模块
 │
-├── legacy/                         # 🔵 旧 Task-Based Workflow (仓的分析)
+├── repo_insights/                  # 🔵 Repo Insights (仓库分析)
 │   ├── api/          (6 files)     #    /repositories/... 端点
 │   ├── services/     (7 files)     #    ReportPipeline, XxxService
 │   ├── schemas/      (7 files)     #    task, profile, analysis, ...
