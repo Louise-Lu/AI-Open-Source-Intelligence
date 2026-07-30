@@ -15,16 +15,40 @@ NUMERIC_REL_TOLERANCE = 0.15
 NUMERIC_ABS_TOLERANCE = 5
 
 INTENT_KEYWORDS: dict[str, list[str]] = {
-    "repository": ["star", "fork", "language", "license", "topic", "repository", "repo"],
-    "readme": ["readme", "document", "docs", "getting started", "overview", "describe"],
-    "release": ["release", "version", "tag", "changelog", "published"],
-    "issue": ["issue", "bug", "ticket", "open", "report"],
-    "pr": ["pull request", "pr", "merge", "pull"],
-    "project_overview": ["is", "project", "framework", "library", "overview", "about"],
-    "project_health": ["health", "active", "maintain", "community", "activity", "healthy"],
-    "roadmap": ["roadmap", "future", "direction", "heading", "upcoming", "next"],
-    "recommendation": ["recommend", "suitable", "should", "adopt", "enterprise", "production"],
+    "information_lookup": [
+        "is", "what", "project", "framework", "library", "overview", "about",
+        "star", "fork", "language", "license", "topic", "repository", "repo",
+        "readme", "document", "docs", "getting started", "describe",
+        "release", "version", "tag", "changelog", "published",
+        "issue", "bug", "ticket", "open", "report",
+        "pull request", "pr", "merge",
+    ],
+    "evaluation": [
+        "health", "active", "maintain", "community", "activity", "healthy",
+        "roadmap", "future", "direction", "heading", "upcoming", "next",
+        "trend", "momentum", "maintained", "risk", "how", "sentiment",
+    ],
     "comparison": ["compare", "versus", "vs", "than", "both", "difference"],
+    "trend_analysis": [
+        "trend", "recent", "latest", "emerging", "growing", "declining",
+        "momentum", "shift", "direction", "market movement",
+    ],
+    "technology_research": [
+        "tutorial", "guide", "how", "architecture", "design", "pattern",
+        "best practice", "deploy", "production", "documentation", "workflow",
+        "principle", "implementation", "internals",
+    ],
+    "market_research": [
+        "market", "opportunity", "space", "startup", "business", "monetize",
+        "demand", "niche", "competitive landscape", "growth",
+    ],
+    "decision_support": [
+        "recommend", "suitable", "should", "adopt", "enterprise", "production",
+        "worth", "mature", "stable", "choose", "which", "best",
+    ],
+    "greeting": ["hello", "hi", "hey", "你好", "嗨"],
+    "small_talk": ["谢谢", "thank", "bye", "再见", "weather", "天气"],
+    "help": ["help", "帮助", "what can you do", "你能做什么", "怎么用"],
 }
 
 

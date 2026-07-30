@@ -35,7 +35,7 @@ from agent.research_policy import (
 )
 from agent.trace import clear_trace, get_discovered_resources, get_evidence_store, get_trace, populate_trace_from_agent_result
 
-from research_agent.intent import ResearchIntentRouter
+from research_agent.intent import IntentRouter
 from research_agent.entity_extractor import EntityExtractor
 from research_agent.entity_resolver import EntityResolver
 
@@ -120,21 +120,26 @@ class ChatService:
     """
 
     def __init__(self):
-        self.router = ResearchIntentRouter()
+        self.router = IntentRouter()
         self.entity_extractor = EntityExtractor()
         self.entity_resolver = EntityResolver()
         self.plan_builder = ExecutionPlanBuilder()
         self.agent = intelligence_agent
+
         # LangGraph recursion_limit 不是业务工具预算。
         # 一个 tool call 通常会消耗 AIMessage + ToolMessage 两个图步骤，还需要最终回答步骤。
         # 真实工具预算由 ResearchPolicy / plan.max_tool_calls 控制。
+        
         self.min_recursion_limit = 12
+
         # 快速模式：跳过 Analyzer 的多次结构化 LLM，只用 evidence 交给 Composer 生成答案。
         # 如果后续需要更完整的结构化信号，把这里改成 True。
         self.use_structured_analyzer = False
+
         # 快速模式：跳过 Composer LLM，直接基于 evidence 生成简报。
         # 如果需要更自然的长文分析，把这里改成 True。
         self.use_llm_composer = False
+        
         self.analyzer = ResearchAgentAnalyzer()
         self.composer = ResearchBriefComposer()
 
@@ -151,7 +156,8 @@ class ChatService:
             "[聊天服务] 1. 意图识别完成: "
             f"objective={intent.objective}, "
             f"entities={intent.entities},"
-            f"depth={intent.depth}"
+            f"depth={intent.depth},"
+            f"foucs={intent.focus}"
         )
 
         if intent.objective in _CHAT_ONLY_OBJECTIVES:

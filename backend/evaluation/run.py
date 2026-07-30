@@ -1,4 +1,7 @@
 """CLI entrypoint: python -m evaluation.run"""
+# 命令行工具 入口点
+# 在项目根目录下运行
+# python -m evaluation.run -> 执行 evaluation/runner.py 的 main()函数
 
 from __future__ import annotations
 

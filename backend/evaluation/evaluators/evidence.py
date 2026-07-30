@@ -142,6 +142,22 @@ def _collect_timestamps(evidence: dict[str, Any]) -> list[datetime]:
             if dt:
                 timestamps.append(dt)
 
+    # Community posts: check created_at, timestamp, date, score
+    for post in evidence.get("community_posts") or []:
+        if isinstance(post, dict):
+            for key in ("created_at", "timestamp", "date"):
+                dt = _parse_datetime(post.get(key))
+                if dt:
+                    timestamps.append(dt)
+
+    # Web pages: check published_at, fetched_at, date
+    for page in evidence.get("web_pages") or []:
+        if isinstance(page, dict):
+            for key in ("published_at", "fetched_at", "date"):
+                dt = _parse_datetime(page.get(key))
+                if dt:
+                    timestamps.append(dt)
+
     return timestamps
 
 
@@ -286,6 +302,22 @@ def _find_unsupported_claims(
         evidence.get("pull_requests")
     ):
         unsupported.append("pull_requests")
+
+    # Community evidence checks
+    if re.search(
+        r"\b(reddit|community|forum|discussion|sentiment|twitter|v2ex|bilibili)\b",
+        lower,
+    ) and not _is_present(evidence.get("community_posts")):
+        unsupported.append("community_posts")
+
+    # Web evidence checks
+    if re.search(
+        r"\b(tutorial|blog|article|official doc|documentation|guide|benchmark|website)\b",
+        lower,
+    ) and not _is_present(evidence.get("web_pages")):
+        # Only flag if the question likely requires web evidence
+        if not _is_present(evidence.get("readme")):
+            unsupported.append("web_pages")
 
     # Deduplicate while preserving order
     seen: set[str] = set()

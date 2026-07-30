@@ -133,7 +133,7 @@ class ExecutionPlanBuilder:
                 "max_discovery_per_source": 2,
                 "max_empty_retry_per_source": 1,
                 "max_reader_per_source": 2,
-                "max_evidence_items": 8,
+                "max_evidence_items": 6,
                 "min_evidence_items": 2,
                 "stop_conditions": StopConditions(min_sources=1, min_evidence_items=2),
             }

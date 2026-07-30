@@ -7,14 +7,53 @@ from typing import Any
 from evaluation.metrics import f1_score, precision, recall
 
 
-def _extract_predicted_tools(trace: list[dict[str, Any]]) -> list[str]:
-    """Preserve call order; use unique set only for set metrics."""
+def _extract_predicted_tools(trace: Any) -> list[str]:
+    """Preserve call order; use unique set only for set metrics.
+
+    trace 可能是:
+    - dict: {"steps": [{"action": {"tool": "xxx"}}, ...], ...}
+    - list[dict]: [{"tool": "xxx"}, ...]  (旧格式)
+    """
     tools: list[str] = []
+
+    if isinstance(trace, dict):
+        # 新格式: trace 是 dict，工具在 steps[].action.tool
+        steps = trace.get("steps") or []
+        for step in steps:
+            if not isinstance(step, dict):
+                continue
+            action = step.get("action")
+            if isinstance(action, dict):
+                name = action.get("tool")
+                if isinstance(name, str) and name:
+                    tools.append(name)
+        return tools
+
+    # 旧格式: trace 是 list
     for step in trace or []:
+        if not isinstance(step, dict):
+            continue
         name = step.get("tool")
         if isinstance(name, str) and name:
             tools.append(name)
     return tools
+
+
+def _normalize_expected_tools(raw: Any) -> list[list[str]]:
+    """将 expected_tools 归一化为 list[list[str]]。
+
+    支持两种格式:
+    - 扁平 list: ["github_search", "github_project_profile"] → 单路径
+    - 嵌套 list: [["github_search", "github_project_profile"], ["web_search", "webpage_reader"]]
+      → 多路径，任意一条命中即可
+    """
+    if not raw:
+        return [[]]
+    if isinstance(raw, list) and len(raw) > 0 and isinstance(raw[0], list):
+        # 多路径格式
+        return [list(path) for path in raw]
+    # 单路径格式
+    return [list(raw)]
 
 
 def _order_score(predicted: list[str], expected: list[str]) -> float:
@@ -63,39 +102,59 @@ def evaluate_tool_selection(
     """
     Evaluate tool selection quality against dataset expected_tools.
 
+    支持多路径评估：如果 expected_tools 是嵌套 list，取 F1 最高的路径。
+
     Metrics:
     - Tool Precision
     - Tool Recall
     - Missed tools / Extra tools
     - Tool Call Order
     """
-    expected_list = list(item.get("expected_tools") or [])
+    all_paths = _normalize_expected_tools(item.get("expected_tools"))
     predicted_list = _extract_predicted_tools(trace)
-
-    expected_set = set(expected_list)
     predicted_set = set(predicted_list)
 
-    prec = precision(predicted_set, expected_set)
-    rec = recall(predicted_set, expected_set)
-    missed = sorted(expected_set - predicted_set)
-    extra = sorted(predicted_set - expected_set)
-    order = _order_score(predicted_list, expected_list)
+    # 多路径：取 F1 最高的路径
+    best_f1 = -1.0
+    best_result = None
+
+    for path in all_paths:
+        path_set = set(path)
+        prec = precision(predicted_set, path_set)
+        rec = recall(predicted_set, path_set)
+        f1 = f1_score(prec, rec)
+
+        if f1 > best_f1:
+            best_f1 = f1
+            missed = sorted(path_set - predicted_set)
+            extra = sorted(predicted_set - path_set)
+            order = _order_score(predicted_list, path)
+            best_result = {
+                "precision": prec,
+                "recall": rec,
+                "f1": f1,
+                "order": order,
+                "expected_tools": path,
+                "missed_tools": missed,
+                "extra_tools": extra,
+            }
 
     return {
         "layer": "tool_selection",
         "implemented": True,
         "score": {
-            "precision": prec,
-            "recall": rec,
-            "f1": f1_score(prec, rec),
-            "order": order,
+            "precision": best_result["precision"],
+            "recall": best_result["recall"],
+            "f1": best_result["f1"],
+            "order": best_result["order"],
         },
         "details": {
-            "expected_tools": expected_list,
+            "expected_tools": best_result["expected_tools"],
+            "all_expected_paths": all_paths,
             "predicted_tools": predicted_list,
             "predicted_unique": sorted(predicted_set),
-            "missed_tools": missed,
-            "extra_tools": extra,
+            "missed_tools": best_result["missed_tools"],
+            "extra_tools": best_result["extra_tools"],
             "duplicate_calls": len(predicted_list) - len(predicted_set),
         },
     }

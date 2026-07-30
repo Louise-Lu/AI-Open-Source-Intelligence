@@ -243,7 +243,7 @@ hello
 """
 
 
-class ResearchIntentRouter:
+class IntentRouter:
     """理解用户研究目标，输出 ResearchIntent。"""
 
     def __init__(self):
@@ -265,7 +265,7 @@ class ResearchIntentRouter:
                 return ResearchIntent(raw_query=query, **result)
             raise ValueError(f"Unexpected LLM response type: {type(result)}")
         except Exception as exc:
-            logger.warning("ResearchIntentRouter LLM error, falling back to rules: %s", exc)
+            logger.warning("IntentRouter LLM error, falling back to rules: %s", exc)
             return self._rule_based_route(query)
 
     # ── Rule-based Fallback ────────────────────────────────────
@@ -275,7 +275,7 @@ class ResearchIntentRouter:
         """规则兜底 — LLM 调用失败时的保守路由。"""
         text = query.lower().strip()
 
-        if ResearchIntentRouter._is_greeting(text):
+        if IntentRouter._is_greeting(text):
             return ResearchIntent(
                 objective="greeting",
                 entities=[],
@@ -284,7 +284,7 @@ class ResearchIntentRouter:
                 raw_query=query,
             )
 
-        if ResearchIntentRouter._is_help(text):
+        if IntentRouter._is_help(text):
             return ResearchIntent(
                 objective="help",
                 entities=[],
@@ -293,7 +293,7 @@ class ResearchIntentRouter:
                 raw_query=query,
             )
 
-        if ResearchIntentRouter._is_small_talk(text):
+        if IntentRouter._is_small_talk(text):
             return ResearchIntent(
                 objective="small_talk",
                 entities=[],
@@ -302,10 +302,10 @@ class ResearchIntentRouter:
                 raw_query=query,
             )
 
-        entities = ResearchIntentRouter._extract_entities(query)
-        focus = ResearchIntentRouter._infer_focus(text)
-        depth = ResearchIntentRouter._infer_depth(text)
-        objective = ResearchIntentRouter._infer_objective(text)
+        entities = IntentRouter._extract_entities(query)
+        focus = IntentRouter._infer_focus(text)
+        depth = IntentRouter._infer_depth(text)
+        objective = IntentRouter._infer_objective(text)
 
         return ResearchIntent(
             objective=objective,

@@ -1,4 +1,13 @@
-"""Layer 5 — Final Answer Quality evaluator (LLM-as-judge)."""
+"""Answer Quality Evaluator v2 — 回答质量评估 (LLM-as-Judge).
+
+评估维度:
+- relevance (相关性, 权重 40%)
+- completeness (完整性, 权重 30%)
+- clarity (清晰度, 权重 20%)
+- conciseness (简洁性, 权重 10%)
+
+输出: 0-100 加权分
+"""
 
 from __future__ import annotations
 
@@ -15,7 +24,7 @@ WEIGHT_CONCISENESS = 0.10
 
 ANSWER_EVAL_PROMPT = """你是一个开源项目分析 Agent 的回答质量评审员。
 
-该 Agent 可以从 GitHub、社区（Reddit/Twitter/V2EX 等）、Web 等多来源收集证据。
+该 Agent 可以从 GitHub、社区（Reddit/Twitter/B站等）、Web 等多来源收集证据。
 
 请根据用户问题、预期意图与最终回答，从以下维度打分（0–100 整数）：
 
@@ -58,10 +67,24 @@ def _clamp_score(value: int | float) -> int:
     return max(0, min(100, int(round(value))))
 
 
-def _expected_intents(item: dict[str, Any]) -> list[str]:
-    if "expected_intents" in item:
-        return list(item.get("expected_intents") or [])
-    legacy = item.get("intent")
+def _get_expected_intents(case: dict[str, Any]) -> list[str]:
+    """从 case 中提取预期意图。"""
+    # v2 格式: expected_intent.objective + expected_intent.focus
+    expected_intent = case.get("expected_intent") or {}
+    if isinstance(expected_intent, dict):
+        parts = []
+        objective = expected_intent.get("objective", "")
+        if objective:
+            parts.append(objective)
+        focus = expected_intent.get("focus") or []
+        parts.extend(focus)
+        if parts:
+            return parts
+
+    # 兼容旧格式
+    if "expected_intents" in case:
+        return list(case.get("expected_intents") or [])
+    legacy = case.get("intent")
     if isinstance(legacy, str) and legacy:
         return [legacy]
     if isinstance(legacy, list):
@@ -71,7 +94,7 @@ def _expected_intents(item: dict[str, Any]) -> list[str]:
 
 def _empty_result(feedback: str) -> dict[str, Any]:
     return {
-        "layer": "answer",
+        "layer": "answer_quality",
         "implemented": True,
         "score": 0,
         "details": {
@@ -84,27 +107,25 @@ def _empty_result(feedback: str) -> dict[str, Any]:
     }
 
 
-def evaluate_answer(
-    item: dict[str, Any],
+def evaluate_answer_quality(
+    case: dict[str, Any],
     answer: str,
-    trace: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """
-    Evaluate final answer quality with DeepSeek structured output.
+    """评估最终回答质量 (v2 接口)。
 
-    Weighted score:
-    - Relevance 40%
-    - Completeness 30%
-    - Clarity 20%
-    - Conciseness 10%
+    Args:
+        case: 评测用例 (使用 query / expected_intent 字段)
+        answer: Agent 的最终回答文本
+
+    Returns:
+        评估结果 dict, score 范围 0-100
     """
-    del trace  # reserved for future grounding checks
     answer = answer or ""
     if not answer.strip():
         return _empty_result("回答为空，无法评分。")
 
-    question = item.get("question") or ""
-    expected_intents = _expected_intents(item)
+    question = case.get("query") or ""
+    expected_intents = _get_expected_intents(case)
     prompt = ANSWER_EVAL_PROMPT.format(
         question=question,
         expected_intents=", ".join(expected_intents) or "（未标注）",
@@ -116,7 +137,7 @@ def evaluate_answer(
         judgement = llm.invoke(prompt)
     except Exception as exc:  # noqa: BLE001
         return {
-            "layer": "answer",
+            "layer": "answer_quality",
             "implemented": True,
             "score": None,
             "details": {
@@ -141,7 +162,7 @@ def evaluate_answer(
     )
 
     return {
-        "layer": "answer",
+        "layer": "answer_quality",
         "implemented": True,
         "score": score,
         "details": {
