@@ -1,6 +1,6 @@
 # ReAct Agent — Goal 驱动的自主研究
 #
-# Agent 接收 ResearchContext，自主决定工具调用和数据源
+# Agent 接收 Context，自主决定工具调用和数据源
 
 from __future__ import annotations
 
@@ -20,10 +20,10 @@ INTELLIGENCE_AGENT_PROMPT = """
 你的职责不是回答问题，而是完成一次真实的研究任务。
 
 ========================
-Research Context
+Execution Plan
 ========================
 
-{research_context}
+{execution_plan}
 
 ========================
 Known Entities
@@ -44,19 +44,25 @@ Current Research Policy 会实时告诉你：
 - 已获得的证据来源
 - 是否建议停止继续搜索
 
-请根据 Research Context 里的 execution_plan 和 Current Research Policy 决定下一步工具调用。
+请根据 Current Research Policy 决定下一步工具调用。
 
 【重要】每一轮只能调用 1 个工具。绝对不要在同一轮发起多个 tool calls。
 
-如果 Current Research Policy 的 Status 是 Ready to Finish，必须停止继续调用工具，直接输出最终结论。
-如果工具返回 tool_policy_block，说明该工具或来源已达到上限。请根据 suggestion 切换到其他允许的来源或工具，不要反复尝试被 block 的工具。
-只有当所有允许来源都已用完或 Status 为 Ready to Finish 时，才停止搜索并输出结论。
+每一轮你应该根据当前已收集的证据，判断还缺什么信息，然后在 source_scope 范围内选择最合适的工具。
+例如：已经拿到 GitHub 基本信息后，可以跳去 web_search 补充社区讨论。
 
-execution_plan 是硬执行边界。
-如果 execution_plan 限制了 source_scope 或 avoid_sources，必须遵守，不要调用范围外工具。
-如果 execution_plan.required_sources 已满足，必须停止继续搜索并输出结论。
-不要把 execution_plan.avoid_sources 中的来源写成“本次缺失”或“研究不足”；它们是本次任务主动排除的范围。
-不要建议后续补充 avoid_sources 中的来源，除非用户明确要求更完整或更深度的研究。
+如果 Current Research Policy 的 Status 是 Ready to Finish，必须停止继续调用工具，直接输出最终结论。
+如果工具返回 tool_policy_block，说明该工具或来源已达到上限。请根据 suggestion 切换到其他来源或工具，不要反复尝试被 block 的工具。
+只有当所有来源都已用完或 Status 为 Ready to Finish 时，才停止搜索并输出结论。
+
+source_scope 是硬执行边界。
+不要调用 source_scope 范围外的工具。
+当 stop_conditions 中的 min_sources 和 min_evidence_items 都满足时，必须停止继续搜索并输出结论。
+不要把 avoid_sources 中的来源写成"本次缺失"或"研究不足"；它们是本次任务主动排除的范围。
+
+execution_plan 中的以下字段必须在工具调用时使用：
+- community_platforms：调用 community_search 时，必须将此列表传入 platforms 参数。例如 community_platforms=["reddit"] 时，调用 community_search(query="...", platforms=["reddit"])。
+- time_range：生成搜索查询时参考此字段。若为 recent/latest，查询应包含时效性关键词（如 "2026"、"latest"）；若为 historical，侧重历史演进。
 
 ========================
 Available Tools
@@ -72,8 +78,30 @@ Available Tools
 
 Discovery Tool 仅用于发现资源。
 
-如果 Discovery 返回空结果，可以换一个更简短的关键词重试同一种 Discovery Tool。
-例如 community_search("CrewAI review sentiment 2024 2025") 无结果时，可以试 community_search("CrewAI")。
+**搜索查询生成原则**：
+
+1. **核心关键词优先**：始终包含实体名称（如 "LangGraph"、"CrewAI"）
+
+2. **根据 objective 选择修饰词**：
+   - `information_lookup`：只用实体名，如 `"LangGraph"`
+   - `evaluation`：可加评价类词，如 `"CrewAI review"`、`"CrewAI feedback"`
+   - `trend_analysis`：可加趋势类词 + 当前年份，如 `"AI Agent trend 2026"`
+   - `technology_research`：可加技术类词，如 `"LangGraph architecture"`、`"LangGraph how it works"`
+   - `comparison`：包含多个实体，如 `"LangGraph vs CrewAI"`
+
+3. **避免的内容**：
+   - 若用户问题没有限定时间，不要用过时的年份（当前是 2026 年）
+   - 冗余修饰词（如 "overview"、"introduction"、"framework" 当它们不增加信息量时）
+   - 过长的查询（保持 2-4 个关键词）
+
+4. **失败重试策略**：
+   - 如果第一次搜索返回空结果，去掉修饰词，只用实体名重试
+
+示例：
+- ✅ `github_search("LangGraph")` 
+- ✅ `web_search("CrewAI review")`（evaluation 场景）
+- ✅ `community_search("AI Agent trend 2026")`（trend_analysis 场景）
+- ❌ `web_search("LangChain framework overview introduction 2024 2025")`
 
 找到合适资源后，应立即进入 Evidence 阅读。
 
@@ -104,7 +132,7 @@ Research Principles
 
 1.
 
-围绕 Research Context 收集证据。
+围绕 execution_plan 收集证据。
 
 不要为了调用工具而调用工具。
 
@@ -170,13 +198,13 @@ Research Findings
 
 
 def build_intelligence_agent_prompt(
-    research_context: Any,
+    execution_plan: Any,
     resolved_entities: list[Any],
 ) -> str:
-    context_dict = (
-        research_context.model_dump()
-        if hasattr(research_context, "model_dump")
-        else dict(research_context or {})
+    plan_dict = (
+        execution_plan.model_dump()
+        if hasattr(execution_plan, "model_dump")
+        else dict(execution_plan or {})
     )
     entity_dict = [
         entity.model_dump() if hasattr(entity, "model_dump") else entity
@@ -184,7 +212,7 @@ def build_intelligence_agent_prompt(
     ]
 
     prompt = INTELLIGENCE_AGENT_PROMPT.format(
-        research_context=json.dumps(context_dict, ensure_ascii=False, indent=2),
+        execution_plan=json.dumps(plan_dict, ensure_ascii=False, indent=2),
         resolved_entities=json.dumps(entity_dict, ensure_ascii=False, indent=2),
         policy_hint=build_policy_hint(),
     )
@@ -195,7 +223,7 @@ intelligence_agent = create_react_agent(
     model=deepseek_model,
     tools=TOOLS,
     prompt=INTELLIGENCE_AGENT_PROMPT.format(
-        research_context="{}",
+        execution_plan="{}",
         resolved_entities="[]",
         policy_hint=build_policy_hint(),
     ),
