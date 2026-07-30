@@ -11,11 +11,9 @@ import {
   Map,
 } from 'lucide-react';
 
-import { getAnalysis } from '../api/analysis';
 import { getComparison } from '../api/comparison';
-import { getProfile } from '../api/profile';
+import { getInsights } from '../api/insights';
 import { getReleaseDiff } from '../api/releaseDiff';
-import { getRoadmap } from '../api/roadmap';
 import Loading from '../components/Loading';
 import MarkdownViewer from '../components/MarkdownViewer';
 import ProfileCard from '../components/ProfileCard';
@@ -102,37 +100,35 @@ export default function Dashboard() {
     setAnalysis('');
     setIsAnalyzing(true);
 
-    const [analysisResult, profileResult, roadmapResult] = await Promise.allSettled([
-      getAnalysis(trimmedOwner, trimmedRepo),
-      getProfile(trimmedOwner, trimmedRepo),
-      getRoadmap(trimmedOwner, trimmedRepo),
-    ]);
+    try {
+      const data = await getInsights(trimmedOwner, trimmedRepo);
 
-    const errors = [];
+      if (data.profile) {
+        setProfile(data.profile);
+        setProfileError('');
+      }
+      if (data.roadmap) {
+        setRoadmap(data.roadmap);
+      }
+      if (data.analysis) {
+        setAnalysis(extractMarkdown(data.analysis, 'analysis'));
+      }
 
-    if (analysisResult.status === 'fulfilled') {
-      setAnalysis(extractMarkdown(analysisResult.value, 'analysis'));
-    } else {
-      errors.push(analysisResult.reason?.message || 'Failed to load analysis.');
+      // 处理部分失败的情况
+      const partialErrors = data._errors || {};
+      const errors = [];
+      if (partialErrors.profile) {
+        setProfileError(partialErrors.profile);
+        errors.push(partialErrors.profile);
+      }
+      if (partialErrors.roadmap) errors.push(partialErrors.roadmap);
+      if (partialErrors.analysis) errors.push(partialErrors.analysis);
+      setTopError(errors.join(' | '));
+    } catch (err) {
+      setTopError(err.message || 'Failed to load insights.');
+    } finally {
+      setIsAnalyzing(false);
     }
-
-    if (profileResult.status === 'fulfilled') {
-      setProfile(profileResult.value);
-      setProfileError('');
-    } else {
-      const message = profileResult.reason?.message || 'Failed to load profile.';
-      setProfileError(message);
-      errors.push(message);
-    }
-
-    if (roadmapResult.status === 'fulfilled') {
-      setRoadmap(roadmapResult.value);
-    } else {
-      errors.push(roadmapResult.reason?.message || 'Failed to load roadmap.');
-    }
-
-    setTopError(errors.join(' | '));
-    setIsAnalyzing(false);
   };
 
   const handleComparison = async (event) => {
