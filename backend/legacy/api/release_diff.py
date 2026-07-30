@@ -1,7 +1,5 @@
 from fastapi import APIRouter
 
-from pydantic import BaseModel
-
 from legacy.services.entity_adapter import EntityAdapter
 from legacy.services.report_pipeline import ReportPipeline
 
@@ -11,24 +9,13 @@ adapter = EntityAdapter()
 pipeline = ReportPipeline()
 
 
-class ReleaseDiffRequest(BaseModel):
-
-    owner: str
-
-    repo: str
-
-    old_tag: str
-
-    new_tag: str
-
-# "/release-diff"
 @router.get("/repositories/{owner}/{repo}/releases/diff")
-def release_diff(request: ReleaseDiffRequest):
-    entity = adapter.from_owner_repo(request.owner, request.repo)
+def release_diff(owner: str, repo: str, old_tag: str, new_tag: str):
+    entity = adapter.from_owner_repo(owner, repo)
     return {
         "comparison": pipeline.generate_release_diff(
             entity,
-            request.old_tag,
-            request.new_tag,
+            old_tag,
+            new_tag,
         )
     }

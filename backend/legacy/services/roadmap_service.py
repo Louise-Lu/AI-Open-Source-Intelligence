@@ -1,5 +1,5 @@
 from evidence import IntelligenceEvidence
-from llms.deepseek import deepseek_model
+from llms.deepseek import deepseek_structured_model
 from legacy.prompts.roadmap import ROADMAP_PROMPT
 from legacy.schemas.roadmap import RoadmapReport
 
@@ -110,5 +110,5 @@ Repository Evidence:
 
 {evidence_text}
 """
-        llm = deepseek_model.with_structured_output(RoadmapReport)
+        llm = deepseek_structured_model.with_structured_output(RoadmapReport)
         return llm.invoke(prompt)

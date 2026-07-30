@@ -1,18 +1,14 @@
 from __future__ import annotations
 
-from shared_schemas.entity import ExtractedEntity, ResolvedEntity
+from legacy.schemas.entity import RepositoryRef
 
 
 class EntityAdapter:
-    def from_owner_repo(self, owner: str, repo: str) -> ResolvedEntity:
-        return ResolvedEntity(
+    def from_owner_repo(self, owner: str, repo: str) -> RepositoryRef:
+        return RepositoryRef(
             name=f"{owner}/{repo}",
-            entity_type="project",
-            aliases=[repo, f"{owner}/{repo}"],
-            official_name=f"{owner}/{repo}",
+            aliases=[repo],
         )
 
-    def from_extracted(self, entity: ExtractedEntity) -> ResolvedEntity:
-        from backend.research_agent.entity_resolver import EntityResolver
-
-        return EntityResolver().resolve(entity)
+    def from_name(self, name: str) -> RepositoryRef:
+        return RepositoryRef(name=name.strip())

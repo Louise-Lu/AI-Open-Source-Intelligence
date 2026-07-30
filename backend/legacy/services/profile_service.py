@@ -1,7 +1,7 @@
 import logging
 
 from evidence import IntelligenceEvidence
-from llms.deepseek import deepseek_model
+from llms.deepseek import deepseek_structured_model
 from legacy.prompts.profile import PROFILE_PROMPT
 from legacy.schemas.profile import RepositoryProfile
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class RepositoryProfileService:
     def generate(self, evidence: IntelligenceEvidence) -> RepositoryProfile:
-        llm = deepseek_model.with_structured_output(RepositoryProfile)
+        llm = deepseek_structured_model.with_structured_output(RepositoryProfile)
         prompt = f"""
 {PROFILE_PROMPT}
 

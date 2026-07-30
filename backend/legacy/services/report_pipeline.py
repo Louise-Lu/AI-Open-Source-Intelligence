@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from shared_schemas.entity import ResolvedEntity
+from legacy.schemas.entity import RepositoryRef
 from legacy.schemas.release_diff import ReleaseDiffEvidence
 from legacy.services.analysis_service import RepositoryAnalysisService
 from legacy.services.comparison_service import RepositoryComparisonService
@@ -21,10 +21,10 @@ class ReportPipeline:
         self.release_diff = ReleaseDiffService()
         self.github = GitHubAPI()
 
-    def build_evidence(self, entity: ResolvedEntity):
+    def build_evidence(self, entity: RepositoryRef):
         return self.collector.collect(entity=entity)
 
-    def generate_report(self, entity: ResolvedEntity, report_type: str):
+    def generate_report(self, entity: RepositoryRef, report_type: str):
         evidence = self.build_evidence(entity)
         if report_type == "profile":
             return self.profile.generate(evidence)
@@ -34,17 +34,14 @@ class ReportPipeline:
             return self.analysis.analyze(evidence)
         raise ValueError(f"Unsupported report_type: {report_type}")
 
-    def generate_comparison(self, left: ResolvedEntity, right: ResolvedEntity):
+    def generate_comparison(self, left: RepositoryRef, right: RepositoryRef):
         left_evidence = self.build_evidence(left)
         right_evidence = self.build_evidence(right)
         return self.comparison.compare(left_evidence, right_evidence)
 
-    def generate_release_diff(self, entity: ResolvedEntity, old_tag: str, new_tag: str):
+    def generate_release_diff(self, entity: RepositoryRef, old_tag: str, new_tag: str):
         evidence = self.build_evidence(entity)
-        github_source = next((s for s in entity.sources if s.source == "github"), None)
-        if not github_source:
-            raise ValueError("Release diff requires github source")
-        owner, repo = github_source.identifier.split("/", 1)
+        owner, repo = entity.name.split("/", 1)
         releases = self.github.get_releases(owner, repo)
         old_release = next(release for release in releases if release["tag_name"] == old_tag)
         new_release = next(release for release in releases if release["tag_name"] == new_tag)
