@@ -1,6 +1,5 @@
 """Tool Efficiency Evaluator.
-
-评估 Agent 工具调用的效率和质量。
+评估 Agent 工具调用的效率和质量 
 
 核心指标:
 1. Tool Precision — 有效工具调用占比 (useful_calls / total_calls)
@@ -59,10 +58,8 @@ TOOL_SOURCE: dict[str, str] = {
 def _extract_tool_trace(trace: Any) -> list[dict[str, Any]]:
     """从 trace 中提取工具调用列表。
 
-    Supports both actual trace format (agent/trace.py):
+    trace 格式 (agent/trace.py):
       {"tool": str, "input": dict, "output": Any}
-    And legacy format:
-      {"action": {"tool": ...}, "observation": ...}
     """
     tools: list[dict[str, Any]] = []
 
@@ -83,18 +80,10 @@ def _extract_tool_trace(trace: Any) -> list[dict[str, Any]]:
         if not isinstance(step, dict):
             continue
 
-        # Primary format: {"tool": str, "input": dict, "output": Any}
+        # 当前格式: {"tool": str, "input": dict, "output": Any}
         name = step.get("tool", "")
         tool_input = step.get("input") or {}
         output = step.get("output") or ""
-
-        # Legacy format fallback
-        if not name:
-            action = step.get("action")
-            if isinstance(action, dict):
-                name = action.get("tool", "")
-                tool_input = action.get("input") or {}
-                output = step.get("raw_output") or step.get("observation") or ""
 
         if name:
             tools.append({

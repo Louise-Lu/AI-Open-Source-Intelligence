@@ -1,9 +1,12 @@
-"""Layer 1 — Intent Accuracy evaluator.
-
+"""Layer 1 — Intent Accuracy Evaluator.
+评估 意图理解 
 检查 ResearchIntent 的 objective / focus / depth 是否与预期匹配。
-注意: time_range 不在 ResearchIntent schema 中（由正则从 raw_query 提取），不参与评估。
 
 输出: intent_accuracy (0-100)
+objective 精确匹配 50%
+focus 用 Jaccard 相似度 35%
+depth 精确匹配但默认值不惩罚 15%。
+
 """
 
 from __future__ import annotations
