@@ -118,11 +118,6 @@ class EntityResolver:
                 resolved = self._ensure_alias(ResolvedEntity(**result))
             else:
                 raise ValueError(f"Unexpected result type: {type(result)}")
-            print(
-                f"[实体解析] LLM 成功: {name} → "
-                f"name={resolved.name}, scope={resolved.entity_scope}, "
-                f"origin={resolved.entity_origin}"
-            )
             return resolved
         except Exception as exc:
             print(f"[实体解析] LLM 失败，走规则兜底: {name}, 原因: {exc}")

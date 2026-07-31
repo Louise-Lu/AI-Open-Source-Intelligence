@@ -84,7 +84,6 @@ INTENT_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究目标�
 注意：时间范围和平台偏好由系统自动从原始查询中提取，你不需要处理。
 
 ## 不要做的事
-- 不要生成 Report
 - 不要选择 Tool
 - 不要规划执行步骤
 - 不要编造实体
@@ -107,7 +106,8 @@ INTENT_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究目标�
 | help | 使用帮助 | "你能做什么"、"怎么用"、"help" |
 
 ## focus
-focus 不代表任务。focus 表示用户真正关心的信息研究维度，允许多个。
+focus 不代表任务。focus 允许多个。
+**核心原则**：focus 应该反映用户真正关心的信息维度，不要过度解读或机械匹配关键词。
 
 只能从以下值中选择：
 community
@@ -123,8 +123,6 @@ market
 opportunity
 risk
 recent_updates
-
-**核心原则**：focus 应该反映用户真正关心的信息维度，不要过度解读或机械匹配关键词。
 
 示例：
 - "OpenAI 发布了什么？" → ["official","recent_updates"]
@@ -261,9 +259,6 @@ class IntentRouter:
             if isinstance(result, ResearchIntent):
                 result.raw_query = query
                 return result
-            if isinstance(result, dict):
-                return ResearchIntent(raw_query=query, **result)
-            raise ValueError(f"Unexpected LLM response type: {type(result)}")
         except Exception as exc:
             logger.warning("IntentRouter LLM error, falling back to rules: %s", exc)
             return self._rule_based_route(query)

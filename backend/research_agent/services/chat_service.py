@@ -1,14 +1,13 @@
 # ChatService — AI Intelligence Research Agent 入口
-#
 # 流程（含 Guard）：
 #   User Query
 #     → IntentRouter
 #           ├── greeting/small_talk/help → Chat Response → END
-#           └── information_lookup/evaluation/comparison/... → Entity → Context Builder → Runtime → Agent → Signals → Brief
+#           └── information_lookup/evaluation/comparison/... → Entity → ExecutionPlan → Runtime → Agent → Signals → Brief
 #
 # Fail Fast 原则：
 # - 非研究意图 → 立即结束
-# - 无实体 → Context Builder 返回 need_user_input，Agent 不启动
+# - 无实体 → ExecutionPlan 返回 need_user_input，Agent 不启动
 # - 无证据 → Analyzer 返回空，Composer 返回 insufficient_information
 
 # 用户问题
@@ -19,6 +18,17 @@
 #   -> ResearchPolicy 初始化运行时策略
 #   -> ToolGateway 统一拦截工具调用
 #   -> ReAct Agent 在允许范围内搜索/读取/停止
+
+
+# EntityResolver输出：
+# {
+#   "name": "LangGraph",
+#   "entity_scope": ["github", "web"],
+#   "entity_origin": "international",
+#   "aliases": ["langgraph"],
+#   "official_name": "LangGraph"
+# }
+
 
 from __future__ import annotations
 
@@ -33,13 +43,13 @@ from agent.research_policy import (
     start_research_policy,
     sync_research_policy_from_trace,
 )
-from agent.trace import clear_trace, get_discovered_resources, get_evidence_store, get_trace, populate_trace_from_agent_result
+from agent.trace import clear_trace, get_evidence_store, get_trace, populate_trace_from_agent_result
 
 from research_agent.intent import IntentRouter
 from research_agent.entity_extractor import EntityExtractor
 from research_agent.entity_resolver import EntityResolver
 
-from research_agent.context_builder import ExecutionPlanBuilder
+from research_agent.execution_plan_builder import ExecutionPlanBuilder
 
 from research_agent.signal_extractor import ResearchAgentAnalyzer
 from research_agent.composer import ResearchBriefComposer
@@ -89,13 +99,7 @@ def _build_chat_response(intent: ResearchIntent) -> dict:
     else:
         answer = "你好！有什么可以帮你的吗？"
 
-    ui_trace = {
-        "intent": intent.model_dump(),
-        "discovered_sources": {},
-        "steps": [],
-        "react_steps": [],
-    }
-    return {"answer": answer, "trace": ui_trace, "error": None}
+    return {"answer": answer, "trace": {"react_steps": []}, "error": None}
 
 
 def _recursion_limit_for_plan(plan: Any, minimum: int = 12) -> int:
@@ -163,7 +167,7 @@ class ChatService:
         if intent.objective in _CHAT_ONLY_OBJECTIVES:
             print(f"[聊天服务] 非研究类意图，直接返回: objective={intent.objective}")
             return _build_chat_response(intent)
-        
+
         resolved_entities = self._extract_and_resolve(message, intent)
         print(
             "[聊天服务] 2. 实体解析完成: "
@@ -177,13 +181,10 @@ class ChatService:
         plan = self.plan_builder.build(intent, resolved_entities)
         if plan is None:
             print("[聊天服务] 未识别到研究对象，返回 need_user_input")
-            return self._build_need_user_response(intent=intent)
+            return self._build_need_user_response()
 
         print(
             "[聊天服务] 3. 执行计划构建完成\n"
-            f"  【研究目标】objective={plan.objective}\n"
-            f"  【研究对象】entities={plan.entities}\n"
-            f"  【关注维度】focus={plan.focus}\n"
             f"  【时间范围】time_range={plan.time_range}\n"
             f"  【任务描述】user_goal={plan.user_goal}\n"
             f"  【执行模式】mode={plan.mode}\n"
@@ -235,7 +236,21 @@ class ChatService:
         populate_trace_from_agent_result(agent_result)
         sync_research_policy_from_trace(get_trace())
 
+        # ── 快读模式：跳过 evidence/analyzer/composer，直接提取 Agent 回答 ──
+        if not self.use_llm_composer:
+            agent_answer = _extract_final_agent_answer(agent_result)
+            print(
+                f"[聊天服务] 快读模式: 直接提取 Agent 回答, "
+                f"长度={len(agent_answer)}, 总耗时={time.perf_counter() - t0:.2f}s"
+            )
+            clear_research_policy()
+            return {
+                "answer": agent_answer,
+                "trace": {"react_steps": _extract_react_steps(agent_result)},
+                "error": agent_error,
+            }
 
+        # ── LLM 模式：完整 evidence → analyzer → composer 流水线 ──
         evidences = get_evidence_store()
 
         source_names = []
@@ -261,7 +276,6 @@ class ChatService:
             print("[聊天服务] 未获取到证据，返回证据不足响应")
             clear_research_policy()
             return self._build_insufficient_evidence_response(
-                intent=intent,
                 agent_result=agent_result,
                 agent_error=agent_error,
             )
@@ -285,15 +299,10 @@ class ChatService:
         )
 
         t_composer = time.perf_counter()
-        if self.use_llm_composer:
-            brief = self.composer.compose(message, evidences, signals)
-            composer_mode = "llm"
-        else:
-            brief = self.composer.compose_fast(message, evidences, signals)
-            composer_mode = "fast"
+        brief = self.composer.compose(message, evidences, signals)
         print(
             "[聊天服务] Composer 生成完成: "
-            f"模式={composer_mode}, "
+            f"模式=llm, "
             f"耗时={time.perf_counter() - t_composer:.2f}s"
         )
         if needs_trend_single_source_warning():
@@ -311,21 +320,14 @@ class ChatService:
         )
 
         response = self._build_response(
-            intent=intent,
             agent_result=agent_result,
             agent_error=agent_error,
             brief=brief,
         )
-        if not self.use_llm_composer:
-            agent_answer = _extract_final_agent_answer(agent_result)
-            if agent_answer:
-                response["answer"] = agent_answer
-                print("[聊天服务] 使用 Agent 最终回答，跳过 fast composer 文本作为最终输出")
         print(
             "[聊天服务] 处理完成: "
             f"总耗时={time.perf_counter() - t0:.2f}s, "
-            f"回答长度={len(response.get('answer', ''))}, "
-            f"步骤数量={len(response.get('trace', {}).get('steps', []))}"
+            f"回答长度={len(response.get('answer', ''))}"
         )
         clear_research_policy()
         return response
@@ -366,9 +368,7 @@ class ChatService:
 
     # ── Response Builders ───────────────────────────────────────
     @staticmethod
-    def _build_need_user_response(
-        intent: ResearchIntent,
-    ) -> dict:
+    def _build_need_user_response() -> dict:
         """当无法识别研究对象时，向用户请求补充信息。"""
         answer = (
             "未识别到需要研究的对象，请提供项目名称或 GitHub Repository。\n\n"
@@ -378,17 +378,10 @@ class ChatService:
             "- Mastra\n"
             "- owner/repo"
         )
-        ui_trace = {
-            "intent": intent.model_dump(),
-            "discovered_sources": {},
-            "steps": [],
-            "react_steps": [],
-        }
-        return {"answer": answer, "trace": ui_trace, "error": None}
+        return {"answer": answer, "trace": {"react_steps": []}, "error": None}
 
     @staticmethod
     def _build_insufficient_evidence_response(
-        intent: ResearchIntent,
         agent_result: Any,
         agent_error: str | None,
     ) -> dict:
@@ -401,17 +394,14 @@ class ChatService:
             "- 研究对象没有公开数据\n\n"
             "请尝试提供其他项目名称或 GitHub 仓库地址。"
         )
-        ui_trace = {
-            "intent": intent.model_dump(),
-            "discovered_sources": _sanitize_value(get_discovered_resources()),
-            "steps": _extract_react_steps(agent_result),
+        return {
+            "answer": answer,
+            "trace": {"react_steps": _extract_react_steps(agent_result)},
+            "error": agent_error,
         }
-        ui_trace["react_steps"] = ui_trace["steps"]
-        return {"answer": answer, "trace": ui_trace, "error": agent_error}
 
     @staticmethod
     def _build_response(
-        intent: ResearchIntent,
         agent_result: Any,
         agent_error: str | None,
         brief,
@@ -433,13 +423,6 @@ class ChatService:
                 f"- {source}" for source in brief.sources
             )
 
-        ui_trace = {
-            "intent": intent.model_dump(),
-            "discovered_sources": _sanitize_value(get_discovered_resources()),
-            "steps": _extract_react_steps(agent_result),
-        }
-        ui_trace["react_steps"] = ui_trace["steps"]
-
         if agent_error:
             answer = (
                 "研究 Agent 调用模型失败，当前没有完成自主工具探索。\n\n"
@@ -451,7 +434,11 @@ class ChatService:
         if len(answer) > MAX_ANSWER_LENGTH:
             answer = answer[:MAX_ANSWER_LENGTH] + "\n\n...(报告过长已截断)"
 
-        return {"answer": answer, "trace": ui_trace, "error": agent_error}
+        return {
+            "answer": answer,
+            "trace": {"react_steps": _extract_react_steps(agent_result)},
+            "error": agent_error,
+        }
 
 
 # 单个工具输出最大字符数（防止 README 等大文本撑爆响应体）
@@ -488,14 +475,7 @@ def _parse_tool_content(content: Any) -> Any:
 
 
 def _format_observation_for_ui(content: Any) -> str:
-    """格式化前端 Observation。
-
-    Tool 返回给 LLM 的 observation 现在包含：
-    - result: 工具原始结果
-    - policy_hint: 动态研究进度（Research Progress）
-
-    前端只展示 observation 字段，所以这里提前整理成更容易读的文本。
-    """
+    """格式化前端 Observation。"""
     parsed = _parse_tool_content(content)
     if isinstance(parsed, dict) and "result" in parsed and "policy_hint" in parsed:
         result_text = _truncate_text(parsed.get("result"), _MAX_OBSERVATION_CHARS)
@@ -506,8 +486,26 @@ def _format_observation_for_ui(content: Any) -> str:
             "Latest Policy Hint:\n"
             f"{policy_text}"
         )
-
     return _truncate_text(parsed, _MAX_OBSERVATION_CHARS)
+
+
+def _sanitize_value(value: Any, max_str_len: int = _MAX_TOOL_OUTPUT_CHARS) -> Any:
+    """递归地将任意值转换为 JSON 安全的基本类型，并截断过长的字符串。"""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value[:max_str_len] + "...(truncated)" if len(value) > max_str_len else value
+    if isinstance(value, (int, float, bool)):
+        return value
+    if isinstance(value, (list, tuple)):
+        return [_sanitize_value(item, max_str_len) for item in value[:50]]
+    if isinstance(value, dict):
+        return {str(k): _sanitize_value(v, max_str_len) for k, v in list(value.items())[:50]}
+    if hasattr(value, "model_dump"):
+        return _sanitize_value(value.model_dump(), max_str_len)
+    if hasattr(value, "dict"):
+        return _sanitize_value(value.dict(), max_str_len)
+    return str(value)[:max_str_len]
 
 
 def _get_message_type(message: Any) -> str:
@@ -593,7 +591,6 @@ def _extract_react_steps(agent_result: dict | None) -> list[dict[str, Any]]:
 
             step = step_by_tool_call_id.get(tool_call_id)
             if step is None:
-                # 兼容缺少 AIMessage tool_call 记录的异常情况。
                 pending_name, pending_args = pending_tc.get(
                     tool_call_id,
                     (tool_name, {}),
@@ -612,28 +609,8 @@ def _extract_react_steps(agent_result: dict | None) -> list[dict[str, Any]]:
                     step_by_tool_call_id[tool_call_id] = step
 
             step["observation"] = observation
-            # 保留原始工具输出供评估使用
             step["raw_output"] = _parse_tool_content(content)
 
     return steps
 
 
-def _sanitize_value(value: Any, max_str_len: int = _MAX_TOOL_OUTPUT_CHARS) -> Any:
-    """递归地将任意值转换为 JSON 安全的基本类型，并截断过长的字符串。"""
-    if value is None:
-        return None
-    if isinstance(value, str):
-        return value[:max_str_len] + "...(truncated)" if len(value) > max_str_len else value
-    if isinstance(value, (int, float, bool)):
-        return value
-    if isinstance(value, (list, tuple)):
-        return [_sanitize_value(item, max_str_len) for item in value[:50]]
-    if isinstance(value, dict):
-        return {str(k): _sanitize_value(v, max_str_len) for k, v in list(value.items())[:50]}
-    # Pydantic models
-    if hasattr(value, "model_dump"):
-        return _sanitize_value(value.model_dump(), max_str_len)
-    if hasattr(value, "dict"):
-        return _sanitize_value(value.dict(), max_str_len)
-    # Fallback: stringify
-    return str(value)[:max_str_len]

@@ -60,10 +60,6 @@ COMPOSER_SYSTEM_PROMPT = """你是 AI Intelligence Research Agent 的研究简�
 
 class ResearchBriefComposer:
     """将证据和信号组合为结构化研究简报。
-
-    与旧 AnswerComposer 的区别：
-    - 输出 ResearchBrief（结构化），而非 ComposedAnswer（仅 answer 字符串）
-    - 不绑报告模板
     - 包含 key_findings、sources、recommendations
     """
 

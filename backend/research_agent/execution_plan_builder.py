@@ -1,11 +1,10 @@
-# context_builder.py — ExecutionPlan Builder
+# execution_plan_builder.py — ExecutionPlan Builder
 #
-# 职责: 根据 ResearchIntent + Entity 构建 ExecutionPlan
+# 职责: 根据 ResearchIntent + ResolvedEntity 构建 ExecutionPlan
 # 输入: ResearchIntent + list[ResolvedEntity]
-# 输出: ExecutionPlan（统一包含研究上下文 + 执行控制）
+# 输出: ExecutionPlan（统一上下文 + 执行控制）
 #
 # ExecutionPlanBuilder 只做确定性组装，用稳定规则生成执行计划。
-# avoid_sources 用于主动排除明显无关的来源。
 
 from __future__ import annotations
 
@@ -14,13 +13,9 @@ from research_agent.schemas.research import ExecutionPlan, ResearchIntent, StopC
 from research_agent.schemas.entity import ResolvedEntity
 
 
-
-
-
 class ExecutionPlanBuilder:
-    """根据 ResearchIntent + Entity 构建 ExecutionPlan。
-
-    不调用 LLM，只做确定性组装。
+    """根据 ResearchIntent + ResolvedEntity 构建 ExecutionPlan。
+    不调用 LLM, 只做确定性组装。
     """
 
     def build(
